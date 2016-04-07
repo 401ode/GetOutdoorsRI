@@ -1,0 +1,58 @@
+<?php
+/**
+ * @file
+ * Code for the Dashboards module.
+ */
+
+/*
+ * Include files
+ */
+module_load_include('inc', 'mogov_dashboard', 'includes/permissions');
+module_load_include('inc', 'mogov_dashboard', 'includes/form_alterations');
+
+/**
+  * Implementation of hook_ctools_plugin_api().
+  */
+function mogov_dashboard_ctools_plugin_api($module, $api) {
+  if ($module == 'page_manager' && $api == 'pages_default') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mogov_dashboard_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' and $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
+  if ($owner == 'panels' && $plugin_type == 'layouts') {
+    return 'panels/layouts';
+  }
+}
+
+/*
+ * Implementation of hook_views_api()
+ */
+function mogov_dashboard_views_api() {
+  return array('api' => 3.0);
+}
+
+/*
+ * Return a "no permissions" div
+ */
+function mogov_dashboard_no_permissions($message) {
+  $output = array(
+    '#type' => 'container',
+    '#title' => NULL,
+    '#attributes' => array(
+      'class' => array(
+        'dashboard-no-permissions',
+      ),
+    ),
+    'text' => array(
+      '#markup' => t($message),
+    ),
+  );
+  return render($output);
+}

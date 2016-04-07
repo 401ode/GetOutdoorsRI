@@ -1,0 +1,810 @@
+<?php
+/**
+ *  @file mo_miles_leaderboard.module
+ *  @brief  Code for the mo_miles_leaderboard module.  Provides more specific statistics 
+ *  tailored to the logged in user's location, age, gender and logged activity
+ *
+ *  @details 
+ *  mo_miles_leaderboard_cron = Implements hook_cron
+ *  mo_miles_leaderboard_menu = Implements hook_menu()
+ *  mo_miles_leaderboard_update_table = Updates the average and highest mileage in the leaderboard_activity_stats table
+ *  mo_miles_leaderboard_cc_update_table = Updates the average and highest mileage in the leaderboard_activity_stats_campus table
+ *  mo_miles_leaderboard_build_cc_leaderboard = Creates the render array to display the campus challenge leaderboard
+ *  mo_miles_leaderboard_populate_table = Initial creation of rows for the leaderboard_activity_stats table
+ *  mo_miles_leaderboard_cc_populate_table = Initial creation of rows for the leaderboard_activity_stats_campus table
+ *  
+ */
+ 
+ 
+ /**
+ *  @brief  Implements hook_cron().
+ *   
+ *  @details  2014-04-15 
+ */
+function mo_miles_leaderboard_cron() {
+//*******************
+watchdog('mo_miles_leaderboard_cron', 'Call mo_miles_leaderboard_update_table. Time is %variable', array('%variable' => date(DATE_RFC2822)), WATCHDOG_INFO, $link = NULL);
+
+    // Run function to update 'leaderboard_activity_stats' table.
+    $execute = mo_miles_leaderboard_update_table();
+} 
+
+/**
+ *  @brief  Implements hook_menu()
+ *
+ *  @details  2014-07-11 
+ */
+function mo_miles_leaderboard_menu() {
+
+  $items = array();
+  
+  $items['admin/data/leaderboard'] = array(
+    'title' => 'Update Leaderboard Table',
+    'description' => 'Update table leaderboard_activity_stats',
+    'page callback' => 'mo_miles_leaderboard_update_table',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/data/campus-leaderboard'] = array(
+    'title' => 'Update Campus Leaderboard Table',
+    'description' => 'Update table leaderboard_activity_stats_campus',
+    'page callback' => 'mo_miles_leaderboard_cc_update_table',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  
+/*  $items['campuschallenge/%'] = array(
+    'title' => 'Re-check user badges',
+    'description' => 'Re-checks all badges for current challenge year for the supplied user.',
+    'page callback' => 'mo_project_badge_recheck',
+    'page arguments' => array(2),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_CALLBACK,
+  );
+*/
+  return $items;
+}
+  
+  
+/**
+ *  @brief  Updates the average and highest mileage in the leaderboard_activity_stats table
+ *  
+ *  @return  TRUE
+ *  
+ *  @details  2014-04-11 
+ *  updated 2015-05-04  to exclude sub-user mileage
+ */
+function mo_miles_leaderboard_update_table() {
+  // Get activity tids
+  $vocab_activities = taxonomy_vocabulary_machine_name_load('activities');
+  $vid_activities = $vocab_activities->vid;
+  $tree_activities = taxonomy_get_tree($vid_activities, 0, 1);
+  foreach ($tree_activities AS $a) {
+    if ($a->name != 'Other') {
+      $array_activity[] = $a->tid;
+    }
+  }
+
+//*******************  
+if ( (!empty($array_activity)) AND (count($array_activity) > 5) ) {
+watchdog('leaderboard_update_table', 'Activity tids retrieved.', array(), WATCHDOG_INFO, $link = NULL);
+} else {
+watchdog('leaderboard_update_table', 'Problem retrieving Activity tids.', array(), WATCHDOG_INFO, $link = NULL);
+}
+
+  // Get Region & County
+  $array_regions = array('KC', 'STL', 'NE', 'LAK', 'CEN', 'SE');
+  $vocab_counties = taxonomy_vocabulary_machine_name_load('mo_gov_counties');
+  $vid_counties = $vocab_counties->vid;
+  $tree_counties = taxonomy_get_tree($vid_counties);
+  foreach ($tree_counties AS $c) {
+    switch($c->description) {
+      case 'KC':
+        $array_region_kc[] = $c->tid;
+        break;
+      case 'STL':
+        $array_region_stl[] = $c->tid;
+        break;
+      case 'NE':
+        $array_region_ne[] = $c->tid;
+        break;
+      case 'LAK':
+        $array_region_lak[] = $c->tid;
+        break;
+      case 'CEN':
+        $array_region_cen[] = $c->tid;
+        break;
+      case 'SE':
+        $array_region_se[] = $c->tid;
+        break;
+    }
+  }
+
+//*******************
+if ( (!empty($array_region_cen)) AND (count($array_region_cen) > 5) ) {
+watchdog('leaderboard_update_table', 'County and Region tids retrieved.', array(), WATCHDOG_INFO, $link = NULL);
+} else {
+watchdog('leaderboard_update_table', 'Problem retrieving County and Region tids.', array(), WATCHDOG_INFO, $link = NULL);
+}
+  
+  // Get age bracket tids
+  $vocab_agebrackets = taxonomy_vocabulary_machine_name_load('age_ranges');
+  $vid_agebrackets = $vocab_agebrackets->vid;
+  $tree_agebrackets = taxonomy_get_tree($vid_agebrackets);
+  foreach ($tree_agebrackets AS $a) {
+    $array_age[] = $a->tid;
+  }
+
+//*******************
+if ( (!empty($array_age)) AND (count($array_age) > 5) ) {
+watchdog('leaderboard_update_table', 'Age Bracket tids retrieved.', array(), WATCHDOG_INFO, $link = NULL);
+} else {
+watchdog('leaderboard_update_table', 'Problem retrieving Age Bracket tids.', array(), WATCHDOG_INFO, $link = NULL);
+}
+  
+  $array_gender = array('female', 'male', 'undisclosed');
+
+  $min_date = date('Y-m-d H:i:s', strtotime('tomorrow -31 days'));    
+  $max_date = date('Y-m-d H:i:s', strtotime('tomorrow -1 second'));
+
+  // Count only verified miles
+  $verified_role = user_role_load_by_name('verified user');
+  $admin_role = user_role_load_by_name('administrator');
+  
+  // Count only miles by the main user (don't include sub-users)
+  $me_term = taxonomy_get_term_by_name('Me', 'sub_user');
+  $me_term = array_keys($me_term);
+  $me_type_tid = array_pop($me_term);  
+  
+  // Update all 1800 rows in the table leaderboard_activity_stats
+  foreach ($array_activity AS $act) {
+    foreach ($array_regions AS $reg) {
+      switch($reg) {
+        case 'KC':
+          $array_counties = $array_region_kc;
+          break;
+        case 'STL':
+          $array_counties = $array_region_stl;
+          break;
+        case 'NE':
+          $array_counties = $array_region_ne;
+          break;
+        case 'LAK':
+          $array_counties = $array_region_lak;
+          break;
+        case 'CEN':
+          $array_counties = $array_region_cen;
+          break;
+        case 'SE':
+          $array_counties = $array_region_se;
+          break;
+      }
+      
+      foreach ($array_age AS $age) {
+        foreach ($array_gender AS $gen) {
+      
+          $subqry = db_select('node', 'n');
+          $subqry->join('users', 'u', 'n.uid = u.uid');
+          $subqry->join('users_roles', 'r', 'u.uid = r.uid');
+          $subqry->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+          $subqry->join('field_data_field_mileage_distance', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type AND d.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+          $subqry->join('field_data_field_mileage_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+          $subqry->join('field_data_field_mileage_subuser', 's', 'n.nid = s.entity_id AND (s.entity_type = :type AND s.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+          $subqry->join('field_data_field_user_county', 'c', 'u.uid = c.entity_id AND (c.entity_type = :type2 AND c.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+          $subqry->join('field_data_field_user_age', 'q', 'u.uid = q.entity_id AND (q.entity_type = :type2 AND q.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+          $subqry->join('subuser', 'su', 's.field_mileage_subuser_value = su.suid');
+          $subqry->fields('u', array('uid'));
+          $subqry->addExpression('SUM(d.field_mileage_distance_value)', 'miles');
+          $subqry->condition('n.type', 'mileage', '=');
+          $subqry->condition('n.status', 0, '<>');
+          $subqry->condition('su.type_tid', $me_type_tid, '==');          
+          $subqry->condition('t.field_mileage_date_value', $min_date, '>=');
+          $subqry->condition('t.field_mileage_date_value', $max_date, '<');
+          $subqry->condition('u.status', 0, '>');
+          $subqry->condition('r.rid', array($verified_role->rid, $admin_role->rid));
+          $subqry->condition('a.field_mileage_activity_tid', $act, '=');
+          $subqry->condition('c.field_user_county_tid', $array_counties, 'IN');
+          $subqry->condition('q.field_user_age_tid', $age, '=');
+          $subqry->groupBy('u.uid');
+          $subqry->orderBy('miles', 'ASC');
+  
+          // If gender is undisclosed, get average and leader from all verified users in the region and age bracket. If gender is provided, narrow down the cohort by gender as well.
+          if ($gen != 'undisclosed') {
+            $subqry->join('field_data_field_user_gender', 'g', 'u.uid = g.entity_id AND (g.entity_type = :type2 AND g.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+            $subqry->condition('g.field_user_gender_value', $gen, '=');
+          }
+
+          $query = db_select($subqry, 's');
+          $query->fields('s');
+          $result = $query->execute()->fetchAll();
+
+          // Results are grouped by distinct uid, so total rows == total users
+          $tot_peers = count($result);
+
+//*******************          
+if ( (!empty($result)) AND (count($result) > 1) ) {
+watchdog('leaderboard_update_table', '%variable results for act=%variable2, %variable3, age=%variable4, %variable5', array('%variable' => count($result), '%variable2' => $act, '%variable3' => $reg, '%variable4' => $age, '%variable5' => $gen), WATCHDOG_INFO, $link = NULL);
+} else {
+//*******************
+$q_string = mo_cms_show_sql($query);
+watchdog('leaderboard_update_table', 'No results retrieved for %variable', array('%variable' => $q_string), WATCHDOG_INFO, $link = NULL);
+}          
+          
+          $cnty = '(' . implode(",", $array_counties) . ')';
+             
+          if ($tot_peers == 0) {
+            // ZERO verified users in this cohort of region, age bracket and gender
+            // have logged miles to this activity in the last 30 days
+            //
+            // The fields have default values, so just skip this row.
+            // This query ends up zeroing out all the rows when it fails to connect or run properly.
+            // NOT running this query preserves the last updated values
+/*          $u_query = db_update('leaderboard_activity_stats');
+            $u_query->fields(array(
+                'field_leaderboard_avg_distance_value' => 0.0,
+                'field_leaderboard_max_distance_value' => 0.0,
+                'field_leaderboard_leader_uid' => NULL,
+                'updated' => time(),
+            ));
+            $u_query->condition('field_leaderboard_activity_tid', $act, '=');
+            $u_query->condition('field_leaderboard_region_code', $reg, '=');
+            $u_query->condition('field_leaderboard_ages_tid', $age, '=');
+            $u_query->condition('field_leaderboard_gender', $gen, '=');
+            $u_query->execute();
+*/
+            watchdog('mo_miles_leaderboard', 'Row SKIPPED activity=%actv, region=%regn, age_bracket=%ageb, gender=%gndr, counties=%cnty, min_date=%mndt, max_date=%mxdt. count()=%peer.', array('%actv' => $act, '%regn' => $reg, '%ageb' => $age, '%gndr' => $gen, '%cnty' => $cnty, '%mndt' => $min_date, '%mxdt' => $max_date, '%peer' => $tot_peers), WATCHDOG_INFO, $link = NULL);
+
+          } else {
+            // At least one verified user in this cohort of region, age bracket and gender
+            // has logged miles to this activity in the last 30 days
+            $leader = 0;
+            $leader_uid = 0;
+            $avg_miles = 0;
+            foreach ($result AS $row) {
+              // Results are sorted by distance, so the last row will hold the highest mileage
+              $leader = $row->miles;
+              $leader_uid = $row->uid;
+              $avg_miles += $leader;
+            }
+            
+            $u_query = db_update('leaderboard_activity_stats');
+            $u_query->fields(array(
+                'field_leaderboard_avg_distance_value' => ($avg_miles / $tot_peers),
+                'field_leaderboard_max_distance_value' => $leader,
+                'field_leaderboard_leader_uid' => $leader_uid,
+                'updated' => time(),
+            ));
+            $u_query->condition('field_leaderboard_activity_tid', $act, '=');
+            $u_query->condition('field_leaderboard_region_code', $reg, '=');          
+            $u_query->condition('field_leaderboard_ages_tid', $age, '=');
+            $u_query->condition('field_leaderboard_gender', $gen, '=');
+            $u_query->execute();
+            watchdog('mo_miles_leaderboard', 'Row UPDATED activity=%actv, region=%regn, age_bracket=%ageb, gender=%gndr, counties=%cnty, min_date=%mndt, max_date=%mxdt. count()=%peer.', array('%actv' => $act, '%regn' => $reg, '%ageb' => $age, '%gndr' => $gen, '%cnty' => $cnty, '%mndt' => $min_date, '%mxdt' => $max_date, '%peer' => $tot_peers), WATCHDOG_INFO, $link = NULL);
+          }
+          
+        }     // end foreach gender
+      }     // end foreach age bracket
+    }     // end foreach region
+  }     // end foreach activity
+  watchdog('mo_miles_leaderboard', 'mo_miles_leaderboard_update_table function complete. Time is %variable', array('%variable' => date(DATE_RFC2822)), WATCHDOG_INFO, $link = NULL);
+
+  $content = t('mo_miles_leaderboard_update_table function complete.<br>Review the results in the <a href="admin/content/data/view/leaderboard_activity_stats">leaderboard_activity_stats</a> table.');
+  return render($content);
+}
+
+
+/**
+ *  @brief  Updates the total mileage in the leaderboard_activity_stats_campus table
+ *  
+ *  @return  TRUE
+ *  
+ *  @details  2014-07-30 
+ *  updated 2015-05-06  to exclude sub-user mileage
+ */
+function mo_miles_leaderboard_cc_update_table() {
+  // Get campus nids and email domains
+  $c_query = db_select('node', 'n');
+  $c_query->join('field_data_field_campus_email_domains', 'e', 'n.nid = e.entity_id AND (e.entity_type = :type AND e.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $c_query->fields('n', array('nid'));
+  $c_query->fields('e', array('field_campus_email_domains_value'));
+  $c_query->condition('n.type', 'campus', '=');
+  $c_query->condition('n.status', 0, '<>');
+  $array_schools = $c_query->execute()->fetchAllKeyed();  
+  
+//*******************
+if ( (!empty($array_schools)) AND (count($array_schools) > 5) ) {
+watchdog('leaderboard_cc_update_table', 'School nids retrieved.', array(), WATCHDOG_INFO, $link = NULL);
+} else {
+watchdog('leaderboard_cc_update_table', 'Problem retrieving School nids.', array(), WATCHDOG_INFO, $link = NULL);
+}
+  
+  // Set date range to September 1, to October 31, of current year
+  // We never want to update previous years.
+  $yr = date("Y");
+  $min_date = date('Y-m-d H:i:s', strtotime($yr . '-09-01 00:00:00'));    
+  $max_date = date('Y-m-d H:i:s', strtotime($yr . '-10-31 23:59:59'));
+  $period = array($min_date, $max_date);
+  
+  // Count only verified miles
+  $verified_role = user_role_load_by_name('verified user');
+  $admin_role = user_role_load_by_name('administrator');
+  
+  // Update all rows in the table leaderboard_activity_stats_campus
+  foreach ($array_schools AS $school => $domains) {
+      $tot_peers = 0;
+      $content = '';
+      $domain = explode(", ", $domains);
+      
+      // Get eligible users by email domain
+      $e_qry = db_select('users', 'u'); 
+      $e_qry->join('users_roles', 'r', 'u.uid = r.uid');          
+      $e_qry->fields('u', array('uid'));
+      $e_qry->condition('u.status', 0, '>');
+      $e_qry->condition('r.rid', array($verified_role->rid, $admin_role->rid)); 
+      
+      $conditions = db_or();
+      foreach($domain AS $edu) {
+          $conditions->condition('u.mail', ('%' . $edu), 'LIKE');
+      }
+      $e_qry->condition($conditions);         
+      $e_uids = $e_qry->execute()->fetchCol();
+      
+      // Get eligible users by account settings
+      $a_qry = db_select('users', 'u'); 
+      $a_qry->join('users_roles', 'r', 'u.uid = r.uid');     
+      $a_qry->join('field_data_field_user_campus_name', 'c', 'u.uid = c.entity_id AND (c.entity_type = :type AND c.deleted = :deleted)', array(':type' => 'user', ':deleted' => 0));          
+      $a_qry->fields('u', array('uid'));
+      $a_qry->condition('u.status', 0, '>');
+      $a_qry->condition('r.rid', array($verified_role->rid, $admin_role->rid)); 
+      $a_qry->condition('c.field_user_campus_name_target_id', $school, '=');         
+      $a_uids = $a_qry->execute()->fetchCol();
+      
+      // Append array $a_uids to the end of the $e_uids array
+      $all_uids = array_merge($e_uids, $a_uids);
+      // Remove duplicate uids
+      $u_uids = array_unique($all_uids);
+          
+      if(!empty($u_uids)) {
+        
+        $result = mo_project_get_mileage_per_subuser($u_uids, array('Me'), array(), $period);
+            
+/*      $query = db_select('users', 'u');
+        $query->join('node', 'n', 'u.uid = n.uid');
+        $query->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+        $query->join('field_data_field_mileage_distance', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type AND d.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));          
+        $query->fields('u', array('uid'));
+        $query->addExpression('SUM(d.field_mileage_distance_value)', 'miles');
+        $query->condition('n.type', 'mileage', '=');
+        $query->condition('n.status', 0, '<>');  
+        $query->condition('t.field_mileage_date_value', $min_date, '>=');
+        $query->condition('t.field_mileage_date_value', $max_date, '<');
+        $query->condition('u.uid', $u_uids, 'IN');
+        $query->groupBy('u.uid');
+        $query->orderBy('miles', 'ASC');            
+        $result = $query->execute()->fetchAll();
+*/
+
+          // Result is an array of objects; one object for each uid,
+          // so total rows == total users
+            $tot_peers = count($result);
+          } else {       
+            $content .= 'Campus nid ' . $school . ' was not updated.<br>';
+          }
+    
+          if ($tot_peers == 0) {
+            // ZERO verified users from this school
+            // have logged miles in the specified time frame
+            //
+            // Do nothing: 
+            // NOT running this query preserves the last updated values.
+            watchdog('leaderboard_cc_update_table', 'Row SKIPPED school nid=%snid, min_date=%mndt, max_date=%mxdt. count()=%peer.', array('%snid' => $school, '%mndt' => $min_date, '%mxdt' => $max_date, '%peer' => $tot_peers), WATCHDOG_INFO, $link = NULL);
+
+          } else {
+            $tot_miles = 0.0;
+            // At least one verified user from this school
+            // has logged miles in the specified time frame
+            foreach ($result AS $row) {
+              $tot_miles += $row->distance;
+            }
+            
+            $u_query = db_update('leaderboard_campus');
+            $u_query->fields(array(            
+                'tot_distance_value' => $tot_miles,
+                'user_count' => $tot_peers,
+                'updated' => time(),
+            ));
+            $u_query->condition('campus_nid', $school, '=');
+            $u_query->condition('challenge_year', $yr, '=');            
+            $u_query->execute();
+            
+            watchdog('leaderboard_cc_update_table', 'Row UPDATED school nid=%snid, min_date=%mndt, max_date=%mxdt. count()=%peer.', array('%snid' => $school, '%mndt' => $min_date, '%mxdt' => $max_date, '%peer' => $tot_peers), WATCHDOG_INFO, $link = NULL);
+          }
+   
+  }     // end foreach school (campus)
+  watchdog('leaderboard_cc_update_table', 'mo_miles_leaderboard_cc_update_table function complete. Time is %variable', array('%variable' => date(DATE_RFC2822)), WATCHDOG_INFO, $link = NULL);
+
+  $content .= 'mo_miles_leaderboard_cc_update_table function complete.<br>Review the results in the <a href="admin/content/data/view/leaderboard_campus">leaderboard_campus</a> data table.';
+  $content = t($content);
+  return render($content);
+}
+
+
+/**
+ *  @brief  Creates the render array to display the last updated date for campus challenge leaderboard
+ *  
+ *  @return  render array
+ *  
+ *  @details  2014-08-22 
+ */
+function mo_miles_leaderboard_get_cc_updated($year=NULL) {
+  if ($year == NULL) {
+    $year = date("Y");
+  } 
+ 
+  $query = db_select('leaderboard_campus', 'l');
+  $query->addExpression('MAX(updated)');
+  $query->condition('l.challenge_year', $year, '='); 
+  $results = $query->execute()->fetchCol();
+
+  $text = 'Leaderboard updated ' . date('F j, Y', $results[0]) . ' at ' . date('g:i a', $results[0]);
+
+  $output = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'last-updated align-right',
+      ),
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#prefix' => '<p>',
+      '#markup' => $text,
+      '#suffix' => '</p>',
+    ),
+  );
+  
+  return $output;
+}
+
+
+/**
+ *  @brief  Creates the render array to display the campus challenge leaderboard
+ *  
+ *  @param [in] $tier    The challenge tier
+ *  @return  render array
+ *  
+ *  @details  2014-07-30 
+ */
+function mo_miles_leaderboard_build_cc_leaderboard($tier=1, $year=NULL) {
+  if ($year == NULL) {
+    $year = date("Y");
+  }
+  
+  switch ($tier) {
+    case 2:
+      $goal = 50000;
+      break;
+    case 3:
+      $goal = 35000;
+      break;
+    case 4:
+      $goal = 15000;
+      break;
+    case 1:    
+    default:
+      $goal = 100000;
+      break;
+  }
+
+  $output = array(
+    'header' => array(),
+    'rows' => array(),
+    'attributes' => array(),
+    'caption' => NULL,
+    'colgroups' => array(),
+    'sticky' => NULL,
+    'empty' => NULL,
+  );
+  
+  $query = db_select('node', 'n');
+  $query->join('leaderboard_campus', 'l', 'n.nid = l.campus_nid');
+  $query->join('field_data_field_campus_division', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type AND d.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $query->leftJoin('field_data_field_campus_logo', 'g', 'n.nid = g.entity_id AND (g.entity_type = :type2 AND g.deleted = :deleted2)', array(':type2' => 'node', ':deleted2' => 0));
+  $query->join('field_data_field_campus_city', 'c', 'n.nid = c.entity_id AND (c.entity_type = :type3 AND c.deleted = :deleted3)', array(':type3' => 'node', ':deleted3' => 0));
+  $query->join('field_data_field_campus_short_name', 's', 'n.nid = s.entity_id AND (s.entity_type = :type4 AND s.deleted = :deleted4)', array(':type4' => 'node', ':deleted4' => 0));
+  $query->join('taxonomy_term_data', 'x', 'c.field_campus_city_tid = x.tid');
+  $query->fields('n', array('title'));
+  $query->fields('x', array('name'));
+  $query->fields('g', array('field_campus_logo_fid'));  
+  $query->fields('l', array('tot_distance_value'));
+  $query->fields('s', array('field_campus_short_name_value'));  
+  $query->condition('n.type', 'campus', '=');
+  $query->condition('n.status', 0, '<>');
+  $query->condition('l.challenge_year', $year, '=');  
+  $query->condition('d.field_campus_division_value', $tier, '=');
+  $query->orderBy('tot_distance_value', 'DESC');
+
+  $results = $query->execute()->fetchAll();
+  $rowspan = count($results);
+
+  foreach ($results as $row) {
+    $clean_city = str_replace(' (city)', '', $row->name);
+    $clean_city .= ', MO';
+    $short = strtolower(str_replace(' ', '-', $row->field_campus_short_name_value));
+    $divclass = 'division-' . $tier;
+    if (!empty($row->field_campus_logo_fid)) {
+      $logo = mo_miles_leaderboard_get_image($row->field_campus_logo_fid);
+    } else { 
+      $logo = '&nbsp;'; 
+    }
+    if ($row->tot_distance_value >= $goal) {
+      $goal_reached = 'goal-reached';
+    } else {
+      $goal_reached = NULL;
+    }
+    
+    if (empty($output['rows'])) {
+        $output['rows'][] = array(
+          'data' => array( 
+            'division' => array(
+              'data' => '<span class="campus-division">Tier ' . $tier . '</span><br>' . number_format($goal) . '<br>miles',
+              'header' => TRUE,
+              'class' => $divclass,
+              'rowspan' => $rowspan,
+            ),
+            'logo' => $logo,
+            'school' => array(
+              'data' =>  t($row->title) . '<br>' . t($clean_city),
+              'class' => 'campus-name',
+            ),
+            'mileage' => array(
+              'data' => number_format(round($row->tot_distance_value)) . ' <span class="campus-small">mi.</span>',
+              'class' => 'campus-miles align-right',
+            ),
+            'percent' => array(
+              'data' => (round(($row->tot_distance_value * 100) / $goal)) . '%',
+              'class' => 'campus-percent align-right',
+            ),
+          ),
+          'class' => array('first', $goal_reached),
+        );
+    } else {
+        $output['rows'][] = array(
+          'data' => array( 
+            'logo' => $logo,
+            'school' => array(
+              'data' =>  t($row->title) . '<br>' . t($clean_city),
+              'class' => 'campus-name',
+            ),
+            'mileage' => array(
+              'data' => number_format(round($row->tot_distance_value)) . ' <span class="campus-small">mi.</span>',
+              'class' => 'campus-miles align-right',
+            ),
+            'percent' => array(
+              'data' => (round(($row->tot_distance_value * 100) / $goal)) . '%',
+              'class' => 'campus-percent align-right',
+            ),            
+          ),
+          'class' => array($goal_reached),
+        );    
+    }
+  }
+  
+  $leaderboard = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'leaderboard',
+      ),
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#markup' => theme_table($output),
+    ),
+  );
+  return $leaderboard;
+}
+
+
+
+
+
+/**
+ *  @brief  Initial creation of rows for the leaderboard_activity_stats table
+ *  
+ *  @return  TRUE
+ *  
+ *  @details 2014-04-09 
+ */
+function mo_miles_leaderboard_populate_table() {
+  // Get activity tids
+  $vocab_activities = taxonomy_vocabulary_machine_name_load('activities');
+  $vid_activities = $vocab_activities->vid;
+  $tree_activities = taxonomy_get_tree($vid_activities, 0, 1);
+  foreach ($tree_activities AS $a) {
+    if ($a->name != 'Other') {
+      $array_activity[] = $a->tid;
+    }
+  }
+
+  // Create regions
+  $region_kc = array('Andrew', 'Atchison', 'Bates', 'Buchanan', 'Caldwell', 'Cass', 'Clay', 'Clinton', 'Daviess', 'DeKalb', 'Gentry', 'Harrison', 'Holt', 'Jackson', 'Johnson', 'Lafayette', 'Nodaway', 'Platte', 'Ray', 'Worth');
+  $region_stl = array('Franklin', 'Gasconade', 'Jefferson', 'St. Charles', 'St. Francois', 'St. Louis', 'St. Louis City', 'St. Louis County', 'Ste Genevieve', 'Ste. Genevieve', 'Warren', 'Washington');
+  $region_ne = array('Adair', 'Audrain', 'Carroll', 'Chariton', 'Clark', 'Grundy', 'Knox', 'Lewis', 'Lincoln', 'Linn', 'Livingston', 'Macon', 'Marion', 'Mercer', 'Monroe', 'Montgomery', 'Pike', 'Putnam', 'Ralls', 'Randolph', 'Schuyler', 'Scotland', 'Shelby', 'Sullivan');
+  $region_lak = array('Barry', 'Barton', 'Benton', 'Camden', 'Cedar', 'Christian', 'Dade', 'Dallas', 'Douglas', 'Greene', 'Henry', 'Hickory', 'Jasper', 'Laclede', 'Lawrence', 'Maries', 'McDonald', 'Miller', 'Morgan', 'Newton', 'Ozark', 'Polk', 'Pulaski', 'St. Clair', 'Stone', 'Taney', 'Vernon', 'Webster', 'Wright');
+  $region_cen = array('Boone', 'Callaway', 'Cole', 'Cooper', 'Howard', 'Moniteau', 'Osage', 'Pettis', 'Saline');
+  $region_se = array('Bollinger', 'Butler', 'Cape Girardeau', 'Carter', 'Crawford', 'Dent', 'Dunklin', 'Howell', 'Iron', 'Madison', 'Mississippi', 'New Madrid', 'Oregon', 'Pemiscot', 'Perry', 'Phelps', 'Reynolds', 'Ripley', 'Scott', 'Shannon', 'Stoddard', 'Texas', 'Wayne');
+
+  // Get Region & County
+  $array_regions = array('KC', 'STL', 'NE', 'LAK', 'CEN', 'SE');
+  $vocab_counties = taxonomy_vocabulary_machine_name_load('mo_gov_counties');
+  $vid_counties = $vocab_counties->vid;
+  $tree_counties = taxonomy_get_tree($vid_counties);
+  foreach ($tree_counties AS $c) {
+    if (in_array($c->name, $region_kc)) {
+      $array_region_kc[] = $c->tid;
+    } elseif (in_array($c->name, $region_stl)) {
+      $array_region_stl[] = $c->tid;
+    } elseif (in_array($c->name, $region_ne)) {
+      $array_region_ne[] = $c->tid;
+    } elseif (in_array($c->name, $region_lak)) {
+      $array_region_lak[] = $c->tid;
+    } elseif (in_array($c->name, $region_cen)) {
+      $array_region_cen[] = $c->tid;
+    } elseif (in_array($c->name, $region_se)) {
+      $array_region_se[] = $c->tid;
+    }    
+  }
+  
+  // Get age bracket tids
+  $vocab_agebrackets = taxonomy_vocabulary_machine_name_load('age_ranges');
+  $vid_agebrackets = $vocab_agebrackets->vid;
+  $tree_agebrackets = taxonomy_get_tree($vid_agebrackets);
+  foreach ($tree_agebrackets AS $a) {
+    $array_age[] = $a->tid;
+  }
+
+  $array_gender = array('female', 'male', 'undisclosed');
+
+  // Create all 1800 rows in the table leaderboard_activity_stats
+  foreach ($array_activity AS $act) {
+    foreach ($array_regions AS $reg) {
+      switch($reg) {
+        case 'KC':
+          $array_counties = $array_region_kc;
+          break;
+        case 'STL':
+          $array_counties = $array_region_stl;
+          break;
+        case 'NE':
+          $array_counties = $array_region_ne;
+          break;
+        case 'LAK':
+          $array_counties = $array_region_lak;
+          break;
+        case 'CEN':
+          $array_counties = $array_region_cen;
+          break;
+        case 'SE':
+          $array_counties = $array_region_se;
+          break;
+      }
+      
+      foreach ($array_age AS $age) {
+        foreach ($array_gender AS $gen) {
+      
+          // Initial table load
+          $i_query = db_insert('leaderboard_activity_stats');
+          $i_query->fields(array(
+              'field_leaderboard_activity_tid' => $act,
+              'field_leaderboard_region_code' => $reg,
+              'field_leaderboard_ages_tid' => $age,
+              'field_leaderboard_gender' => $gen,
+              'field_leaderboard_avg_distance_value' => 0.0,
+              'field_leaderboard_max_distance_value' => 0.0,
+              'field_leaderboard_leader_uid' => 0,
+              'updated' => time(),
+          ));
+          $i_query->execute();
+
+          // Update the taxonomy_term_data table to indicate what region a county belongs to
+          $u_query = db_update('taxonomy_term_data');
+          $u_query->fields(array(
+              'description' => ($reg),
+          ));
+          $u_query->condition('tid', $array_counties, 'IN');
+          $u_query->execute();
+  
+        }     // end foreach gender
+      }     // end foreach age bracket
+    }     // end foreach region
+  }     // end foreach activity
+  return TRUE;
+}
+
+
+/**
+ *  @brief  Initial creation of rows for the leaderboard_campus table
+ *  
+ *  @return  TRUE
+ *  
+ *  @details 2014-07-11 
+ */
+function mo_miles_leaderboard_cc_populate_table() {
+  $year = date("Y");
+  
+  // Get campus nids and email domains
+  $c_query = db_select('node', 'n');
+  $c_query->fields('n', array('nid'));
+  $c_query->condition('n.type', 'campus', '=');
+  $c_query->condition('n.status', 0, '<>');
+  $array_schools = $c_query->execute()->fetchCol();
+  
+  // Create all rows in the table leaderboard_campus
+  foreach ($array_schools AS $sch) {
+      // Initial table load
+      $i_query = db_insert('leaderboard_campus');
+      $i_query->fields(array(
+          'challenge_year' => $year,
+          'campus_nid' => $sch,
+          'tot_distance_value' => 0.0,
+          'user_count' => 0,
+          'updated' => time(),
+      ));
+      $i_query->execute();
+      
+  }     // end foreach school (campus)
+  return TRUE;
+}
+
+
+/**
+ *  @brief  Gets formatted image of campus logo
+ *  
+ *  @param [in] $fid      field_campus_logo from the campus node
+ *  @param [in] $size     text representation of badge size 
+ *  @return  renderable array
+ *  
+ *  @details  2014-08-14 
+ */
+function mo_miles_leaderboard_get_image($fid) {
+  if (!empty($fid)) {
+    $img = file_load($fid);
+    $width = '';
+    $height = '';
+    if (!empty($img->metadata['width'])) {
+      $width = $img->metadata['width'];
+    }
+    if (!empty($img->metadata['height'])) {
+      $height = $img->metadata['height'];
+    }
+ 
+    $img_vars = array(
+      'style_name' => 'campus_logo',
+      'path' => $img->uri,
+      'width' => $width,
+      'height' => $height,
+      'alt' => NULL,
+      'title' => NULL,
+      'attributes' => array(
+        'class' => array(
+          'badge',
+        ),
+      ),
+    );
+    $field1 = field_get_items('file', $img, 'field_file_image_alt_text');
+    if (!empty($field1[0]['value'])) {
+      $img_vars['alt'] = t($field1[0]['value']);
+    }
+    $field2 = field_get_items('file', $img, 'field_file_image_title_text');
+    if (!empty($field2[0]['value'])) {
+      $img_vars['title'] = t($field2[0]['value']);
+    } else if (!empty($field1[0]['value'])) {
+      $img_vars['title'] = t($field1[0]['value']);
+    }
+
+    return theme_image_style($img_vars);
+  }
+  return NULL;
+}

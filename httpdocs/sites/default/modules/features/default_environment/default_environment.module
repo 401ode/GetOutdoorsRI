@@ -1,0 +1,34 @@
+<?php
+/**
+ * @file
+ * Code for the default Environment module.
+ */
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function default_environment_ctools_plugin_api($module = NULL, $api = NULL) {
+  if ($module == "environment_indicator" && $api == "default_environment_indicator_environments") {
+    return array("version" => "1");
+  }
+}
+
+/**
+ * Implements hook_init()
+ * Enable and disable modules according to environment
+ */
+/*function default_environment_init() {
+  global $conf;
+  $path = drupal_get_path('module', 'default_environment') . '/module_lists';
+  if (file_exists($path)) {
+    $files = drupal_system_listing('/\.inc$/', $path, 'name', 0);
+    foreach ($files as $name=>$file) {
+      if ($name == $conf['environment']) {
+        include_once 'module_lists/' . $file->filename;
+        module_disable($disable, FALSE);
+        module_enable($enable, FALSE);
+        break;
+      }
+    }
+  }
+}*/

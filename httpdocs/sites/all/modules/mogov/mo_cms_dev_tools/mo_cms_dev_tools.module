@@ -1,0 +1,45 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS: Dev Tools module.
+ */
+
+function mo_cms_dump($var) {
+  
+  switch(gettype($var)) {
+    case 'array':
+    case 'object':
+      $string = '<pre>' . print_r($var, TRUE) . '</pre>';
+      break;
+    default:
+      $string = $var;
+      
+  }
+  drupal_set_message($string);
+  
+}
+
+/**
+ *  @brief  Gets the human-readable SQL query, with arguments in place, useful for debugging
+ *  
+ *  @param [in] $query The SelectQuery object
+ *  @return  String containing the human-readable SQL query.
+ *  
+ *  @details 2014 
+ */
+function mo_cms_show_sql(SelectQueryInterface $query) {
+  $string = (string) $query;
+  $arguments = $query->arguments();
+
+  if (!empty($arguments) && is_array($arguments)) {
+    foreach ($arguments as $placeholder => &$value) {
+      if (is_string($value)) {
+        $value = "'$value'";
+      }
+    }
+
+    $string = strtr($string, $arguments);
+  }
+
+  return $string;
+}  

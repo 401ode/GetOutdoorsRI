@@ -1,0 +1,15 @@
+name = Sliders
+description = Creates and manages various types of sliders.
+core = 7.x
+package = Site: all
+version = 7.x-1.0
+
+dependencies[] = ctools
+dependencies[] = entity
+dependencies[] = entityreference
+dependencies[] = field_group
+dependencies[] = mogov_helpers
+dependencies[] = media_pane
+dependencies[] = panels
+dependencies[] = uuid
+

@@ -1,0 +1,7 @@
+core = "7.x"
+description = "Site-specific features"
+name = "MO Project"
+package = "Missouri DMD Projects"
+php = "5.2.4"
+project = "mo_project"
+version = "7.x-1.0-dev"

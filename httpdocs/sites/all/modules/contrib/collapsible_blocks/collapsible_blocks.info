@@ -1,0 +1,5 @@
+name = Collapsible Blocks
+description = Adds an option to each block's config to allow the block to be collapsed and expanded by clicking on its title.
+core = 7.x
+dependencies[] = block
+

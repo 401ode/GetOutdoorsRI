@@ -1,0 +1,6 @@
+name = Hosting Environment
+description = Settings and functions related to the Missouri SDC hosting environment
+core = 7.x
+package = Site: all
+version = 7.x-1.0
+project = mogov_environment

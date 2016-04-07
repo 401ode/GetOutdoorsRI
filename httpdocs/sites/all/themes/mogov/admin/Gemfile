@@ -1,0 +1,7 @@
+source 'http://rubygems.org'
+gem 'sass'
+gem 'compass'
+gem 'breakpoint'
+gem 'susy'
+gem 'singularitygs'
+gem 'modular-scale'

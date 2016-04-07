@@ -1,0 +1,137 @@
+@import "susy"
+@import "../variables/_layout"
+
+ul.sf-menu
+  li
+    float: none
+  
+  ul.menu-minipanel-panel
+    background: $white
+    border: 1px solid $gray-light
+  
+    .panel-pane.pane-custom
+      text-align: left
+      
+      ul
+        margin-top: 10px
+        
+      h2,
+      h3,
+      h4,
+      img
+        margin-bottom: 10px
+        
+      li
+        margin: 0 0 5px 20px
+        list-style-type: disc
+        float: none
+  
+  .sf-accordion
+    display: block
+    position: static
+
+.l-main-menu
+  display: none
+  background: $brand-primary
+  height: auto 
+  padding: 10px 0 
+  border: 1px solid $blue-dark
+  
+  li.leaf 
+    list-style-image: none 
+    list-style-type: none
+
+  .menu  
+    height: auto 
+    width: 100%
+    margin: 0 auto 
+    padding-left: 0
+      
+    .collapsed
+      list-style-type: none
+      list-style-image: none
+
+    > li  
+      background: $diag_patt, $nav_bluegradient repeat-x 
+      margin: 5px 0 
+      border: 0 solid $brand-primary 
+      border-radius: 3px 
+      text-align: center
+
+      > a  
+        display: block 
+        font-weight: normal
+        font-size: 13px 
+        color: $brand-secondary-border 
+        border: none 
+        padding: 10px 
+        line-height: 1.5em 
+        background: none  
+        text-decoration: none 
+        text-align: center 
+        text-shadow: 1px 1px 1px $gray
+        font-family: $font-family-serif
+
+        &:hover, 
+        &:focus  
+          background: $blue-light-border 
+          background: rgba(0,0,0,.2) 
+          color: $white 
+          text-decoration: none
+
+
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  ul.menu-minipanel-panel
+    width: $tab-max-width!important
+    top: 44px!important
+    padding: 20px
+  
+  ul.sf-menu.sf-accordion
+    position: absolute
+  
+  .l-main-menu
+    display: block
+    position: relative
+    /*min-width: 100% */
+    margin: 0 auto 
+    padding: 0 
+    background: $nav_patt_newblue repeat-x
+
+    .menu 
+      height: 44px 
+      width: 100% 
+      margin: 0 
+      line-height: 1em
+
+      > li 
+        float: left 
+        margin: 0 
+        padding: 0 
+        border-radius: 0 
+        margin: 0 
+        background: none
+
+        > a 
+          color: $white 
+          border-right: 1px solid #4c7e99 
+          border-left: 1px solid #66a8cc
+          padding: 12px 18px
+    
+          &:hover,
+          &:focus,
+          .active,
+          .active-trail 
+            color: $white
+            cursor: pointer
+            text-shadow: none
+            font-weight: normal
+            background: $blue-light-border 
+            text-decoration: none
+
+// Desktop
+@include at-breakpoint($desk) // At a given Susy Media Layout, use a given amount of columns.
+  ul.menu-minipanel-panel
+    width: $desk-max-width!important
+    

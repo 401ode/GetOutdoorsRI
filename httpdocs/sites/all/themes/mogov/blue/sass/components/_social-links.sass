@@ -1,0 +1,76 @@
+// Sprites
+$social_icons: sprite-map("social_icons/*.png") // define a sprite map
+
+/*social media icon list in footer*/
+.pane-menu-menu-social-links
+  margin: 0
+  
+  ul
+    margin: 0
+  
+    li
+      float: left
+      list-style-type: none
+      margin: 0 5px 5px 0
+      padding: 0
+      
+      &.leaf
+        list-style-type: none
+        list-style-image: none
+
+      a
+        height: 43px
+        width: 44px
+        display: block
+        background-repeat: no-repeat
+        &:hover,
+        &:focus
+          border-bottom: none
+
+      .twitter
+        @include get-sprite($social_icons, 'twitter')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'twitter_hover')
+
+      .rss
+        @include get-sprite($social_icons, 'rss')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'rss_hover')
+
+      .facebook
+        @include get-sprite($social_icons, 'facebook')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'facebook_hover')
+
+      .flickr
+        @include get-sprite($social_icons, 'flickr')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'flickr_hover')
+
+      .email
+        @include get-sprite($social_icons, 'email')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'email_hover')
+
+      .youtube
+        @include get-sprite($social_icons, 'youtube')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'youtube_hover')
+
+      .linkedin
+        @include get-sprite($social_icons, 'linkedin')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'linkedin_hover')
+
+      .govdelivery
+        @include get-sprite($social_icons, 'govdelivery')
+        &:hover,
+        &:focus
+          @include get-sprite($social_icons, 'govdelivery_hover')

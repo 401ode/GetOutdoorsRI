@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS: Events feature.
+ */
+
+include_once 'mo_cms_events.features.inc';

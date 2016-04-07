@@ -1,0 +1,272 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS: News feature.
+ */
+
+include_once 'mo_cms_news.features.inc';
+ 
+/**
+ * Implements hook_menu().
+ */
+function mo_cms_news_menu() {
+
+  $items = array();
+
+  $items['admin/config/mo-cms/mo-cms-news/config'] = array(
+    'title' => 'MO CMS: News',
+    'description' => 'Options for the MO CMS: News module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('variable_module_form', 'mo_cms_news'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_variable_info().
+ */
+function mo_cms_news_variable_info($options) {
+    
+  $variables['mo_cms_news_archive_path'] = array(
+    'title' => t('Path to the main news archive', array(), $options),
+    'description' => t('Used to build links to the news archive at the end of lists.'),
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => 'newsroom/news-archive',
+  );
+  
+  $variables['mo_cms_news_recent_block_count'] = array(
+    'title' => t('Number of items to display in Recent News Releases block', array(), $options),
+    'description' => t('Enter 0 to disable block.'),
+    'type' => 'number',
+    'access' => 'access administration pages',
+    'default' => 5,
+    'element' => array(
+      '#size' => 3,
+    ),
+  );
+  
+  $variables['mo_cms_news_topic_block_count'] = array(
+    'title' => t('Number of items to display in Related News Releases block', array(), $options),
+    'description' => t('Enter 0 to disable block.'),
+    'type' => 'number',
+    'access' => 'access administration pages',
+    'default' => 5,
+    'element' => array(
+      '#size' => 3,
+    ),
+  );
+  
+  return $variables;
+}
+
+function mo_cms_news_node_view($node, $view_mode, $langcode) {
+  switch ($node->type) {
+    case 'mo_cms_news_release':
+      if (!empty($node->content['field_mo_cms_county_muni']['#items'][0]['target_id'])) {
+        $prefix = '<span class="place-name">';
+        $suffix = '</span>';
+        $tid = $node->content['field_mo_cms_county_muni']['#items'][0]['target_id'];
+        $term = taxonomy_term_load($tid);
+        if (empty($node->content['field_mo_cms_county_muni']['#items'][0]['entity'])) {
+          $node->content['field_mo_cms_county_muni']['#items'][0]['entity'] = $term;
+        }
+        $vocabulary = taxonomy_vocabulary_load($node->content['field_mo_cms_county_muni']['#items'][0]['entity']->vid);
+        if ($vocabulary->machine_name == 'mo_cms_counties') {
+          $primary = '<span class="pri">' . $node->content['field_mo_cms_county_muni'][0]['#markup'] . ' County</span>';
+          $secondary = ', <span class="sec">MO</span>';
+          $node->content['field_mo_cms_county_muni'][0]['#markup'] = $prefix . $primary . $secondary . $suffix;
+        } elseif ($vocabulary->machine_name == 'mo_cms_municipalities') {
+          $primary = '<span class="pri">' . $node->content['field_mo_cms_county_muni'][0]['#markup'] . '</span>';
+          $secondary = ', <span class="sec">MO</span>';
+          $node->content['field_mo_cms_county_muni'][0]['#markup'] = $prefix . $primary . $secondary . $suffix;
+        } elseif ($vocabulary->machine_name == 'mo_cms_out_of_state_locations') {
+          $pri_field = field_get_items('taxonomy_term', $term, 'field_mo_cms_location_lists_pri');
+          $sec_field = field_get_items('taxonomy_term', $term, 'field_mo_cms_location_lists_sec');
+          if (!empty($pri_field[0]['value']) and !empty($pri_field[0]['value'])) {
+            $primary = '<span class="pri">' . $pri_field[0]['value'] . '</span>';
+            $secondary = '<span class="sec">' . $sec_field[0]['value'] . '</span>';
+            $node->content['field_mo_cms_county_muni'][0]['#markup'] = $prefix . $primary . ', ' . $secondary . $suffix;
+          } else {
+            $content = $node->content['field_mo_cms_county_muni'][0]['#markup'];
+            $node->content['field_mo_cms_county_muni'][0]['#markup'] = $prefix . $content . $suffix;
+          }
+        }
+      }
+      $node->content['field_mo_cms_contact']['#title'] = t('For more information, contact');
+      break;
+    default:
+      break;
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function mo_cms_news_block_info() {
+  $count = variable_get_value('mo_cms_news_topic_block_count');
+  if ($count) {
+    $blocks['related_news']['info'] = t('MO CMS: News - Related News');
+  }
+  $count = variable_get_value('mo_cms_news_recent_block_count');
+  if ($count) {
+    $blocks['recent_news']['info'] = t('MO CMS: News - Recent News');
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function mo_cms_news_block_view($delta='') {
+  $block = array();
+  switch($delta) {
+    case 'recent_news':
+      $count = variable_get_value('mo_cms_news_recent_block_count');
+      if ($count) {
+        $block['subject'] = t('Recent News');
+        $block['content'] = mo_cms_news_get_recent_news_content($count);
+      }
+      break;
+    case 'related_news':
+      $count = variable_get_value('mo_cms_news_topic_block_count');
+      if ($count) {
+        $block['subject'] = t('Related News');
+        $block['content'] = mo_cms_news_get_related_news_content($count);
+      }
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mo_cms_news_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' and $plugin_type == 'content_types') {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+function mo_cms_news_get_recent_news_content($count) {
+  $nodes = mo_cms_news_get_recent_news_items($count);
+  $data = mo_cms_news_class_nodes($nodes);
+  $link_options = array(
+    'html' => TRUE,
+    'attributes' => array(
+      'class' => array(
+        'read-more-link',
+      ),
+    ),
+  );
+  $contents = array(
+    0 => array(
+      '#markup' => mo_cms_news_make_list($data),
+    ),
+    1 => array(
+      '#markup' => l('See more news', variable_get_value('mo_cms_news_archive_path'), $link_options),
+    ),
+  );
+  return render($contents);
+}
+
+function mo_cms_news_get_related_news_content($count) {
+  // On news items, current interest trumps matching score, so we just check
+  // for at least one matching tag and then sort by date.
+  module_load_include('inc', 'mo_cms', 'includes/helper_functions');
+  $contents = NULL;
+  $node = mo_cms_get_current_node();
+  if (!$node) {
+    return FALSE;
+  }
+  $field = field_get_items('node', $node, 'field_tags');
+  $tids = array();
+  if (!empty($field[0]['tid'])) {
+    foreach ($field as $field_item) {
+      $tids[] = $field_item['tid'];
+    }
+  }
+  if (!$tids) {
+    return FALSE;
+  }
+  $nodes = mo_cms_news_get_recent_news_items($count, $tids);
+  $data = mo_cms_news_class_nodes($nodes);
+  $contents = mo_cms_news_make_list($data);
+  return $contents;
+}
+
+function mo_cms_news_get_recent_news_items($count, $tags=array()) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'mo_cms_news_release');
+  $query->propertyCondition('status', 1);
+  if ($tags) {
+    $query->fieldCondition('field_tags', 'tid', $tags);
+  }
+  $query->fieldOrderBy('field_mo_cms_news_date', 'value', 'DESC');
+  $query->range(0, $count);
+  $result = $query->execute();
+  if (empty($result['node'])) {
+    return FALSE;
+  }
+  $nodes = entity_load('node', array_keys($result['node']));
+  return $nodes;
+}
+
+function mo_cms_news_class_nodes($nodes) {
+  $data = array();
+  foreach ($nodes as $nid=>$node) {
+    $result = new stdClass();
+    $short_title_field = field_get_items('node', $node, 'field_mo_cms_news_short_headline');
+    if (!empty($short_title_field[0]['value'])) {
+      $result->title = t($short_title_field[0]['value']);
+    } else {
+      $result->title = $node->title;
+    }
+    $result->url = 'node/' . $nid;
+    $result->media_class = FALSE;
+    $media_field = field_get_items('node', $node, 'field_mo_cms_media');
+    if (!empty($media_field[0]['type'])) {
+      foreach ($media_field as $media_field_item) {
+        if ($media_field_item['type'] == 'image' and !in_array($result->media_class, array('with-video', 'with-audio'))) {
+          $result->media_class = 'with-image';
+        } elseif ($media_field_item['type'] == 'audio' and $result->media_class != 'with-video') {
+          $result->media_class = 'with-audio';
+        } elseif ($media_field_item['type'] == 'video') {
+          $result->media_class = 'with-video';
+          break;
+        }
+      }
+    }
+    $data[] = $result;
+  }
+  return $data;
+}
+
+function mo_cms_news_make_list($items) {
+  $list = array(
+    'type' => 'ul',
+    'title' => NULL,
+    'attributes' => array(
+      'class' => array(
+        'menu',
+        'mo-cms-news-items',
+      ),
+    ),
+    'items' => array(),
+  );
+  foreach ($items as $key=>$item) {
+    $list['items'][$key] = array(
+      'data' => l($item->title, $item->url),
+    );
+    if ($item->media_class) {
+      $list['items'][$key]['class'] = array(
+        $item->media_class,
+      );
+    }
+  }
+  return theme_item_list($list);
+}

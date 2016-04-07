@@ -1,0 +1,145 @@
+@import "susy"
+@import "../variables/_layout"
+
+//mixin
+=button-style
+  position: relative
+  display: block
+  font-weight: bold
+  font-size: $font-size-h5
+  padding: 10px
+  color: $white
+  border-radius: 5px
+  border: 1px solid $blue-light-border
+  box-shadow: 2px 2px 2px $brand-secondary-border
+  margin: 10px 0
+  text-shadow: 1px 1px 1px $gray
+  height: auto 
+  max-width: 100%
+  background-color: none
+  @include background-image($diag_patt,linear-gradient(#5b96b6, #558caa))
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5b96b6', endColorstr='#558caa',GradientType=0 ) /* IE6-9 */
+
+=button-hover
+  text-shadow: 1px 1px 1px $gray 
+  box-shadow: 2px 2px 2px $brand-secondary-border
+  border: 1px solid #607480
+
+form
+
+  fieldset 
+    border: 1px solid $gray-lighter
+    background: $brand-secondary
+    margin: 30px 0 20px 
+    padding: 20px
+    
+    p 
+      margin: 0 10px
+    
+    legend
+      display: block
+      width: 98%
+      padding: 0
+      margin: 0 1% 20px
+      line-height: inherit
+      color: $gray-darker
+      border: 0
+      border-bottom: 1px solid $gray-light
+      position: relative
+      top: 30px
+      font-size: $font-size-h3
+        
+  input,
+  textarea,
+  select 
+    margin-bottom: 8px
+    border: 1px solid $brand-secondary-border
+    border-radius: 5px
+    font-size: $font-size-h5
+    font-family: $font-family-sans-serif
+    
+  select 
+    margin: 10px 0 10px 10px
+    height: 25px
+    
+    
+  select[multiple=multiple] 
+    height: auto
+    
+  input:hover,
+  textarea:hover,
+  input:focus,
+  textarea:focus 
+    border: 1px solid #666
+    background-color: $gray-lighter
+     
+  textarea 
+    width: 90%
+    margin: 5px 0 0 10px
+    
+  label 
+    color: $gray
+    font-size: $font-size-base
+    font-weight: bold
+    margin-left: 10px
+    display: inline-block
+    margin-bottom: 5px
+    
+  input 
+    height: 25px
+    margin-top: 5px
+    margin-left: 10px
+    max-width: 90%
+
+   
+  button, 
+  .button, 
+  input[type=submit] 
+    +button-style
+    
+  button:hover,
+  button:focus,
+  .button:hover,
+  .button:focus, 
+  input[type=submit]:hover, 
+  input[type=submit]:focus 
+    +button-hover
+    
+  input[type=radio] 
+    border: 0
+    height: auto
+    padding: 0
+    
+  form ul 
+    margin-left: 0
+    
+    li 
+      list-style-type: none
+    
+  .error 
+    background-color: $brand-danger
+    
+  .form-item .description 
+    margin: 5px 12px
+
+//buttons outside of form element
+
+button,
+.button, 
+  +button-style
+    
+button:hover,
+button:focus,
+.button:hover,
+.button:focus, 
+  +button-hover
+
+// Desktop
+@include at-breakpoint($desk) // At a given Susy Media Layout, use a given amount of columns.
+  
+  .options-inline .form-type-checkbox,
+  .options-inline .form-type-radio
+    float: left
+    
+    label
+      margin-left: 0

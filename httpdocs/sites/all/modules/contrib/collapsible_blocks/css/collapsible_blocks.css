@@ -1,0 +1,3 @@
+.collapsible-block-collapsed .block-inner .content:first-of-type {
+    display: none;
+}

@@ -1,0 +1,37 @@
+/*******************************************************************************
+ * columns-3-b.layout.scss
+ *
+ * Styling of the Blue "3 Columns B" layout.
+ ******************************************************************************/
+@import "susy"
+@import "../../../variables/_layout"
+
+// Mobile
+.panel-display--columns-3-b
+  .l-container
+    @include container // Define these elements as the grid containers.
+    margin-bottom: $vert-spacing-unit
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  .panel-display--columns-3-b
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .columns-3-b-region--column-1
+        @include span-columns(3, 12)
+      .columns-3-b-region--column-2
+        @include span-columns(6, 12)
+      .columns-3-b-region--column-3
+        @include span-columns(3 omega, 12)
+
+// Desktop
+@include at-breakpoint($desk)
+  .panel-display--columns-3-b
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .columns-3-b-region--column-1
+        @include span-columns(6, 24)
+      .columns-3-b-region--column-2
+        @include span-columns(12, 24)
+      .columns-3-b-region--column-3
+        @include span-columns(6 omega, 24)

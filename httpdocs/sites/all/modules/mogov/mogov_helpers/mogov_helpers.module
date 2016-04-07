@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Code for the Blocks module.
+ */
+
+// Some functions are used often enough and are lightweight enough that we may as
+// well load them all the time.
+module_load_include('inc', 'mogov_helpers', 'includes/get_nodes');
+
+// For others, we provide a helper function to load the include file when desired.
+function mogov_helpers_load($include) {
+  module_load_include('inc', 'mogov_helpers', 'includes/' . $include);
+}

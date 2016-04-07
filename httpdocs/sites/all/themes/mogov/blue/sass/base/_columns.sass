@@ -1,0 +1,44 @@
+@import "susy"
+$grid-padding: 0
+$container-style: fluid
+
+// Mobile
+.columns-2,
+.columns-3,
+.columns-4
+  @include container // Define these elements as the grid containers.
+  margin-bottom: $vert-spacing-unit
+  clear: both
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  .columns-2
+    @include set-container-width // Reset only the container width (elements have already been declared as containers).
+    .col-1
+      @include span-columns(6, 12)
+    .col-1.last
+      @include span-columns(6 omega, 12)
+  .columns-3
+    @include set-container-width // Reset only the container width (elements have already been declared as containers).
+    .col-1
+      @include span-columns(4, 12)
+    .col-1.last
+      @include span-columns(4 omega, 12)
+    .col-2
+      @include span-columns(8, 12)
+    .col-2.last
+      @include span-columns(8 omega, 12)
+  .columns-4
+    @include set-container-width // Reset only the container width (elements have already been declared as containers).
+    .col-1
+      @include span-columns(3, 12)
+    .col-1.last
+      @include span-columns(3 omega, 12)
+    .col-2
+      @include span-columns(6, 12)
+    .col-2.last
+      @include span-columns(6 omega, 12)
+    .col-3
+      @include span-columns(9, 12)
+    .col-3.last
+      @include span-columns(9 omega, 12)

@@ -1,0 +1,8 @@
+name = Mileage
+description = Creates and manages mileage entries for 100missourimiles.com.
+core = 7.x
+package = Site: 100missourimiles.com
+version = 7.x-1.0
+
+dependencies[] = entity
+dependencies[] = mogov_helpers

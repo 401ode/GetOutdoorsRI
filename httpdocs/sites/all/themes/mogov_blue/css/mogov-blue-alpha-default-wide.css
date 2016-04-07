@@ -1,0 +1,7 @@
+/**
+ * This file will hold styles that are loaded using the same media query as the
+ * wide grid.
+ */
+#mo-cycle-8 li.royalSlide {
+    text-align: center;
+}

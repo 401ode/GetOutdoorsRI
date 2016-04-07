@@ -1,0 +1,39 @@
+/**
+ * MO.gov Admin is based on the Seven administration theme.
+ * Overrides should be applied here.
+ */
+
+/**
+ * The Fieldsets module likes to make all text fields within
+ * vertical tabs 100% width. That's crazy, so we'll override.
+ */
+.vertical-tabs .form-type-textfield input {
+    width: auto;
+}
+
+/**
+ * The Feeds module is finicky about where feed config inputs
+ * appear on the form, and what shares their fieldset, so
+ * modifying the inserted fieldset doesn't work well. Hiding
+ * the fieldset wrapper instead.
+ */
+#mo-cms-feed-node-form fieldset#edit-feeds,
+#mo-cms-feed-node-form fieldset#edit-feeds .fieldset-wrapper {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/**
+ * Admin form classes
+ */
+.invalid {
+    color: red;
+}
+
+
+/*disabled text */
+
+.form-disabled input.form-autocomplete, .form-disabled input.form-text, .form-disabled input.form-file, .form-disabled textarea.form-textarea, .form-disabled select.form-select {
+	color: #494949!important;
+}

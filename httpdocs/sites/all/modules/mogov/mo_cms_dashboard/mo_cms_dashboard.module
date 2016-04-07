@@ -1,0 +1,53 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS: Dashboard feature.
+ */
+
+include_once 'mo_cms_dashboard.features.inc';
+
+/**
+ * Implements hook_block_info().
+ */
+function mo_cms_dashboard_block_info() {
+  $blocks = array();
+  $blocks['create_content']['info'] = t('MO CMS Dashboard: Create Content');
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function mo_cms_dashboard_block_view($delta='') {
+    
+  $block = array();
+  $links = array(
+    'title' => NULL,
+    'type' => 'ul',
+    'attributes' => array(
+      'class' => array(
+        'menu',
+      ),
+    ),
+    'items' => array(),
+  );
+  $content_types = node_type_get_types();
+  $content_type_keys = array_keys($content_types);
+  sort($content_type_keys);
+  foreach ($content_type_keys as $content_type_key) {
+    $content_type = $content_types[$content_type_key];
+    $permission = 'create ' . $content_type->type . ' content';
+    if (user_access($permission)) {
+      $path = 'node/add/' . str_replace('_', '-', $content_type->type);
+      $links['items'][] = l($content_type->name, $path);
+    }
+  }
+  if ($links['items']) {
+    $block['title'] = t('Create Content');
+    $block['content'] = theme_item_list($links);
+  }
+
+  return $block;
+    
+}
+

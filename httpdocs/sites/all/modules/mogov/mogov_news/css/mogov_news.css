@@ -1,0 +1,44 @@
+.group-media .file-video,
+.group-media .file-audio, 
+.group-media .file-document,
+.group-media .file-image {
+  margin: 30px 0;
+  font-weight: bold;
+  display: block;
+}
+
+.group-media .file-image img {
+  border: 1px solid #DDE2F0;
+}
+
+.download-link {
+  display: inline-block;
+  background: url("/sites/default/themes/mogov_site/img/download_icon.png") no-repeat;
+  background-size: 1em 1em;
+  width: 1em;
+  height: 1em;
+  margin-left: 5px;
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+
+.file-icon {
+  float: left;
+  margin: 5px 5px 5px 0;
+}
+
+.place-name {
+  float: left;
+  margin-right: 5px;
+}
+
+.place-name:after {
+  content: "  -  "
+}
+
+.field-name-field-mogov-news-deck-copy {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.5em;
+  margin-bottom: 6px;
+} 

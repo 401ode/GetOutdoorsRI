@@ -1,0 +1,1 @@
+Custom templates may be placed in this directory.

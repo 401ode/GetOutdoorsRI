@@ -1,0 +1,30 @@
+@import "susy"
+@import "../variables/_layout"
+
+.resp-tabs-container
+  border-color: $brand-secondary-border
+  margin-bottom: 25px
+  
+ul.resp-tabs-list
+  background: $brand-secondary-border
+  font-family: $font-family-sans-serif-2
+  
+  li
+    font-size: $font-size-h3
+    font-weight: normal
+
+.resp-tab-content-active,
+.resp-tab-active
+  background: $brand-secondary
+  border: 1px solid $brand-secondary-border
+  
+.resp-tab-active
+  border-bottom:  none
+  
+h2.resp-accordion
+  font-size: $font-size-h4
+  background: $gray-lighter
+  
+h2.resp-accordion.resp-tab-active
+  background: $blue-lighter
+  

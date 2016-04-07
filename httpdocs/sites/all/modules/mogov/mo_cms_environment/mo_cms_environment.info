@@ -1,0 +1,9 @@
+name = MO CMS: Environment
+description = Settings and functions related to the Missouri SDC hosting environment
+core = 7.x
+package = MO CMS
+version = 7.x-1.0
+project = mo_cms_environment
+dependencies[] = features
+dependencies[] = variable
+features[features_api][] = api:1

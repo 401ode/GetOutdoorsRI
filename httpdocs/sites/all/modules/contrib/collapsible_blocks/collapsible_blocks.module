@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * Enable necessary support files
+ */
+function collapsible_blocks_add_support() {
+  $module_path = drupal_get_path('module', 'collapsible_blocks');
+  drupal_add_css($module_path . '/css/collapsible_blocks.css');
+  drupal_add_js($module_path . '/js/collapsible_blocks.js', array('type' => 'file',));
+}
+
+
+/**
+ * Implements hook_form_FORMID_alter().
+ * @see block_add_block_form()
+ */
+function collapsible_blocks_form_block_add_block_form_alter(&$form, &$form_state) {
+  collapsible_blocks_form_block_admin_configure_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORMID_alter().
+ * Adds mobile specific visibility options to block configuration form.
+ * @see block_admin_configure()
+ */
+function collapsible_blocks_form_block_admin_configure_alter(&$form, &$form_state) {
+  $query = db_select('collapsible_blocks', 'c');
+  $query->addField('c', 'collapsible');
+  $query->addField('c', 'collapsed');
+  $query->condition('c.module', $form['module']['#value']);
+  $query->condition('c.delta', $form['delta']['#value']);
+  $result = $query->execute();
+  $collapsible_default = 0;
+  $collapsed_default = 0;
+  foreach ($result as $row) {
+    $collapsible_default = $row->collapsible;
+    $collapsed_default = $row->collapsed;
+  }
+
+  $form['settings']['collapsible_blocks'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Collapsible Blocks'),
+    'collapsible' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Collapsible'),
+      '#default_value' => $collapsible_default,
+      '#description' => t('Allow this block to be collapsed and expanded by clicking on its title.<br><b>Note:</b> If the block\'s title is not displayed, you won\'t have anything to click on to toggle it open or closed.'),
+    ),
+    'collapsed' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Collapsed'),
+      '#default_value' => $collapsed_default,
+      '#description' => t('This block should be collapsed when the page loads.'),
+    ),
+  );
+
+  $form['#submit'][] = 'collapsible_blocks_form_block_admin_configure_submit';
+}
+
+/**
+ * Form submit handler for block configuration form.
+ * @see collapsible_blocks_form_block_admin_configure_alter()
+ */
+function collapsible_blocks_form_block_admin_configure_submit($form, &$form_state) {
+  $query = db_delete('collapsible_blocks');
+  $query->condition('module', $form_state['values']['module']);
+  $query->condition('delta', $form_state['values']['delta']);
+  $query->execute();
+  $query = db_insert('collapsible_blocks');
+  $query->fields(array(
+    'collapsible',
+    'collapsed',
+    'module',
+    'delta',
+  ));
+  $query->values(array(
+    'collapsible' => $form_state['values']['collapsible'],
+    'collapsed' => $form_state['values']['collapsed'],
+    'module' => $form_state['values']['module'],
+    'delta' => $form_state['values']['delta'],
+  ));
+  $query->execute();
+}
+
+/*
+ * Turn block title into link and add javascript if collapsability
+ * is enabled.
+ */
+function collapsible_blocks_preprocess_block(&$vars) {
+  $query = db_select('collapsible_blocks', 'c');
+  $query->addField('c', 'collapsible');
+  $query->addField('c', 'collapsed');
+  $query->condition('c.module', $vars['block']->module);
+  $query->condition('c.delta', $vars['block']->delta);
+  $result = $query->execute();
+  $collapsible = FALSE;
+  $collapsed = FALSE;
+  foreach ($result as $row) {
+    if ($row->collapsible) {
+      $collapsible = TRUE;
+      if ($row->collapsed) {
+        $collapsed = TRUE;
+      }
+    }
+  }
+  if ($collapsible) {
+    collapsible_blocks_add_support();
+    $new_classes = array('collapsible-block');
+    if ($collapsed) {
+      $new_classes[] = 'collapsible-block-collapsed';
+    }
+    $link_vars = array(
+      'fragment' => $vars['block_html_id'],
+      'html' => TRUE,
+      'external' => TRUE,
+    );
+    if (!empty($vars['block']->subject)) {
+      $text = $vars['block']->subject;
+    }
+    $vars['block']->subject = l($text, '', $link_vars);
+    $vars['classes_array'] = array_merge($vars['classes_array'], $new_classes);
+  }
+}

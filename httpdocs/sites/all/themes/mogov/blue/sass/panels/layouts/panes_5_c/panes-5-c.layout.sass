@@ -1,0 +1,37 @@
+/*******************************************************************************
+ * panes-5-c.layout.sass
+ *
+ * Styling of the "5 Panes C" layout.
+ ******************************************************************************/
+@import "susy"
+@import "../../../variables/_layout"
+
+// Mobile
+.panel-display--panes-5-c
+  .l-container
+    @include container // Define these elements as the grid containers.
+    margin-bottom: $vert-spacing-unit
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  .panel-display--panes-5-c
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .panes-5-c-region--row1-col1,
+      .panes-5-c-region--row3-col1
+        @include span-columns(8, 12)
+      .panes-5-c-region--row1-col2,
+      .panes-5-c-region--row3-col2
+        @include span-columns(4 omega, 12)
+
+// Desktop
+@include at-breakpoint($desk)
+  .panel-display--panes-5-c
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .panes-5-c-region--row1-col1,
+      .panes-5-c-region--row3-col1
+        @include span-columns(16, 24)
+      .panes-5-c-region--row1-col2,
+      .panes-5-c-region--row3-col2
+        @include span-columns(8 omega, 24)

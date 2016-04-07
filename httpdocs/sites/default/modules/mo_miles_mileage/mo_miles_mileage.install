@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function mo_miles_mileage_schema() {
+  
+  $schema = array();
+   
+  $schema['mo_miles_mileage'] = array(
+    'description' => 'The base table for the Mileage entity',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary key of the Mileage entity',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Mileage title.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'uid' => array(
+        'description' => 'Mileage owner.',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'date' => array(
+        'description' => 'Mileage date.',
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'distance' => array(
+        'description' => 'Mileage value.',
+        'type' => 'numeric',
+        'size' => 'normal',
+        'precision' => 10,
+        'scale' => 2,
+        'not null' => TRUE,
+      ),
+      'activity_tid' => array(
+        'description' => 'Activity term ID.',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'location' => array(
+        'description' => 'Mileage location.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'note' => array(
+        'description' => 'Mileage entry note.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'status' => array(
+        'description' => 'Mileage status; 1 is published.',
+        'type' => 'int',
+        'length' => 1,
+        'default' => 1,        
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'Mileage created date.',
+        'type' => 'int',
+        'length' => 11,
+        'default' => 0,         
+        'not null' => TRUE,
+      ),
+      'changed' => array(
+        'description' => 'Mileage changed date.',
+        'type' => 'int',
+        'length' => 11,
+        'default' => 0,         
+        'not null' => TRUE,
+      ),
+      'uuid' => array(
+        'description' => 'Mileage UUID.',
+        'type' => 'varchar',
+        'length' => 36,
+        'default' => '',        
+        'not null' => TRUE,
+      ),
+      'old_nid' => array(
+        'description' => 'Mileage entry old nid.',
+        'type' => 'int',
+        'default' => NULL,
+      ),
+    ),
+    'primary key' => array('id', 'uid'),
+  );
+  
+  return $schema;
+}

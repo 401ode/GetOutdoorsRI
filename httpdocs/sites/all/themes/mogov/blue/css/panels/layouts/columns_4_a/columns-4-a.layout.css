@@ -1,0 +1,74 @@
+/******************************************************************************
+ * columns-4-a.layout.scss
+ *
+ * Styling of the "4 Columns A" layout.
+ ***************************************************************************** */
+/******************************************************************************
+ * _variables.sass: sets variables for the standard layout
+ ***************************************************************************** */
+.panel-display--columns-4-a .l-container {
+  *zoom: 1;
+  max-width: 1190px;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+.panel-display--columns-4-a .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .panel-display--columns-4-a .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-1 {
+    width: 21.73913%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-2 {
+    width: 21.73913%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-3 {
+    width: 21.73913%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-4 {
+    width: 21.73913%;
+    float: right;
+    margin-right: 0;
+  }
+}
+@media (min-width: 992px) {
+  .panel-display--columns-4-a .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-1 {
+    width: 23.40426%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-2 {
+    width: 23.40426%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-3 {
+    width: 23.40426%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--columns-4-a .l-container .columns-4-a-region--column-4 {
+    width: 23.40426%;
+    float: right;
+    margin-right: 0;
+  }
+}

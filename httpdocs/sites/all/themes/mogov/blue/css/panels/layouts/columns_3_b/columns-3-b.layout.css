@@ -1,0 +1,64 @@
+/******************************************************************************
+ * columns-3-b.layout.scss
+ *
+ * Styling of the Blue "3 Columns B" layout.
+ ***************************************************************************** */
+/******************************************************************************
+ * _variables.sass: sets variables for the standard layout
+ ***************************************************************************** */
+.panel-display--columns-3-b .l-container {
+  *zoom: 1;
+  max-width: 1190px;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+.panel-display--columns-3-b .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .panel-display--columns-3-b .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--columns-3-b .l-container .columns-3-b-region--column-1 {
+    width: 21.73913%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--columns-3-b .l-container .columns-3-b-region--column-2 {
+    width: 47.82609%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--columns-3-b .l-container .columns-3-b-region--column-3 {
+    width: 21.73913%;
+    float: right;
+    margin-right: 0;
+  }
+}
+@media (min-width: 992px) {
+  .panel-display--columns-3-b .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--columns-3-b .l-container .columns-3-b-region--column-1 {
+    width: 23.40426%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--columns-3-b .l-container .columns-3-b-region--column-2 {
+    width: 48.93617%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--columns-3-b .l-container .columns-3-b-region--column-3 {
+    width: 23.40426%;
+    float: right;
+    margin-right: 0;
+  }
+}

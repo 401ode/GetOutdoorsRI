@@ -1,0 +1,7 @@
+core = "7.x"
+description = "Support functions for development"
+name = "MO CMS: Dev Tools"
+package = "MO CMS"
+php = "5.2.4"
+project = "mo_cms_dev_tools"
+version = "7.x-1.0-dev"

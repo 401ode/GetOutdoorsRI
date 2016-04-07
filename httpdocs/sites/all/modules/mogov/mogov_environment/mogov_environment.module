@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * @file
+ * Code for the MO.gov: Hosting Environment module.
+ */
+
+module_load_include('inc', 'mogov_environment', 'includes/variables');
+module_load_include('inc', 'mogov_environment', 'includes/menu');
+module_load_include('inc', 'mogov_environment', 'includes/clear_cache_alter');
+module_load_include('inc', 'mogov_environment', 'includes/clear_memcache');

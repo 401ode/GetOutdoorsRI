@@ -1,0 +1,31 @@
+@media all and (max-width: 800px) {
+  #toolbar,
+  #admin-menu {
+    display: none;
+  }
+
+  html body.toolbar,
+  html body.admin-menu {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+}
+details,
+summary {
+  display: block;
+}
+
+.no-details summary:hover,
+.no-details summary:focus {
+  background: #dddddd;
+}
+.no-details details > * {
+  display: none;
+}
+.no-details details summary {
+  display: block;
+}
+
+summary {
+  cursor: pointer;
+}

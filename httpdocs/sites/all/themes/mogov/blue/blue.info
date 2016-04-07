@@ -1,0 +1,115 @@
+name        = Blue
+description = Base theme for MO.gov sites.
+screenshot  = screenshot.png
+core        = 7.x
+base theme  = zen
+
+
+; ========================================
+; Stylesheets
+; ========================================
+
+; Replace system css files with Zen's
+stylesheets[all][] = system.menus.css
+stylesheets[all][] = system.messages.css
+stylesheets[all][] = system.theme.css
+
+; Add our own stylesheet.
+stylesheets[all][] = css/blue.normalize.css
+stylesheets[all][] = css/blue.hacks.css
+stylesheets[all][] = css/blue.styles.css
+stylesheets[all][] = css/blue.no-query.css
+
+
+; ========================================
+; Breakpoints
+; ========================================
+breakpoints[wide]   = all and (min-width: 992px)
+breakpoints[normal] = all and (min-width: 768px)
+breakpoints[mobile] = all and (min-width: 0px)
+
+
+; ========================================
+; Scripts
+; ========================================
+scripts[] = ../../../libraries/jquery.details.min.js
+scripts[] = js/blue.behaviors.js
+
+
+; ========================================
+; Plugins
+; ========================================
+plugins[panels][layouts] = panels/layouts
+
+
+; ========================================
+; Regions
+; ========================================
+;
+; In the page.tpl, the contents of the region are output with a
+; $page['MACHINE-NAME'] variable and, in the maintenance-page.tpl, the region is
+; output with a $MACHINE-NAME variable. For example, with this line in the .info
+; file:
+;   regions[header_top] = Header top
+; You'll use this variable in page.tpl.php:
+;   <?php print render($page['header_top']); ?>
+; And you'll use this variable in maintenance-page.tpl.php:
+;   <?php print $header_top; ?>
+regions[branding]         = Branding
+regions[header_content_1] = Header Content 1
+regions[header_content_2] = Header Content 2
+regions[premenu]          = Premenu
+regions[menu]             = Menu
+regions[submenu]          = Submenu
+regions[alert]            = Alert
+regions[warning]          = Warning
+regions[advisory]         = Advisory
+regions[notice]           = Notice
+regions[content]          = Content
+regions[sidebar]          = Sidebar
+regions[footer]           = Footer Content
+
+; The page_top and page_bottom regions are hidden, which means they will not
+; show up on the blocks administration page. But they are required in order for
+; the html.tpl.php to work properly, so do not delete them.
+regions[page_top]         = Page top
+regions[page_bottom]      = Page bottom
+
+
+; ========================================
+; Features
+; ========================================
+;
+; Various page elements output by the theme can be toggled on and off. The
+; "features" control which of these check boxes display on the
+; admin/appearance config page. This is useful for suppressing check boxes
+; for elements not used by your sub-theme. To suppress a check box, omit the
+; entry for it below. See the Drupal 7 Theme Guide for more info:
+; https://drupal.org/node/171205#features
+features[] = logo
+features[] = name
+features[] = slogan
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = favicon
+features[] = main_menu
+features[] = secondary_menu
+
+
+; ========================================
+; Settings
+; ========================================
+;
+; Set the default values of settings on the theme-settings.php form.
+settings[zen_breadcrumb]           = no
+settings[zen_breadcrumb_separator] = ' › '
+settings[zen_breadcrumb_home]      = 1
+settings[zen_breadcrumb_trailing]  = 0
+settings[zen_breadcrumb_title]     = 0
+settings[zen_skip_link_anchor]     = main-menu
+settings[zen_skip_link_text]       = Jump to navigation
+settings[zen_html5_respond_meta][] = respond
+settings[zen_html5_respond_meta][] = html5
+settings[zen_html5_respond_meta][] = meta
+settings[zen_rebuild_registry]     = 0
+settings[zen_wireframes]           = 0

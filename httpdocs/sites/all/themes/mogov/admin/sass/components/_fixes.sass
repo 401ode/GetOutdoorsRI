@@ -1,0 +1,66 @@
+/**
+ * Fixes for some odd little bugs in Ember
+ */
+
+.page-admin-config
+  .admin
+    .left.clearfix
+      clear: left
+    .right.clearfix
+      clear: right
+
+// Menu minipanels incorrectly inserts itself into the admin theme
+.ember
+  .breadcrumb
+    .menu-minipanel-panel
+      display: none
+
+
+//margin at bottom of the page not enough
+#page
+  margin: 1.5rem 2.25em 3em
+  position: relative
+  
+.page-admin-config-mogov-api-keys
+  form
+    background: #fff
+    padding: 10px
+    margin-bottom: 20px
+
+
+//linkit modal popup in panel edit mode needs z-index
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.linkit-wrapper
+  z-index: 10000
+  
+//fix overflow on table cells with edit button/dropdown in them
+td.ctools-export-ui-operations 
+  overflow: visible
+
+//fix notify new users via email, you can't see it!
+.form-item.form-type-checkbox.form-item-notify
+  border: 1px solid #f79521
+  display: inline-block
+  padding: 10px
+  margin-top: 20px
+  background: #FDE5CB
+  
+  
+//fixing opacity on tips & descriptions
+.tips,
+.description
+  opacity: .8
+  
+//weird issue with views dropdown
+.views-ui-display-tab-actions .ctools-button-processed input,
+.views-ui-display-tab-actions .ctools-button-processed input:hover,
+.views-ui-display-tab-actions .ctools-button-processed input:focus
+  color: #1695a3
+  text-shadow: none
+  
+.views-ui-display-tab-actions .ctools-button-processed input:hover,
+.views-ui-display-tab-actions .ctools-button-processed input:focus
+  color: #2a7d87
+
+//fix media browser from popping up behind panel page modal
+#mediaBrowser
+  z-index: 1002

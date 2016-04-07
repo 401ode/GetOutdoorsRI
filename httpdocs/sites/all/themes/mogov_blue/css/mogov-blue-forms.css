@@ -1,0 +1,133 @@
+#section-content fieldset {
+    border: 1px solid #cfcfcf;
+    background: #eeeeee;
+    margin-bottom: 10px;
+}
+#section-content fieldset p {
+    margin: 0 10px;
+}
+#section-content legend {
+    display: block;
+    padding: 5px;
+    margin-bottom:20px;
+    background: #dae1e6;
+    border: 1px solid #cfcfcf;
+    font-size: 14px;
+    font-weight: bold;
+    color: #444;
+    width: 100%;
+    font-family: 'Francois One', Arial, Helvetica, sans-serif;
+}
+#section-content input.sizeXS,
+#section-content select.sizeXS {
+    width: 10%;
+    margin-bottom: 8px;
+}
+#section-content input.sizeS,
+#section-content select.sizeS {
+    width: 30%;
+    margin-bottom: 8px;
+}
+#section-content input.sizeM,
+#section-content select.sizeM {
+    width: 50%;
+    margin-bottom: 8px;
+}
+#section-content input.sizeL,
+#section-content select.sizeL {
+    width: 70%;
+    margin-bottom: 8px;
+}
+#section-content input.sizeXL,
+#section-content select.sizeXL {
+    width: 90%;
+    margin-bottom: 8px;
+}
+#section-content input,
+#section-content textarea,
+#section-content select {
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#section-content select {
+    margin: 10px 0 10px 10px;
+}
+#section-content input:hover,
+#section-content textarea:hover,
+#section-content input:focus,
+#section-content textarea:focus {
+    border: 1px solid #666;
+    background-color: #e1e1e1;
+} 
+#section-content textarea {
+    width: 90%;
+    margin: 5px 0 0 10px;
+}
+#section-content label {
+    color: #444;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+#section-content input {
+    height: 25px;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+#section-content button {
+    position: relative;
+    display: block;
+    font-weight: bold;
+	font-size: 16px;
+    padding: 10px;
+    color: #fff;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #587d93;
+    -moz-box-shadow: 2px 2px 2px #ddd;
+    -webkit-box-shadow: 2px 2px 2px #ddd;
+    box-shadow: 2px 2px 2px #ddd;
+    margin: 10px 0;
+	text-shadow: 1px 1px 1px #444444;
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), #5b96b6; /* Old browsers */
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), -moz-linear-gradient(top,  #5b96b6 0%, #6daccf 46%, #558caa 100%); /* FF3.6+ */
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5b96b6), color-stop(46%,#6daccf), color-stop(100%,#558caa)); /* Chrome,Safari4+ */
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), -webkit-linear-gradient(top,  #5b96b6 0%,#6daccf 46%,#558caa 100%); /* Chrome10+,Safari5.1+ */
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), -o-linear-gradient(top,  #5b96b6 0%,#6daccf 46%,#558caa 100%); /* Opera 11.10+ */
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), -ms-linear-gradient(top,  #5b96b6 0%,#6daccf 46%,#558caa 100%); /* IE10+ */
+    background: url("/sites/all/themes/mogov_blue/img/diag_pat_trans.png"), linear-gradient(top,  #5b96b6 0%,#6daccf 46%,#558caa 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5b96b6', endColorstr='#558caa',GradientType=0 ); /* IE6-9 */
+}
+#section-content button:hover,
+#section-content button:focus {
+    -moz-box-shadow: 2px 2px 2px #aaa;
+    -webkit-box-shadow: 2px 2px 2px #aaa;
+    text-shadow: 1px 1px 1px #444; 
+	box-shadow: 2px 2px 2px #aaa;
+    border: 1px solid #607480;
+}
+#section-content input[type=radio] {
+    border: 0;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+#section-content form ul {
+    margin-left: 0;
+}
+#section-content form ul li {
+    list-style-type: none;
+}
+/*#section-content .required {
+    color: #e85d5d;
+    font-size: 18px;
+    font-weight: bold;
+}*/
+#section-content .error {
+    background-color: #e9d2d2;
+}

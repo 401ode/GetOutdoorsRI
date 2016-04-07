@@ -1,0 +1,32 @@
+/**
+ * CSS for dashboard stuff that is theme-independent
+ */
+
+.chart-table {
+  border-collapse: separate;
+}
+
+.chart-table td {
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+.chart-table .chart-background {
+  background-repeat: no-repeat;
+}
+
+.chart-table.blue .chart-background {
+  background-image: url('../img/1px_lightblue.jpg');
+}
+
+.chart-table.green .chart-background {
+  background-image: url('../img/1px_lightgreen.jpg');
+}
+
+.chart-table.yellow .chart-background {
+  background-image: url('../img/1px_lightyellow.jpg');
+}
+
+.chart-table.orange .chart-background {
+  background-image: url('../img/1px_lightorange.jpg');
+}

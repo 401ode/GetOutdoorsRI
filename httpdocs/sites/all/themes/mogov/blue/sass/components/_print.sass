@@ -1,0 +1,93 @@
+/* Inline Print Styles */
+@media print 
+  *
+    background: transparent!important
+    color: black !important
+    text-shadow: none !important
+    filter:none!important
+    -ms-filter: none !important
+    border: 0  /* Black prints faster: sanbeiji.com/archives/953 */
+
+  a,
+  a:visited
+    color: #444 !important
+    text-decoration: underline
+    word-wrap: break-word 
+
+  pre,
+  blockquote
+    border: 1px solid #999
+    page-break-inside: avoid 
+  
+  thead
+    display: table-header-group  /* css-discuss.incutio.com/wiki/Printing_Tables */
+
+  tr,
+  img
+    page-break-inside: avoid 
+  
+  @page
+    margin: 0.5cm 
+
+  p,
+  h2,
+  h3
+    orphans: 3
+    widows: 3 
+
+  h2,
+  h3
+    page-break-after: avoid 
+
+  img,
+  audio,
+  video,
+  embed,
+  object
+    display: none
+
+  #navbar-administration,
+  .region-sidebar,
+  #breadcrumb, .breadcrumb,
+  #toolbar,
+  #block-sharethis-sharethis-block,
+  .tabs,
+  #block-workbench-block,
+  #block-menu-menu-mogov-utility-bar,
+  #region-branding,
+  #zone-submenu-wrapper,
+  #section-header,
+  #back-top,
+  #block-mogov-gsa-search,
+  #block-mogov-blocks-social-bar,
+  .l-header,
+  .l-main-menu,
+  .l-alerts,
+  .l-warnings,
+  .l-advisories,
+  .l-notices,
+  .l-footer,
+  .flexslider,
+  .flex-viewport,
+  .messages 
+    display: none !important
+
+  p,
+  li,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  div  /*font-size: 12px */
+    line-height: 1.3em
+    margin: 5px 0
+    padding: 0
+    border: none
+
+  .content-box
+    border: 0
+    background: #fff
+    box-shadow: none
+    height: auto

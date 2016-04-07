@@ -1,0 +1,74 @@
+/******************************************************************************
+ * standard.layout.sass
+ ***************************************************************************** */
+/******************************************************************************
+ * _variables.sass: sets variables for the standard layout
+ ***************************************************************************** */
+.l-zone .l-container {
+  *zoom: 1;
+  max-width: 1190px;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+.l-zone .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .l-zone .l-container {
+    max-width: 1190px;
+  }
+  .l-zone .l-container .l-branding {
+    width: 47.82609%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .l-zone .l-container .l-header-content {
+    width: 47.82609%;
+    float: right;
+    margin-right: 0;
+  }
+
+  .with-sidebar .l-main .l-content {
+    width: 65.21739%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .with-sidebar .l-main .region-sidebar {
+    width: 30.43478%;
+    float: right;
+    margin-right: 0;
+  }
+}
+@media (min-width: 992px) {
+  .l-zone .l-container {
+    max-width: 1190px;
+  }
+  .l-zone .l-container .l-branding {
+    width: 40.42553%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .l-zone .l-container .l-header-content {
+    width: 57.44681%;
+    float: right;
+    margin-right: 0;
+  }
+
+  .with-sidebar .l-main .l-content {
+    width: 65.95745%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .with-sidebar .l-main .region-sidebar {
+    width: 31.91489%;
+    float: right;
+    margin-right: 0;
+  }
+}

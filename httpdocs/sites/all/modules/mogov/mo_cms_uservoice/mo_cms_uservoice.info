@@ -1,0 +1,10 @@
+name = MO CMS: UserVoice
+description = Embeds UserVoice on a site.
+core = 7.x
+package = MO CMS
+php = 5.2.4
+version = 7.x-1.0
+project = mo_cms_uservoice
+dependencies[] = features
+dependencies[] = variable
+features[features_api][] = api:1

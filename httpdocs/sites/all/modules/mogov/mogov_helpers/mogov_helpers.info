@@ -1,0 +1,6 @@
+name = Helpers
+description = Helper functions that may be used by other modules.
+core = 7.x
+package = Site: all
+version = 7.x-1.0
+project = mogov_helpers

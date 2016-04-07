@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Collapsible Blocks module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function collapsible_blocks_schema() {
+
+  $schema['collapsible_blocks'] = array(
+    'description' => 'Saves collapsibility settings for blocks.',
+    'fields' => array(
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'description' => 'The block\'s origin module, from {block}.module.',
+      ),
+      'delta' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'description' => 'The block\'s unique delta within module, from {block}.delta.',
+      ),
+      'collapsible' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Enable collapsibility on this block. (1 = yes, 0 = no)',
+      ),
+      'collapsed' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Block loads collapsed. (1 = yes, 0 = no)',
+      ),
+    ),
+    'primary key' => array('module', 'delta', 'collapsible'),
+    'indexes' => array(
+      'collapsible' => array('collapsible'),
+    ),
+  );
+
+  return $schema;
+}

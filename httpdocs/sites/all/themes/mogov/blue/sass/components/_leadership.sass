@@ -1,0 +1,68 @@
+@import "susy"
+@import "../variables/_layout"
+
+#block-mogov-blocks-leadership
+  display: block
+  margin: 20px auto
+  height: 76px
+  width: 100%
+  
+  h2
+    display: none
+
+  .leadership-info
+    width: 100%
+    margin: 0 auto
+    display: block
+    height: 76px
+    
+  p 
+    margin: 0 auto
+    padding: 0
+    width: 33%
+    float: left
+    font-size: $font-size-small
+    line-height: 1.5em
+    text-align: center
+
+    &.mogov 
+      height: 76px
+      width: 85px
+      margin: 0 10px
+      display: block
+
+  a 
+    padding-top: 20px
+    color: $white
+
+    &.gov 
+      display: block
+      height: 56px
+      text-align: center
+
+    &.state 
+      display: block
+      background: transparent $logo_footer center no-repeat
+      height: 76px
+      width: 85px
+
+    &.agency 
+      display: block
+      height: 56px
+      text-align: center
+
+  &:hover,
+  &:focus 
+    border-bottom: none
+    text-decoration: none
+    color: $white
+
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+
+  #block-mogov-blocks-leadership
+    .leadership-info
+      width: 50%
+    p 
+      width: 40%

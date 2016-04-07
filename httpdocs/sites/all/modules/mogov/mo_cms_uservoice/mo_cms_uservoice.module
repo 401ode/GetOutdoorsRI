@@ -1,0 +1,169 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS: UserVoice feature.
+ */
+
+ 
+/**
+ * Implements hook_init()
+ */
+function mo_cms_uservoice_init() {
+  $module_path = drupal_get_path('module', 'mo_cms_uservoice');
+  mo_cms_uservoice_add_js();
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function mo_cms_uservoice_menu() {
+  $items = array();
+  
+  $items['admin/config/mo-cms/uservoice'] = array(
+    'title' => 'MO CMS: UserVoice',
+    'description' => 'Configuration for the MO CMS: UserVoice module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('variable_module_form', 'mo_cms_uservoice'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_variable_info().
+ */
+function mo_cms_uservoice_variable_info($options) {
+  $variables = array(
+    'mo_cms_uservoice_hash' => array(
+      'title' => t('Uservoice hash', array(), $options),
+      'description' => t('Enter the unique hash provided for this site\'s UserVoice URL.'),
+      'type' => 'text',
+      'access' => 'access administration pages',
+      'default' => FALSE,
+      'element' => array(
+        '#type' => 'textfield',
+      ),
+    ),
+    'mo_cms_uservoice_accent_color' => array(
+      'title' => t('Accent color', array(), $options),
+      'description' => t('Enter a valid CSS color for the UserVoice pop-up accents.'),
+      'type' => 'text',
+      'access' => 'access administration pages',
+      'default' => NULL,
+      'element' => array(
+        '#type' => 'textfield',
+      ),
+    ),
+    'mo_cms_uservoice_trigger_color' => array(
+      'title' => t('Trigger color', array(), $options),
+      'description' => t('Enter a valid CSS color for the UserVoice pop-up trigger.'),
+      'type' => 'text',
+      'access' => 'access administration pages',
+      'default' => NULL,
+      'element' => array(
+        '#type' => 'textfield',
+      ),
+    ),
+    'mo_cms_uservoice_use_custom_id' => array(
+      'title' => t('Use custom ID', array(), $options),
+      'description' => t('Use a custom element ID to trigger the UserVoice pop-up.'),
+      'type' => 'boolean',
+      'access' => 'access administration pages',
+      'default' => FALSE,
+    ),
+    'mo_cms_uservoice_trigger_position' => array(
+      'title' => t('Trigger position', array(), $options),
+      'description' => t('Select the trigger position for the UserVoice pop-up.'),
+      'type' => 'text',
+      'access' => 'access administration pages',
+      'default' => 'bottom-left',
+      'element' => array(
+        '#type' => 'select',
+        '#options' => array(
+          'top-left' => t('Top left'),
+          'top-right' => t('Top right'),
+          'bottom-left' => t('Bottom left'),
+          'bottom-right' => t('Bottom right'),
+        ),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="mo_cms_uservoice_use_custom_id"]' => array('checked' => FALSE),
+          ),
+        ),
+      ),
+    ),
+    'mo_cms_uservoice_custom_id' => array(
+      'title' => t('Custom trigger ID', array(), $options),
+      'description' => t('Enter the element ID that will trigger the UserVoice pop-up (do not include the #).'),
+      'type' => 'text',
+      'access' => 'access administration pages',
+      'default' => NULL,
+      'element' => array(
+        '#type' => 'textfield',
+        '#states' => array(
+          'visible' => array(
+            ':input[name="mo_cms_uservoice_use_custom_id"]' => array('checked' => TRUE),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  return $variables;
+}
+
+
+/**
+ * Build the UserVoice JavaScript
+ */
+function mo_cms_uservoice_add_js() {
+
+  // Main script
+  $hash = variable_get_value('mo_cms_uservoice_hash');
+  $script = 'UserVoice=window.UserVoice||[];'
+          . '(function(){'
+          .   'var uv=document.createElement("script");'
+          .   'uv.type="text/javascript";'
+          .   'uv.async=true;'
+          .   'uv.src="//widget.uservoice.com/' . $hash . '.js";'
+          .   'var s=document.getElementsByTagName("script")[0];'
+          .   's.parentNode.insertBefore(uv,s)'
+          . '})();';
+
+  // Set colors
+  $accent = variable_get_value('mo_cms_uservoice_accent_color');
+  $trigger = variable_get_value('mo_cms_uservoice_trigger_color');
+  $script .= 'UserVoice.push(["set", {'
+          .    'accent_color: "' . $accent . '",'
+          .    'trigger_color: "' . $trigger . '",'
+          .    'trigger_background_color: "rgba(46, 49, 51, 0.6)"'
+          .  '}]);';
+
+  // If user is logged in, identify the user and pass traits
+  global $user;
+  if ($user->uid) {
+    $script .= 'UserVoice.push(["identify", {'
+            .    'email: "' . $user->mail . '",'
+            .    'name: "' . format_username($user) . '",'
+            .    'created_at: ' . $user->created
+            .  '}]);';
+  }
+
+  if (variable_get_value('mo_cms_uservoice_use_custom_id')) {
+    $id = variable_get_value('mo_cms_uservoice_custom_id');
+    $script .= 'UserVoice.push(["addTrigger", "#' . $id . '", { mode: "contact" }]);';
+  } else {
+    $position = variable_get_value('mo_cms_uservoice_trigger_position');
+    $script .= 'UserVoice.push(["addTrigger", { mode: "contact", trigger_position: "' . $position . '" }]);';
+  }
+
+// Autoprompt for Satisfaction and SmartVote (only displayed under certain conditions)
+//UserVoice.push(['autoprompt', {}]);
+
+  drupal_add_js($script, array('type' => 'inline', 'scope' => 'footer', 'weight' => 5));
+
+}

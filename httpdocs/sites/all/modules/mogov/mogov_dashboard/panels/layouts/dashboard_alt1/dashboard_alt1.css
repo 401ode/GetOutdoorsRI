@@ -1,0 +1,36 @@
+.panel-display--dashboard-alt1 .l-container {
+  *zoom: 1;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.panel-display--dashboard-alt1 .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .panel-display--dashboard-alt1 .l-container {
+  }
+  .panel-display--dashboard-alt1 .dashboard-alt1-col-1 {
+    width: 32%;
+    float: left;
+    margin-right: 2%;
+  }
+  .panel-display--dashboard-alt1 .dashboard-alt1-col-2 {
+    width: 66%;
+    float: right;
+  }
+  .panel-display--dashboard-alt1 .l-container .dashboard-alt1-region--col2-row1-col1,
+  .panel-display--dashboard-alt1 .l-container .dashboard-alt1-region--col2-row3-col1 {
+    width: 48.33%;
+    float: left;
+    margin-right: 3.34%;
+  }
+  .panel-display--dashboard-alt1 .l-container .dashboard-alt1-region--col2-row1-col2,
+  .panel-display--dashboard-alt1 .l-container .dashboard-alt1-region--col2-row3-col2 {
+    width: 48.33%;
+    float: left;
+  }
+}

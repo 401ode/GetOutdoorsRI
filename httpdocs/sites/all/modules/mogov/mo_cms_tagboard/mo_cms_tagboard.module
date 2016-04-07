@@ -1,0 +1,77 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS: Tagboard module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function mo_cms_tagboard_menu() {
+
+  global $base_url;
+  $items = array();
+
+  $items['admin/config/mo-cms/tagboard'] = array(
+    'title' => 'MO CMS: Tagboard',
+    'description' => 'Configuration for the MO CMS: Tagboard module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('variable_module_form', 'mo_cms_tagboard'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_variable_info().
+ */
+function mo_cms_tagboard_variable_info($options) {
+  $variables = array();
+
+  $variables['tagboard_id'] = array(
+    'title' => t('Tagboard ID', array(), $options),
+    'description' => t('This may just be a name, or a name and an ID number separated by a slash. Just enter the whole thing here.'),
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => 0,
+  );
+  
+  return $variables;
+}
+
+function mo_cms_tagboard_block_info() {
+  $blocks = array();
+  $blocks['mo_cms_tagboard']['info'] = t('Tagboard');
+  return $blocks;
+}
+
+function mo_cms_tagboard_block_view($delta='') {
+
+  $block = array();
+
+  switch ($delta) {
+
+    case 'mo_cms_tagboard':
+      $content = array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'id' => 'tagboard-embed',
+        ),
+      );
+      $block['content'] = render($content);
+      $id = variable_get_value('tagboard_id');
+      $js = 'var tagboardOptions = {tagboard:"' . $id . '", autoLoad: true};'
+          . 'Modernizr.load({'
+          .   'test: Modernizr.mq("only screen and (min-width:739px)"),'
+          .   'yep: "//tagboard.com/public/js/embed.js"'
+          . '})';
+      drupal_add_js($js, array('type' => 'inline', 'scope' => 'footer'));
+      break;
+
+  }
+  
+  return $block;
+
+}

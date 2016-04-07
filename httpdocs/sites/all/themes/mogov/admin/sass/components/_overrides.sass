@@ -1,0 +1,34 @@
+/**
+ * Override some of Ember's styles for aesthetic reasons
+ */
+
+a,
+a:link,
+a:visited,
+.action-links li:before
+  color: #1695A3
+  
+  &:hover,
+  &:focus
+    color: #2a7d87
+    
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"],
+[class*="action-item"], 
+.button,
+[id^="edit-cancel"]
+  background: #eb7f00
+  color: #fff
+  text-shadow: 0 1px 0 #444
+
+  &:hover,
+  &:focus
+    background: #ff8b03
+    color: #fff
+    text-shadow: 0 1px 0 #444
+    
+img, video, audio, figure
+  display: inline-block
+  margin: 0

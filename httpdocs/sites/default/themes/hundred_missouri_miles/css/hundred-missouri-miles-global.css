@@ -1,0 +1,2281 @@
+/**
+ * This file will hold styles for the mobile version of your website (mobile
+ * first).
+ * 
+ * This also can include ANY global CSS that applies site-wide. Unless
+ * overwritten by a more specific style rule, CSS declarations in this file
+ * will apply site-wide.
+ * 
+ * File will be aggregated and minimized when performance options are enabled,
+ * so feel free to use readable formatting.
+ */
+ 
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,700);
+
+body {
+	font-size: 16px; 
+    line-height: 1.75em;
+	color: #3B2D1B;
+	background: #eae4cf url("/sites/default/themes/hundred_missouri_miles/img/footer-image-sm.png") center bottom repeat-x;
+	padding-bottom: 180px;
+	font-family: 'Roboto', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.2em;
+    color: #16534f;
+	letter-spacing: normal;
+}
+
+h1, 
+.dotted-underline, 
+#home-page .pane-mo-cms-slider > h2 {
+	border-bottom: 2px dotted #d5cfb0;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 14px 0;
+}
+
+p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address, fieldset {
+	margin-bottom: 14px; 
+}
+
+ol {
+	margin-left: 40px;
+}
+
+.item-list ol li {
+	list-style: decimal;
+}
+
+dt {
+    font-weight: bold;
+    margin: 6px 0;
+}
+
+dd {
+    margin: 4px 10px 4px 30px;
+	font-style: normal;
+}
+
+/*bug reporting bar*/
+
+#zone-header-prefix-wrapper {
+	background: #16534f;
+	color: #f0ede2;
+	text-align: center;
+	padding: 10px 0;
+}
+
+#zone-header-prefix-wrapper a {
+	color: #689038;
+	border-bottom: 1px dotted #689038;
+	font-weight: bold;
+}
+
+#zone-header-prefix-wrapper a:hover, #zone-header-prefix-wrapper a:focus  {
+	color: #b15226;
+	border-bottom: 1px dotted #b15226;
+}
+/*header*/
+
+
+
+#region-header-left {
+	background-color: #5cb8b4;
+	border-bottom: 4px solid #34807b; 
+	margin: 0; 
+}
+
+#zone-header .block-title, 
+#block-mo-project-gov-progress {
+    display: none;
+	font-weight: bold;
+}
+
+.logo {
+	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/100-Mo-Logo.png"); 
+	height: 150px;
+	width: 185px;
+	display: block; 
+}
+
+
+/**
+*top menu
+*/
+
+/*.menu-level-1 li a, #block-system-user-menu li a {
+}*/
+
+.menu-level-1 {
+	width: 100%; 
+	position: relative;
+}
+
+
+.menu-level-1 li, #block-system-user-menu li , #block-menu-menu-secondary-menu li{
+    font-weight: bold;
+    list-style: none!important;
+}
+
+.menu-level-1 li a, #block-menu-menu-secondary-menu li a {
+	color: #fff;
+	font-size: 1em; 
+	background: #1E5350;
+    border-radius: 10px;
+    display: block;
+    font-size: 1em;
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.not-logged-in .my-miles-menu-item {
+	display: none;
+}
+
+/**
+*user menu
+*/
+
+#block-system-user-menu ul {
+    position: absolute;
+    right: 10px;
+    top: -150px;
+}
+
+#block-system-user-menu li {
+	line-height: 1em;
+}
+
+#block-system-user-menu li a {
+	color: #E3E1CC;
+	background: #4b701f;
+	border-radius: 10px 10px 10px 10px;
+	display: block;
+	font-size: .8em;
+	margin: 5px 0;
+	padding: 5px;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: 1px 1px 5px #444;
+	width: 100px;
+}
+
+#navigate{ 
+  	background: #2A7771;
+	border-radius: 10px 10px 0 0; 
+	height: 20px; 
+	bottom: 0;
+	position: absolute;
+	top: 123px;
+    font-size: .8em;
+}
+
+#navigate .menu-toggle {   
+    color: #E3E1CC;
+    display: block;
+    padding: 3px 5px 0px 5px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: 1px 1px 5px #444;
+    width: 95px;
+}
+
+#zone-alert-wrapper {
+    background: #B15126;
+	color: #fff;
+    padding: 5px;
+}
+
+#zone-alert-wrapper p {
+   margin-bottom: 0;
+}
+
+span.arrow {
+	background: url("/sites/default/themes/hundred_missouri_miles/img/nav-arrows.png") no-repeat -4px -1px;
+	width: 14px;
+	height: 10px;
+	display: inline-block;
+	position: relative;
+	left: 15px;
+	top: 1px
+}
+
+.arrow.down_png {
+	background: url("/sites/default/themes/hundred_missouri_miles/img/nav-arrows.png") no-repeat -4px -19px;
+	width: 14px;
+	height: 10px;
+}
+
+body.front h1#page-title, 
+.block-user-stats .block-title, 
+.welcome-msg .governor  {
+  display: none;
+}
+
+.progress-wrapper {
+  height: 20px;
+  margin: 10px 0;
+}
+
+.logged .progress-wrapper {
+	margin: 30px 0 10px 0;
+}
+
+.progress-bar-label {
+    clear: left;
+    display: block;
+    float: none;
+}
+
+.progress-value-label {
+	float: left;
+	line-height: 1.5em;
+	margin-left: 10px;
+	font-weight: bold;
+}
+
+.progress-value {
+  background-color: #70983F;
+  float: left;
+  height: 20px;
+}
+.ajax-updating {
+  background-color: #eee;
+}
+.invalid input {
+  background-color: #eecccc!important;
+}
+.invalid-message {
+    clear: left;
+    color: #6A6A6A;
+    display: block;
+    font-size: 10px;
+    line-height: 1em;
+    position: relative;
+}
+
+/**
+ * Badges
+ */
+.badges {
+  margin: 10px 0;
+}
+.badge {
+  float: left;
+  display: block;
+}
+
+.badge h4 {
+	clear: left;
+	text-align: center;
+	font-size: 13px!important;
+	font-weight: normal;
+}
+
+ul.badges {
+	padding-left: 0!important;
+	margin-left: 0!important;
+}
+
+.badge.archived img {
+	opacity: .3;
+}
+
+/*badge gallery */
+
+#overall-badges, #activity-badges {
+	background: #EFEDE1;
+	margin-bottom: 12px;
+	-moz-border-radius: 0 0 5px 5px;
+	border-radius: 0 0 5px 5px;
+}
+
+#overall-badges h3, #activity-badges h3 {
+	background: #6D9641;
+	color: #EFEDE1;
+	margin: 0;
+	padding: 10px
+	
+}
+
+#overall-badges p, #activity-badges p,
+#overall-badges li, #activity-badges li {
+	text-align: center;
+}
+
+#overall-badges > p {
+	padding: 50px;
+}
+
+#overall-badges li p {
+	font-size: 13px;
+	clear: left;
+	line-height: 1.2em;
+}
+
+.item-list ul.badges li {
+    margin: 5px 15px;
+	width: 100px;
+	padding: 0;
+	height: 130px;
+}
+
+.page-trophy ul.tabs.primary {
+	margin: 10px 0 5px 0;
+	border-bottom: 0;
+	border-color: #DFDCD2;
+}
+
+.page-trophy ul.primary li {
+	margin-right: 0;
+}
+
+.page-trophy ul.primary li a {
+	font-size: 20px;
+	border-radius: 5px 5px 0 0;
+	padding: 5px 10px;
+	background: #D5D1C0;
+}
+
+.page-trophy ul.primary li a:hover {
+	border-bottom: none;
+	background: #FAF8EA;
+	border-color: #DFDCD2;
+
+}
+
+.page-trophy ul.primary li.active a {
+	background: #EFEDE1;
+	border-bottom: none;
+}
+
+#trophy-sidebar .item-list ul.badges li {
+	margin: 5px;
+}
+
+
+
+/*media gallery*/
+
+.media-gallery-item a:hover, .media-gallery-item a:focus {
+    border-bottom: none !important;
+}
+
+/* login page */
+
+.form-item-field-mo-cms-postal-address-und-0-country {
+	display: none;
+}
+
+/*homepage*/
+
+.not-logged-in.page-home .region-sidebar .block-inner {
+	border: none;
+	background: none;
+	margin-bottom: 0;
+}
+
+.page-home #block-mo-project-user-stats, 
+#block-mo-project-log-mileage-form-front, 
+.not-logged-in.page-home #block-block-15 {
+	margin-bottom: 20px;
+}
+
+.logged-in.page-home #block-block-15 .block-inner, 
+.logged-in.page-home #block-block-10 .block-inner {
+	border: none;
+	background: none;
+	padding: 0;
+}
+
+.logged-in.page-home #block-block-15 .block-inner .content {
+	padding: 0;
+	margin: 10px 0;
+}
+
+
+#mileage-location {
+	height: auto;
+	font-size: 14px;
+	width: 96%!important;
+}
+
+
+.page-home .section-content img {
+	margin: 0 auto;
+}
+
+/*logged in homepage*/
+
+#leaderboard-group-notable-figures h3,
+#leaderboard-group-notable-figures .activity-bg, 
+#leaderboard-group-notable-figures .activity-icon, 
+.badge-goal { 
+	display: none;
+}
+
+#user-stats .req-medal.btn {
+    border-radius: 0;
+	border: none;
+}
+
+.hundred-missouri-miles-4-top-1-bottom .top {
+	width: 100%;
+	float: none;
+}
+
+
+/*sidebar medal link*/
+#req-medal {
+	background: url("/sites/default/themes/hundred_missouri_miles/img/medal-color.png") no-repeat;
+	padding: 20px 0 20px 40px;
+	height: 20px;
+	display: block;
+	line-height: 1.2em; 
+}
+
+#req-medal:hover, #req-medal:focus {
+	border-bottom: none!important;
+}
+
+/*logged miles message */
+
+#modal-message {
+	font-weight: bold;
+	text-align: center;
+	width: 50%;
+	position: fixed;
+	top: 50%;
+	left: 20%;
+	background: #fbfaf7;
+	border: 5px solid #b15127;
+	border-radius: 5px;
+	padding: 50px 20px;
+	box-shadow: 2px 2px 5px #444;
+}
+
+
+/*Log miles page*/
+
+#edit-field-mileage-date-value-wrapper label {
+	color: #3B2D1B;
+}
+
+
+
+/*trails search */
+
+#block-mo-project-event-search .block-inner {
+	background: #F0EEE2;
+	border: 1px solid #BDBAA9;
+	padding: 10px; 
+}
+
+#views-exposed-form-trails-page .form-type-bef-checkbox  {
+	white-space: nowrap;	
+}
+
+#views-exposed-form-trails-page .views-exposed-widget.views-submit-button, 
+#views-exposed-form-mo-cms-events-lists-mo-cms-events-search .views-exposed-widget.views-submit-button {
+	float: none;
+	clear: left;
+	padding: 10px 0;	
+}
+
+#edit-submit-trails { 
+	margin: 0;
+}
+
+table {
+	color: #3B2D1B;
+	
+}
+
+thead th, th, th.active {
+	background: #70983F;
+	color: #EDEBDF;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+tr.even td, tr.even td.active {
+	background: #f9f8f2;
+}
+
+tr.odd td, tr.odd td.active {
+	background: #f3f1e6;
+}
+
+tr:hover td, tr.even:hover td.active, tr.odd:hover td.active {
+ 	background: #dbd9cb;
+}
+
+tr.even td.active, tr.odd td.active, th.active {
+	border-left: 0;
+	border-right: 0;
+	
+}
+
+th.active img {
+	vertical-align: middle;
+}
+
+th a, th a:link, th a:visited {
+	color: #EDEBDF;
+}
+
+th a:hover, th a:focus {
+	border-bottom: none!important;
+	color: #fff!important;
+}
+
+.item-list ul.activity-icons li {
+	margin: 0 5px 5px 0;
+}
+
+.views-field.views-field-field-trail-activity {
+	width: auto;
+	/*white-space: nowrap;*/
+}
+.table-container
+{
+	width: 100%;
+	overflow-y: auto;
+	_overflow: auto;
+	margin: 0 0 1em;
+}
+.table-container::-webkit-scrollbar
+{
+	-webkit-appearance: none;
+	width: 14px;
+	height: 14px;
+}
+
+.table-container::-webkit-scrollbar-thumb
+{
+	border-radius: 8px;
+	border: 3px solid #fff;
+	background-color: rgba(0, 0, 0, .3);
+}
+
+/*forms*/
+button,
+.button, 
+input[type="reset"], 
+input[type="submit"], 
+input[type="button"], 
+.form-actions input,
+.form-actions input:focus,
+.form-actions input:hover,
+a.btn, 
+.logged-in.page-user ul.tabs li a, 
+#user-stats a.btn, 
+#section-content a.btn {
+	background: #c16236;
+	color: #fff;
+	font-size: 20px;
+	text-align: center;
+	padding: 6px 12px;
+	text-shadow: 1px 1px 5px #444;
+	clear:  left;
+	display: block;
+	box-shadow: 1px 1px 2px #413628;
+	font-weight: bold;
+	margin: 10px 10px 10px 0;
+	border-radius: 0;
+	text-decoration: none;
+	border: none;
+}
+
+button:hover,
+.button:hover, 
+input[type="reset"]:hover, 
+input[type="submit"]:hover, 
+input[type="button"]:hover, 
+.form-actions input:hover, 
+a.btn:hover, 
+.logged-in.page-user ul.tabs li a:hover, 
+#user-stats a.btn:hover, 
+#section-content a.btn:hover, 
+button:focus,
+.button:focus, 
+input[type="reset"]:focus, 
+input[type="submit"]:focus, 
+input[type="button"]:focus, 
+.form-actions input:focus, 
+a.btn:focus, 
+.logged-in.page-user ul.tabs li a:focus, 
+#user-stats a.btn:focus, 
+#section-content a.btn:focus  {
+	color: #fff;
+	background: #a3431b;
+}
+
+#mo-cms-user-groups-group-action-form input.btn.form-button-disabled {
+	box-shadow: none;
+	background: #ce8652;
+}
+
+button:focus, 
+button:active, 
+.button:focus,
+.button:active,
+input:focus, 
+input:active, 
+select:focus, 
+select:active, 
+textarea:focus, 
+textarea:active  {
+	box-shadow: 0 0 7px #B15126
+}
+
+
+legend {
+	font-weight: bold;
+}
+
+input[type=text], textarea, select, input[type=password] {
+    width: 96%!important;
+}
+
+input[type=text], input[type=password], select {
+	height: 26px; 
+}
+
+input, select, textarea {
+	border-radius: 0!important;
+	font-size: 16px;
+
+}
+
+.form-item .description {
+	font-size: .7em;
+}
+
+#edit-actions input {
+	display: inline;
+	margin-right: 10px;
+}
+
+.multiselect li a {
+	background: auto;
+}
+
+select.multiselect_sel {
+    width: 250px !important;
+}
+
+/**
+ * Content control - use on any elements to show/hide content on mobile
+ */
+.mobile-hide {
+    display: none;
+}
+.mobile-only {
+    display: block!important;
+}
+
+
+/*content */
+
+#zone-content {
+	margin-top: 20px; 
+}
+
+#zone-content ul li.leaf {
+	list-style-image: none;
+	list-style-type: disc;
+	color: #2a7671;
+}
+
+.section-content .node ol, 
+.section-content .node ul {
+	padding-left: 0;
+	margin-left: 30px;
+}
+
+.section-content h2 { font-size: 22px; }
+.section-content h3 { font-size: 20px; }
+.section-content h4 { font-size: 18px; }
+.section-content h5 { font-size: 16px; }
+.section-content h6 { font-size: 14px; }
+
+.section-content a, 
+#modal-content a, 
+#section-footer a {
+    color: #2a7671;
+    background-color: transparent;
+	font-weight: bold;
+}
+
+.section-content a:hover, 
+.section-content a:focus, 
+#modal-content a:hover, 
+#modal-content a:focus, 
+#section-footer a:hover,
+#section-footer a:focus {
+    color: #b15226;
+	border-bottom: 1px dotted #b15226;
+}
+
+
+.section-content .img-caption {
+	font-style: italic;
+	line-height: 1.4em;
+	font-size: .8em;
+}
+
+
+.section-content img, #region-branding img { 
+	max-width: 100%!important;
+	height: auto!important; 
+	display: block; 
+	position: relative;
+}
+
+.folded-corner-box, 
+.content-box,
+#node-panel-234688 > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div, 
+#mo-cms-user-group-detail-panel #panel-top-left-upper .inside  { 
+	background: #EFEDE1 url("/sites/default/themes/hundred_missouri_miles/img/folded_corner.png") no-repeat top right; 
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	margin-bottom: 20px;
+}
+
+.folded-corner-box h2, 
+.content-box h2,
+#node-panel-234688  > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div h2, 
+.logged-in.node-type-mo-cms-user-group h1, 
+.logged-in.page-groups h1, 
+.node-type-achievement #region-content h2 {
+	border-bottom: 2px dotted #d5cfb0;
+    color: #624f36;
+}
+
+/*collapsible panes*/
+
+
+.reverse-header h2,
+.panel-pane.collapsible.collapsed .pane-title {
+	background:#2a7671;
+	color: #fff!important;
+	padding: 20px 10px!important;
+	border-bottom: none;
+	margin-top: 0;
+}
+
+.panel-pane.collapsible .pane-title:hover,
+.panel-pane.collapsible .pane-title:focus,
+.panel-pane.collapsible .pane-title {
+	cursor: pointer;
+	background-color: #c16236;
+}
+
+/*log miles pane*/
+.pane-mo-project-log-mileage-form .pane-title,
+.pane-mo-project-log-mileage-form-front .pane-title {
+	background-color: #c16236;
+}
+
+.panel-pane.collapsible .pane-content {
+	max-height: 30em;
+	height: auto;
+	transition: opacity 0.6s ease-in-out, max-height 0.6s ease-in-out;
+	opacity: 1;
+}
+
+.panel-pane.collapsible.collapsed .pane-content {
+	display: block;
+	max-height: 0;
+	height: 0;
+	transition: opacity 0 ease-in-out;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+}
+
+
+.content-box { 
+	background-image: none; 
+}
+
+.content-box.add-padding ul {
+	margin-left: 0;
+}
+
+
+.add-height { 
+	min-height: 370px;
+}
+
+.add-height-200 {
+	min-height: 200px;
+}
+
+.add-height-400 {
+	min-height: 400px;
+}
+
+.capwords {
+	text-transform: capitalize;
+}
+
+.add-padding, 
+#node-panel-234688  > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div,
+#mo-cms-user-group-detail-panel #panel-top-left-upper .inside {
+	padding: 20px;
+}
+
+.mileage-box {
+	background-color: #70983f;
+	border-radius: 5px;
+	padding: 10px;
+	color: #F4F0E6;
+	text-align: center;
+	margin: 20px 0;
+	
+}
+
+/*.mileage-box.thirty-day {
+	background-color: #5BB2AC;
+}*/
+
+.mileage-box .mileage {
+	font-size: 48px;
+	margin: 20px 0;
+	font-weight: bold;
+
+}
+
+.mileage-box .mileage-label {
+	font-size: 18px;
+	line-height: 1.2em;
+
+}
+
+.mileage-box.thirty-day .mileage {
+	font-size: 24px;
+
+}
+
+.mileage-box.thirty-day .mileage-label {
+	font-size: 12px;
+	line-height: 1.2em;
+}
+
+.mileage-box.no-background {
+	background-color: transparent;
+	color: #624f36;
+}
+
+.mileage-box.brown-background {
+	background-color: #D9D7CB;
+	color: #624f36;
+	height: 100px;
+	border: 1px solid #c3c1b7;
+}
+
+.mileage-box.brown-background.transparent-icon-person {
+	background-position: 70%;
+}
+
+span.mi {
+	font-size: 40%;
+}
+
+.pane-current-challenge-miles-home .mileage-box .mileage-label {
+	font-weight: bold;
+}
+
+.mileage-box.thirty-day.user-thirty,
+.mileage-box.thirty-day.avg-thirty,
+.mileage-box.thirty-day.leader-thirty {
+	opacity: .7;
+}
+
+.panel-pane.collapsed .groups-icon,
+.panel-pane.collapsed .activity-calc-icon,
+.panel-pane.collapsed .trophy-icon,
+.panel-pane.collapsed .settings-icon,
+.panel-pane.collapsed .miles-icon,
+.panel-pane.collapsed .buddy-icon,
+.panel-pane .groups-icon,
+.panel-pane .activity-calc-icon,
+.panel-pane .trophy-icon,
+.panel-pane .settings-icon,
+.panel-pane .miles-icon,
+.panel-pane .buddy-icon {
+	background: url("/sites/default/themes/hundred_missouri_miles/img/header-icons.png") no-repeat;
+	display: inline-block;
+	width: 45px;
+	height: 32px;
+	background-position: -3px -268px;
+	float: left;
+	margin-right: 10px;
+	top: -5px;
+	position: relative;
+}
+
+.panel-pane.collapsed .activity-calc-icon,
+.panel-pane .activity-calc-icon {
+	background-position: -57px -149px;
+	width: 40px;
+	height: 39px;
+}
+
+.panel-pane .activity-calc-icon,
+.panel-pane h2:hover .activity-calc-icon,
+.panel-pane h2:focus .activity-calc-icon {
+	background-position: -5px -149px;
+}
+
+.panel-pane.collapsed .trophy-icon,
+.panel-pane .trophy-icon {
+	background-position: -57px -205px;
+	width: 40px;
+	height: 42px;
+}
+
+.panel-pane .trophy-icon,
+.panel-pane h2:hover .trophy-icon,
+.panel-pane h2:focus .trophy-icon {
+	background-position: -5px -205px;
+}
+
+.panel-pane.collapsed .miles-icon,
+.panel-pane .miles-icon,
+.panel-pane.pane-mo-project-log-mileage-form-front .miles-icon {
+	background-position: -5px -80px;
+	width: 38px;
+	height: 54px;
+	top: -13px;
+}
+
+/*.panel-pane .miles-icon,
+.panel-pane h2:hover .miles-icon,
+.panel-pane h2:focus .miles-icon {
+	background-position: -5px -80px;
+}*/
+
+.panel-pane.collapsed .settings-icon,
+.panel-pane .settings-icon {
+	background-position: -57px -322px;
+	width: 41px;
+	height: 41px;
+}
+
+.panel-pane .settings-icon,
+.panel-pane h2:hover .settings-icon,
+.panel-pane h2:focus .settings-icon {
+	background-position: -5px -322px;
+}
+
+.panel-pane.collapsed .groups-icon,
+.panel-pane .groups-icon {
+	background-position: -55px -269px;
+	width: 45px;
+	height: 32px;
+}
+
+.panel-pane .groups-icon,
+.panel-pane h2:hover .groups-icon,
+.panel-pane h2:focus .groups-icon {
+	background-position: -3px -268px;
+}
+
+.panel-pane.collapsed .buddy-icon,
+.panel-pane .buddy-icon {
+	background-position: -60px -378px;
+	width: 40px;
+	height: 46px;
+}
+
+.panel-pane .buddy-icon,
+.panel-pane h2:hover .buddy-icon,
+.panel-pane h2:focus .buddy-icon {
+	background-position:  -8px -378px;
+}
+
+
+
+.trophy-icon-white, .stats-icon-white, .activitylog-icon-white {
+    background: url("/sites/default/themes/hundred_missouri_miles/img/header-icons.png") no-repeat;
+	width: 17px;
+    height: 17px;
+    background-position: -49px -48px;
+	display: inline-block;
+	margin-right: 5px; 
+}
+
+.stats-icon-white {
+	background-position: -86px -13px;
+	width: 20px;
+    height: 13px;
+}
+
+.activitylog-icon-white {
+	background-position: -87px -51px;
+	width: 16px;
+    height: 12px;
+}
+
+
+
+.transparent-icon-cycling, 
+.transparent-icon-geocaching, 
+.transparent-icon-hiking,
+.transparent-icon-paddling,
+.transparent-icon-riding,
+.transparent-icon-walking,
+.transparent-icon-rolling,
+.transparent-icon-swimming,
+.transparent-icon-running, 
+.transparent-icon-skating, 
+.transparent-icon-person, 
+.transparent-icon-gov,
+.transparent-icon-first-lady,
+.leaderboard-activity-stats.cycling .mileage-box.first, 
+.leaderboard-activity-stats.geocaching .mileage-box.first, 
+.leaderboard-activity-stats.hiking .mileage-box.first, 
+.leaderboard-activity-stats.paddling .mileage-box.first, 
+.leaderboard-activity-stats.riding .mileage-box.first, 
+.leaderboard-activity-stats.walking .mileage-box.first, 
+.leaderboard-activity-stats.rolling .mileage-box.first, 
+.leaderboard-activity-stats.swimming .mileage-box.first, 
+.leaderboard-activity-stats.running .mileage-box.first, 
+.leaderboard-activity-stats.skating .mileage-box.first {
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+
+.transparent-icon-cycling, .leaderboard-activity-stats.cycling .mileage-box.first {
+    background-image: url("/sites/default/themes/hundred_missouri_miles/img/cycling-bg.png");
+}
+
+.transparent-icon-geocaching, .leaderboard-activity-stats.geocaching .mileage-box.first {
+    background-image: url("/sites/default/themes/hundred_missouri_miles/img/geocaching-bg.png");	
+}
+
+.transparent-icon-hiking, .leaderboard-activity-stats.hiking .mileage-box.first {
+ 	background-image: url("/sites/default/themes/hundred_missouri_miles/img/hiking-bg.png");}
+
+.transparent-icon-paddling, .leaderboard-activity-stats.paddling .mileage-box.first,
+#blue-miles-page .pane-blue-mileage-pane.mileage-box.thirty-day.paddling {
+ 	background-image: url("/sites/default/themes/hundred_missouri_miles/img/paddling-bg.png");
+}
+
+.transparent-icon-riding, .leaderboard-activity-stats.riding .mileage-box.first {
+     background-image: url("/sites/default/themes/hundred_missouri_miles/img/riding-bg.png");
+}
+
+.transparent-icon-rolling, .leaderboard-activity-stats.rolling .mileage-box.first {
+     background-image: url("/sites/default/themes/hundred_missouri_miles/img/rolling-bg.png");
+}
+
+.transparent-icon-running, .leaderboard-activity-stats.running .mileage-box.first {
+    background-image: url("/sites/default/themes/hundred_missouri_miles/img/running-bg.png");
+}
+
+.transparent-icon-skating, .leaderboard-activity-stats.skating .mileage-box.first {
+ 	background-image: url("/sites/default/themes/hundred_missouri_miles/img/skating-bg.png");
+}
+
+.transparent-icon-swimming, .leaderboard-activity-stats.swimming .mileage-box.first,
+#blue-miles-page .pane-blue-mileage-pane.mileage-box.thirty-day.swimming {
+     background-image: url("/sites/default/themes/hundred_missouri_miles/img/swimming-bg.png");
+}
+
+.transparent-icon-walking, .leaderboard-activity-stats.walking .mileage-box.first {
+     background-image: url("/sites/default/themes/hundred_missouri_miles/img/walking-bg.png");
+}
+
+.transparent-icon-gov {
+	 background-image: url("/sites/default/themes/hundred_missouri_miles/img/gov-bg.png");
+	 background-position: 0 13px;
+}
+
+.transparent-icon-first-lady {
+	 background-image: url("/sites/default/themes/hundred_missouri_miles/img/first-lady-bg.png");
+ 	 background-position: 0 13px;
+}
+
+.transparent-icon-person,
+#blue-miles-page .pane-blue-mileage-pane.mileage-box.thirty-day {
+    background-image: url("/sites/default/themes/hundred_missouri_miles/img/person-bg.png");
+	background-position: 0 13px;
+}
+
+
+/* Leaderboard */
+
+
+.leaderboard-activity-stats .leaderboard-box {
+  float: left; 
+  width: 30%; 
+  margin-right: .5em;
+}
+
+.leaderboard-activity-stats .leaderboard-box.first {
+	width: 100%;
+	clear: both;
+}
+
+#mo-project-add-mileage-form {
+	height: auto;
+	padding: 0 20px;
+}
+
+.page-dashboard-mileage-log #mo-project-add-mileage-form {
+	padding: 0;
+}
+
+.view-leaderboard-user p {
+	font-size: 12px;
+	line-height: 1em;
+}
+
+#leaderboard-header h3 {
+	margin: 0 0 7px 0;
+}
+
+#leaderboard-header .totals, #leaderboard-header .thirtydays {
+	width: 100%;
+}
+
+
+
+
+/*activity icons*/
+
+.activity-icon {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background: transparent url("/sites/default/themes/hundred_missouri_miles/img/activityicons_spritesheet.png");
+	margin-right: 5px;
+	float: left;
+	
+}
+
+.activity-icon.cycling {
+    background-position: -5px -5px;
+}
+
+.activity-icon.hiking {
+    background-position: -43px -5px;
+}
+
+.activity-icon.riding {
+    background-position: -5px -43px;
+}
+
+.activity-icon.paddling {
+    background-position: -43px -43px;
+}
+
+.activity-icon.rolling {
+    background-position: -81px -5px;
+}
+
+.activity-icon.swimming {
+    background-position: -81px -43px;
+}
+
+.activity-icon.walking {
+    background-position: -5px -81px;
+}
+
+.activity-icon.running {
+	background-position: -83px -82px;
+}
+
+.activity-icon.other {
+    background-position:  -40px -80px;
+}
+
+.activity-icon.boarding {
+    background-position:  -6px -117px;
+}
+
+.activity-icon.skating {
+    background-position:  -121px -8px;
+}
+
+.activity-icon.aerobics {
+    background-position:  -85px -115px;
+}
+
+.activity-icon.geocaching {
+    background-position:  -118px -43px;
+}
+
+
+.number {
+    background: #70983F;
+    color: #E7E0CD;
+    border-radius: 80px;
+    display: inline-block;
+    font-size: 22px;
+    margin: 0 10px 0 0;
+    padding: 5px 15px; 
+}
+
+/*pdf file icon, drupal likes to add automatically, remove*/
+.file-icon {
+    display: none !important;
+}
+
+/**
+*Sidebar
+*/
+
+.region-sidebar-inner .block-inner {
+	margin-bottom: 20px;
+}
+
+.region-sidebar-inner .plain-sidebar .block-inner .content, 
+.plain-sidebar .block-inner {
+	border: none;
+	padding: 0;
+	background: none;
+}
+	
+
+.block-activity-converter .block-inner, 
+.block-achievements .block-inner {
+	margin-top: -20px;
+	border-top: none;
+}
+
+
+.region-sidebar-inner h2 {
+    color: #624f36;
+	padding: 10px;
+}
+
+.region-sidebar-inner .block-inner .content {
+	padding: 10px; 
+}
+
+.region-sidebar-inner ul {
+	margin-left: 30px;
+}
+
+.region-sidebar-inner .collapsible-block h2 {
+	display: block; 
+
+}
+
+.region-sidebar-inner .collapsible-block h2 a:hover, 
+.region-sidebar-inner .collapsible-block h2 a:focus {
+	border-bottom: 0!important;
+}
+
+.region-sidebar-inner .collapsible-block h2 a {
+	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/expand.png") no-repeat;
+	color: #fff;
+	padding-left: 38px; 
+}
+
+.region-sidebar-inner .item-list ul li {
+	margin: 0;
+}
+
+.region-sidebar-inner .item-list h3 {
+	font-size: 16px;
+	
+}
+
+#region-sidebar ul.menu li a.active {
+	color: #204240;
+}
+
+
+/*flexslider in sidebar for sponsors*/
+
+.region-sidebar .flexslider {
+	border: none;
+	background: transparent;
+	box-shadow: none;
+	
+}
+
+.region-sidebar #block-mo-cms-slider-mo-cms-slider-1464 .flex-viewport {
+	height: 575px!important;
+}
+
+.region-sidebar .flexslider ul {
+	margin: 0 auto;
+}
+
+#block-mo-cms-slider-mo-cms-slider-1464 .block-inner {
+    background: none;
+    border: 0 none;
+}
+
+#block-mo-cms-slider-mo-cms-slider-1464 h2 {
+	background: none;
+	color: #16534f;
+	border: none;
+	border-bottom: 2px dotted #d5cfb0;
+
+}
+
+
+/*flexslider overrides*/
+
+.section-content .flexslider ul, 
+.section-content .flexslider ol,
+.section-content .flexslider .item-list ul li {
+	margin: 0;
+	padding: 0;
+}
+
+.section-content .flexslider li {
+	list-style-type: none;
+}
+
+.section-content .flex-direction-nav li a {
+	background-image: url("/sites/default/themes/hundred_missouri_miles/img/bg_direction_nav.png");
+	width: 27px;
+	height: 26px;
+}
+
+.section-content .flex-direction-nav li .flex-prev {
+	left: 10px;
+	background-position: -1px -1px;
+}
+
+.section-content .flex-direction-nav li .flex-next {
+	right: 10px;
+	background-position: -31px -1px;
+}
+
+.section-content .flex-direction-nav a:before, 
+.section-content .flex-direction-nav a.flex-next:before {
+	content: '';
+}
+
+.ie7 .flex-direction-nav .flex-prev, 
+.ie7 .flexslider:hover .flex-prev,
+.ie7 .flex-direction-nav .flex-next, 
+.ie7 .flexslider:hover .flex-next {
+	display: none;
+}
+
+.ie8 .flex-direction-nav .flex-prev, 
+.ie8 .flexslider:hover .flex-prev {
+	left: 10px;
+}
+
+.ie8 .flex-direction-nav .flex-next, 
+.ie8 .flexslider:hover .flex-next {
+	right: 10px;
+}
+
+.section-content .flex-direction-nav a:hover,
+.section-content .flex-direction-nav a:focus, 
+.section-content .flex-control-nav li a:hover,
+.section-content .flex-control-nav li a:focus, 
+.flex-pauseplay a:hover, 
+.flex-pauseplay a:focus  {
+	border-bottom: none;
+}
+
+.flexslider .slides {
+	zoom: 1
+}
+
+.flexslider .slides > li {
+	position: relative
+}
+
+.flex-container {
+	zoom: 1;
+	position: relative
+}
+
+.flex-caption, .mo-cms-slider-caption {
+	width: 96%;
+	padding: 2%;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	background: rgba(0,0,0,.6);
+	color: #fff;
+	text-align: center;
+	text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+	font-size: 14px;
+	line-height: 18px
+}
+
+.flex-caption {
+	font-size: 12px;
+}
+
+.flex-pauseplay a { 
+	color: #fff;
+	right: 10px; 
+	height: 25px;
+}
+
+.section-content .flexslider ul li {
+	list-style: none;
+}
+
+.node .flexslider ol, .node .flexslider  ul {
+	padding-left: 0px;
+}
+
+.section-content .related-content-alt .flexslider ul li {
+	margin: 0!important;
+}
+
+/*node slider*/
+
+.flexslider .slide {
+	display: none;	
+}
+
+.flexslider .slide.flex-active-slide {
+	display: block;
+}
+
+/*add space above and below content pager*/
+.section-content .item-list .pager {
+	margin: 20px 0;
+}
+
+.section-content .pager li.pager-previous a {
+	width: 70px;
+}
+
+/*fix images on the sponsor slider, test*/
+#mo-cms-slider-234689 img {
+	width: auto!important;
+}
+
+
+/* delete page node*/
+
+.page-node-delete h1, .page-node-edit h1 {
+	font-size: 18px;
+	border-bottom: none;	
+}
+
+
+/*footer */
+
+#section-footer {
+	text-align: center;
+	padding: 10px 0;
+	margin-top: 40px;
+	width: 100%;
+}
+
+#section-footer ul {
+    list-style-type: none;
+    margin: 20px auto;
+    width: 60%;
+    text-align: center;
+}
+
+#section-footer li {
+    list-style: none;
+	margin: 10px 0;
+	display: inline-block;
+}
+
+#section-footer #block-menu-menu-footer-menu li {
+    line-height: 0.8em;
+	padding-bottom: 3px;
+}
+
+#section-footer #block-menu-menu-footer-menu a {
+	margin: 0 10px; 	
+}
+
+#section-footer #block-menu-menu-social-menu ul  {
+	width: 100%;
+	text-align: center;
+}
+
+#section-footer a.social-icon {
+	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/social.png") no-repeat;
+	display: block;
+	width: 39px; 
+	height: 38px;	
+}
+
+#section-footer a.social-icon.facebook {
+	background-position: -6px -7px;
+}
+
+#section-footer a.social-icon.instagram {
+	background-position: -55px -6px
+}
+
+#section-footer a.social-icon.twitter {
+	background-position: -6px -57px;
+}
+	
+	
+#section-footer a.social-icon.youtube {
+	background-position: -56px -57px;
+}
+
+#section-footer a.social-icon:hover, #section-footer a.social-icon:focus {
+	margin-top: -1px;
+	border-bottom: none!important;
+}
+
+/*pager*/
+
+li.pager-previous a {
+    width: 70px !important;
+}
+
+.pager li a:hover, 
+.pager li a:active,
+.pager li a:focus {
+	border-bottom: none!important;
+}
+
+/*user groups*/
+
+.self, .owner {
+	color: #B15126;
+	font-weight: bold;
+}
+
+.self .progress-value {
+	background: #B15126;
+}
+
+.no-leaderboard {
+	font-weight: bold;
+	margin: 20px 0;
+}
+
+.node-mo-cms-user-group ul.activity-icons,
+.node-mo-cms-user-group ul.activity-icons li {
+	margin: 0;
+	padding: 0;
+}
+
+.group-login-links {
+	padding: 10px;
+	background: #E2DDC9;
+	border: 2px dotted #2a7671;
+}
+
+.not-logged-in.node-type-mo-cms-user-group h1, 
+.not-logged-in.page-groups-directory h1 {
+	border-bottom: none;
+}
+
+#request-group {
+	margin-bottom: 10px;
+	max-width: 100%;
+}
+
+.node-type-mo-cms-user-group .panel-pane.pane-group-details-pane > .pane-content, 
+.node-type-mo-cms-user-group .panel-pane.pane-group-miles-pane > .pane-content {
+	padding: 0 20px 20px 20px;
+}
+
+.node-mo-cms-user-group .group-total-mileage {
+	font-weight: bold;
+	color: #70983F;	
+	font-size: 22px;
+	float: left; 
+	
+}
+
+.node-mo-cms-user-group .pane-group-total-miles-pane h2 {
+	display: inline;
+	float: left;
+	margin: 0 10px 0 0;
+	border-bottom: none;
+}
+
+.node-mo-cms-user-group .pane-group-total-miles-pane h2:after {
+	content: " : ";
+}
+
+.node-mo-cms-user-group .field-name-field-mo-cms-postal-address {
+	font-weight: bold;
+}
+
+.node-mo-cms-user-group .pane-node-field-trail-activity {
+	margin: 10px 0;
+}
+
+.node-mo-cms-user-group .pane-node-field-trail-activity h2 {
+	display: inline;
+	margin: 0 10px 0 0;
+	float: left;
+}
+
+.node-mo-cms-user-group ul.activity-icons {
+	float: left;
+	margin-left: 10px;
+}
+
+#panel-top-left-lower {
+	clear: left;
+}
+
+ul.umbrella-groups-list li {
+	list-style-type: disc;
+	color: #2a7671;	
+}
+
+#mo-cms-user-groups-group-action-form {
+	margin-bottom: 10px;
+}
+
+#mo-cms-user-groups-group-action-form img {
+	margin: 5px 0;
+}
+
+/*messages*/
+
+.messages h3 {
+	font-size: 18px;
+	margin: 0; 
+}
+
+#messages-content .message {
+	padding: 20px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	margin-top: 20px;
+	color: #624f36;
+}
+
+#messages-content .message.notification  {
+	background: #f2ff99;
+}
+
+#messages-content .message.Child.notification,
+#messages-content .message.Pet.notification,
+#messages-content .message.Other.notification {
+	background: #f0d66d;
+}
+
+#messages-content .message.warning {
+	background: #ffb380;
+}
+
+#region-messages .message-close {
+	float: right;
+	cursor: pointer;
+	background: url("/sites/default/themes/hundred_missouri_miles/img/close.png") no-repeat;
+	width: 35px;
+	height: 35px;
+	position: relative;
+	top: -10px;
+}
+
+.badge-notification img.badge {
+	margin-right: 10px;
+}
+
+.badge-notification.Pet,
+.badge-notification.Child,
+.badge-notification.Other {
+	min-height: 70px;
+}
+
+#messages-content .badge-name {
+	font-weight: bold;
+}
+
+/*change log*/
+.view-change-log caption {
+  padding-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+}
+.view-change-log td {
+  vertical-align: top;
+  font-size: 14px;
+}
+.view-change-log td.views-field-title {
+  width: 30%;
+  font-weight: bold;
+}
+.view-change-log td.views-field-tags {
+  width: 20%;
+}
+.view-change-log td.views-field-body {
+  width: 50%;
+}
+
+/*help text */
+.form-item .description {
+	 font-size: 14px;
+	 color: #444;
+	 line-height: 1.5em;
+	 margin-top: 10px;
+}
+
+/*jquery overrides */
+.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1em;
+}
+
+.ui-widget .ui-state-default, 
+.ui-widget .ui-state-default a, 
+.ui-widget .ui-state-default a:link, 
+.ui-widget .ui-state-default a:visited {	
+	background: #1A5752;
+	color: #FEFFFF;
+	border: none;
+}
+
+.ui-widget .ui-state-default a:hover, 
+.ui-widget .ui-state-default a:focus, 
+.ui-widget .ui-state-active a:hover, 
+.ui-widget .ui-state-active a:focus,
+.ui-widget .ui-state-active a, 
+.ui-widget .ui-state-active a:link, 
+.ui-widget .ui-state-default:hover, 
+.ui-widget .ui-state-default:focus {
+	background: #1e655f;
+	color: #FEFFFF;
+	border: none; 
+}
+
+.ui-widget .ui-state-active .ui-icon, .ui-widget .ui-state-default .ui-icon {
+	background-image: url("/sites/default/themes/hundred_missouri_miles/img/ui-icons.png");
+}
+
+
+/*user settings */
+
+.logged-in.page-user ul.tabs {
+	border-bottom: none;
+}
+
+.logged-in.page-user ul.tabs li a {
+	width: auto;
+	float: left;
+}
+
+.logged-in.page-user ul.tabs li {
+	display: inline-block;
+}
+
+.page-user .field-label-above {
+	margin: 12px 0 6px 0;
+}
+
+.page-user .field-group-format-wrapper .field-label-inline .field-label {
+	width: 120px;
+	text-align: right;
+	margin-right: 20px;
+
+}
+
+#edit-field-mo-cms-postal-address-und-0 legend {
+	display: none;
+}
+
+.confirm-parent, .password-parent,
+div.form-item div.password-suggestions {
+	width: auto;
+}
+
+.password-suggestions ul {
+	margin-left: 30px;
+}
+
+/*on site group sign up*/
+
+.webform-client-form .fieldset-wrapper, 
+#edit-submitted-personal-info-email {
+	width: 90%;
+}
+
+/*responsive buttons overrides*/
+
+.rrssb-buttons li a .text {
+	position: relative;
+	top: -5px;
+}
+
+/*qtip dropdown menu*/
+
+.qtip .qtip-wrapper {
+	box-shadow: 1px 1px 3px #aba797;
+}
+
+.qtip .qtip-contentWrapper {
+	border: 1px solid #c5b6a5!important;
+}
+
+.qtip .qtip-content {
+	padding: 10px 20px!important;
+	background: #fcf9e7!important;
+}
+
+.qtip ul {
+	margin: 0 10px 0 20px; 
+}
+
+.qtip li {
+	list-style-type: none;
+	line-height: 1.2em;
+	margin: 12px 0;
+}
+
+.qtip h3 {
+	color: #16534f;
+	margin-bottom: 4px;
+}
+
+.qtip a {
+	font-weight: bold;
+	color: #b15226;
+	font-size: 14px;
+}
+
+.qtip a:hover, 
+.qtip a:focus {
+	color: #ea7640;
+}
+
+@media only screen and (max-width: 740px) {
+  .qtip {
+  display: none!important;
+  }
+}
+
+/*blog styles*/
+
+.node-article .field-name-field-article-author-info,
+.node-article .field-name-field-article-author,
+.node-article .date-display-single,
+.view-blog-archives .views-field-field-article-author-info,
+.view-blog-archives .views-field-field-article-author,
+.view-blog-archives .date-display-single {
+	color: #2a7671;
+}
+
+.node-teaser.node-article h2 {
+	border-bottom: none;
+}
+
+
+
+.node-article .field-name-field-article-author-info,
+.view-blog-archives .views-field-field-article-author-info {
+	font-style: italic;
+}
+
+.node-article .node-readmore a {
+	display: block;
+	background: #b15226;
+	color: #fff;
+	text-transform: uppercase;
+	float: right;
+	border-radius: 0;
+	padding: 10px;
+	text-shadow: none;
+	margin-top: 20px;
+}
+
+.node-article .node-readmore a:hover,
+.node-article .node-readmore a:focus {
+	background: #b15226;
+	border-bottom: 1px solid #999;
+}
+
+.node-teaser.node-article {
+	border-bottom: 2px dotted #d5cfb0;
+	padding-bottom: 20px;
+}
+
+.node-full.node-article .field-name-body,
+.node-full.node-article .field-name-field-mogov-image img,
+.node-teaser.node-article .field-name-field-mogov-image img,
+.pane-blog-archives-blog-pane-search .views-field-field-mogov-image img{
+	border-bottom: 8px solid #628F29;
+	margin-bottom: 10px;
+}
+
+#blog-search-form,
+#views-exposed-form-blog-archives-blog-pane-search {
+	background: #628F29;
+	padding: 20px 10px;
+	margin-bottom: 20px;
+	position: relative;
+}
+
+#blog-search-form #edit-combine,
+#views-exposed-form-blog-archives-blog-pane-search #edit-combine {
+	margin-right: 10px;
+	width: 100%!important;
+	font-style: italic;
+	height: 32px;
+}
+
+#blog-search-form-button {
+	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/search.png") no-repeat;
+	box-shadow: none;
+	position: absolute;
+	right: 0;
+	top: 15px;
+	background-size: 75%;
+}
+
+.context-blog-tags .region-sidebar-inner .block-inner .content,
+.context-blog-tags .region-sidebar-inner .block-inner {
+	padding: 0;
+	margin: 0;
+}
+
+.view-blog-archives .views-field-title {
+	font-size: 22px;
+	margin-top: 20px;
+}
+
+/*campus challenge*/
+
+.page-node-440083 h1 {
+	display: none;
+}
+
+#campus-challenge .leaderboard th {
+	background: #24746e url("/sites/default/themes/hundred_missouri_miles/img/daig-pattern.png") repeat;
+	text-align: center;
+	line-height: 1em;
+	width: 25%;
+	vertical-align: top;
+	font-size: 28px;
+}
+
+#campus-challenge .leaderboard .campus-miles {
+	width: 10%;
+	color: #6f9938;
+	font-weight: bold;
+	border-left: 1px solid #ccc;
+	min-width: 50px;
+	white-space: nowrap;
+}
+
+#campus-challenge .leaderboard .campus-percent  {
+	background: #6f9938;
+	width: 10%;
+	color: #fff;
+	font-weight: bold;
+}
+
+.page-user .ui-accordion .ui-accordion-content {
+	height: auto!important;
+}
+
+
+/* Non-semantic Helper Classes */
+.hide { position: absolute; height: 0; width: 0; overflow: hidden;}
+.no-border { border: 0 !important;}
+.align-left { text-align: left; }
+.align-right { text-align: right; }
+.center {text-align: center;}
+.smaller { font-size: 80%; }
+.nowrap { white-space: nowrap;}
+.margin-bottom-20 { margin-bottom: 20px; }
+.margin-top-20 { margin-top: 20px; }
+.add-margin { margin: 10px; }
+.ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }/* For image replacement */
+.hidden { display: none; visibility: hidden; } /* Hide for both screenreaders and browsers: css-discuss.incutio.com/wiki/Screenreader_Visibility */
+.visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }/* Hide only visually, but have it available for screenreaders: by Jon Neal. www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto;} /* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: drupal.org/node/897638 */
+.invisible { visibility: hidden; }/* Hide visually and from screenreaders, but maintain layout */
+/* http://sonspring.com/journal/clearing-floats */
+
+
+/* Inline Print Styles */
+@media print {
+* { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important;
+-ms-filter: none !important; border: 0; } /* Black prints faster: sanbeiji.com/archives/953 */
+a, a:visited { color: #444 !important; text-decoration: underline; word-wrap: break-word; }
+a[href]:after { content: " (" attr(href) ")"; }
+abbr[title]:after { content: " (" attr(title) ")"; }
+pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
+thead { display: table-header-group; } /* css-discuss.incutio.com/wiki/Printing_Tables */
+tr, img { page-break-inside: avoid; }
+@page { margin: 0.5cm; }
+p, h2, h3 { orphans: 3; widows: 3; }
+h2, h3{ page-break-after: avoid; }
+img, audio, video, embed, object { display: none;}
+#region-site-info, #zone-menu-wrapper, #zone-header-wrapper, #zone-footer-blocks-wrapper, #zone-leadership-wrapper, #zone-features, #region-sidebar, #region-search, #section-footer, #breadcrumb, #toolbar, #block-sharethis-sharethis-block, .tabs, #block-workbench-block, #zone-utility-bar-wrapper, #region-branding, #zone-submenu-wrapper, #section-header, #back-top { display: none !important;}
+p, li, h1, h2, h3, h4, h5, h6, div { font-size: 12px; line-height: 1.3em; margin: 5px 0; padding: 0; }
+.content-box { border: 0; background: #fff; box-shadow: none; height: auto;}
+
+}
+
+/*blue miles*/
+
+#blue-miles-page .reverse-header h2,
+#blue-miles-page .mileage-box.thirty-day {
+	background-color: #108D9F
+}
+
+.blue-miles-header-pane,
+#blue-miles-page .blue-miles.mileage-box.thirty-day,
+.blue-miles-thirty-day .mileage-box,
+.pane-blue-miles-slide {
+	background-color: #0f5c90;
+	color: #fff;
+}
+
+/*#bluemiles-stats {
+	background: #598db0;
+}*/
+
+#bluemiles-paddling .progress-value,
+#bluemiles-swimming .progress-value {
+	background-color: #bfeeff;
+	height: 30px;
+	min-width: 30px;
+}
+
+#bluemiles-swimming,
+#bluemiles-paddling {
+	position: relative;
+	font-weight: bold;
+	margin-top: 10px;
+}
+
+#bluemiles-paddling span.activity-icon.paddling,
+#bluemiles-swimming span.activity-icon.swimming {
+	position: absolute;
+	top: 40px;
+}
+
+#bluemiles-stats {
+	margin: 20px;
+}
+
+#bluemiles-stats h3,
+.pane-blue-miles-slide h3 {
+	color: #bfeeff;
+	font-size: 20px;
+	font-family: 'Oswald';
+}
+
+#blue-miles-page .folded-corner-box h2,
+#blue-miles-page #bluemiles-leaderboard h2 {
+	color: #0f5c91;
+	border-bottom: none;
+}
+
+#bluemiles-header.mileage-box.thirty-day {
+	background-color: #0C5081
+}
+
+#bluemiles-header .bluemileage-label {
+	font-size: 20px;
+	color: #bfeeff;
+}
+
+#blue-miles-page .pane-blue-mileage-pane.mileage-box.thirty-day.paddling,
+#blue-miles-page .pane-blue-mileage-pane.mileage-box.thirty-day.swimming,
+#blue-miles-page .pane-blue-mileage-pane.mileage-box.thirty-day {
+	background-repeat: no-repeat;
+	background-position: bottom left;
+	font-weight: bold;
+}
+
+#bluemiles-leaderboard-rows th,
+#bluemiles-leaderboard-rows td {
+	white-space: nowrap;
+}
+
+.page-node-462007 h1#page-title {
+	display: none;
+}
+
+.add-pane-padding .pane-content {
+	padding: 0 20px 20px 20px;
+}
+
+
+
+/*additions to homepage*/
+
+.pane-blue-miles-slide .add-padding {
+	padding: 0 20px;
+}
+
+.pane-blue-miles-slide p {
+	font-size: 14px;
+	line-height: 1.4em;
+	margin-bottom: 0;
+}
+
+.blue-miles-slide-image img {
+	max-width: 92%!important;
+}
+
+.pane-mo-project-bluemiles-bars .progress-value-label {
+	clear: left;
+}
+
+.pane-mo-project-bluemiles-bars {
+	padding: 0 20px;
+}
+
+.blue-miles-intro {
+	margin-right: 10px;
+}
+
+.pane-mo-project-bluemiles-bars {
+	padding: 0 20px;
+}
+
+#mini-panel-home-page-slider .pane-mo-project-bluemiles-bars {
+	padding: 0;
+}
+
+.pane-mo-project-bluemiles-bars,
+.blue-miles-intro {
+	width: 45%;
+	float: left;
+}
+
+#mini-panel-blue_miles_header .pane-mo-project-bluemiles-bars,
+#mini-panel-blue_miles_header .blue-miles-intro,
+#mini-panel-blue_miles_header_ .pane-mo-project-bluemiles-bars,
+#mini-panel-blue_miles_header_ .blue-miles-intro {
+	width: 100%;
+	float: none;
+	padding: 0 20px;
+}
+
+
+
+
+
+/*fixing 3 column panel for this minipanel*/
+#mini-panel-front_page_buttons .panel-3col-33 .panel-col  {
+	width: 33%;
+}
+
+#mini-panel-front_page_buttons .panel-col .inside {
+	margin: 5px;
+}
+
+.pane-mo-project-gov-progress {
+	margin-bottom: 10px;
+}
+
+.pane-mo-project-gov-progress .item-list ul {
+	margin: 0;
+	padding: 0;
+}
+
+.pane-mo-project-gov-progress .item-list ul li {
+	padding: 0 40px 0 50px;
+	margin: 5px 0;
+	height: 40px;
+	font-weight: bold;
+	line-height: 2.5em;
+}
+
+.pane-mo-project-gov-progress .item-list ul li.Gov {
+	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/gov-icon.png") 10px no-repeat;
+}
+
+.pane-mo-project-gov-progress .item-list ul li.FL {
+	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/fl-icon.png") 10px no-repeat;
+}
+
+.pane-mo-project-gov-progress .item-list ul li.Dog {
+	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/header-icons.png") -154px -51px no-repeat;
+}
+
+.pane-mo-project-gov-progress .item-list ul li .name,
+.pane-mo-project-gov-progress .item-list ul li .mileage {
+	width: 50%;
+	float: left;
+}
+
+.pane-mo-project-gov-progress .item-list ul li .mileage {
+	text-align: right;
+}
+
+.pane-mo-project-gov-progress h2.pane-title {
+	background: #624f36;
+	text-align: center;
+	color: #fff;
+	padding: 10px;
+	margin-bottom: 0;
+}
+
+/*text area grippie*/
+.resizable-textarea .grippie {
+	width: 96%;
+}
+
+/*share events - dates*/
+.page-events-share .container-inline-date .date-padding {
+	padding: 0;
+}
+
+/*my family table with icons*/
+span.Child, span.Pet, span.Other, span.Me {
+	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/header-icons.png") no-repeat;
+	height: 40px;
+	width: 40px;
+	display: block;
+	float: left;
+}
+
+span.Child {
+	background-position: -117px -1px;
+}
+
+span.Pet {
+	background-position: -160px -51px;
+}
+
+span.Other {
+	background-position: -162px 0;
+}
+
+span.Me {
+	background-position: -114px -52px;
+}
+
+/* add a buddy */
+
+.pane-mo-project-add-subuser-form td {
+	line-height: 40px;
+}
+

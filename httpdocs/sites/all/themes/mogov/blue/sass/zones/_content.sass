@@ -1,0 +1,121 @@
+h1
+  padding: 10px
+  color: $white
+  border: 1px solid $blue-dark
+  background: #1e3a62
+  @include background-image(linear-gradient($blue-darker, $brand-primary))
+  
+.landing-page-buttons ul 
+  margin-left: 0
+  padding-left: 0
+
+  li 
+    list-style-type: none!important
+
+  a 
+    display: block
+    padding: 16px 8px
+    margin: 6px 0
+    border: 1px solid $brand-secondary-header
+    background: $brand-secondary $diag_patt
+    border-radius: 6px
+
+    &:hover, 
+    &:focus 
+      border: 1px solid $brand-secondary-header
+      background-color: $blue-lighter
+      margin-bottom: 0
+      text-decoration: none
+
+
+.landing-page-content-box 
+  border: 1px solid $brand-secondary-border
+  border-top: 0
+  background: $brand-secondary
+
+
+  h2 
+    background-color: $blue
+    color: $white-dark
+    padding: 16px 10px
+    border-top: 1px solid $brand-secondary-border
+    border-bottom: 1px solid $brand-secondary-border
+    margin: 0 0 12px 0
+
+  p 
+    padding: 0 12px
+    
+  .node-mogov-contact
+    padding: 0 10px 10px
+
+
+.landing-page-content-box-no-header 
+  border: 1px solid $brand-secondary-border
+  background: $brand-secondary
+  padding: 20px
+
+.landing-page-sidebar
+  h2 
+    background-color: $blue
+    color: $white-dark
+    padding: 14px
+    border-bottom: none
+    margin-bottom: 0
+
+  ul 
+    margin: 0
+    padding: 0
+    border: 1px solid $brand-secondary-border
+    background-color: $brand-secondary
+
+    li 
+      list-style-type: none
+      margin: 0
+      padding: 0 
+      border-bottom: 1px solid $brand-secondary-border
+
+      a 
+        padding: 12px
+        display: block
+
+        &:hover,
+        &:focus 
+          background: $blue-lighter
+          text-decoration: none
+	
+
+      &:last-child, 
+      &:last-child:hover, 
+      &:last-child:focus  
+        border-bottom: none
+
+
+.content-box
+  background: $brand-secondary 
+  display: block
+  position: relative
+  border: 1px solid $brand-secondary-border
+  box-shadow: 1px 1px 2px $gray-lighter
+  padding: 10px
+  margin-bottom: 20px
+  height: 100% /*for IE7*/
+
+.border-box 
+  background-color: $white
+  display: inline-block
+  position: relative
+  border: 1px solid $brand-secondary-border
+  box-shadow: 1px 1px 2px  $gray-lighter
+
+.video-icon 
+  background: transparent url("/sites/all/themes/mogov/blue/images/mainsprite.png")no-repeat -187px -134px
+  height: 38px
+  width: 53px 
+  display: inline-block
+  margin-right: 6px
+  vertical-align: middle 
+
+.reverse-header h2
+  background: $brand-secondary-header
+  color: $gray-darker
+  

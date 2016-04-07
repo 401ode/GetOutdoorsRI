@@ -1,0 +1,282 @@
+<?php
+/**
+ *  @file  mo_miles_mileage.module
+ *  @brief  Code for the MO project: 100 Missouri Miles.com
+ *
+ *  @details
+ *  mo_miles_mileage_ctools_plugin_directory = Implements hook_ctools_plugin_directory
+ *  
+ *  
+ *  
+ */  
+
+ 
+/**
+ *  @brief Implements hook_ctools_plugin_directory
+ *  
+ *  @details 2014-09-09 
+ */
+function mo_miles_mileage_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' and $plugin_type == 'content_types') {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+module_load_include('inc', 'mo_miles_mileage', 'includes/menu');
+module_load_include('inc', 'mo_miles_mileage', 'includes/entities');
+module_load_include('inc', 'mo_miles_mileage', 'includes/batch_ops');
+
+
+/**
+ *  @brief  Get count of users logging supplied activities
+ *  
+ *  @param [in] $activities Parameter_Description
+ *  @param [in] $period     Optional. Time period to cover
+ *  @return  count of users
+ *  
+ *  @details  2013
+ *  converted 2014-09-26 
+ */
+function mo_miles_get_activity_uids($activities, $period='current') {
+  $range = mo_miles_get_date_range_by_period($period);
+  $verified_role = user_role_load_by_name('verified user');
+  $admin_role = user_role_load_by_name('administrator');
+
+  $query = db_select('mo_miles_mileage', 'm');
+  $query->join('users', 'u', 'm.uid = u.uid');
+  $query->join('users_roles', 'r', 'u.uid = r.uid');
+  $query->addField('m', 'uid', 'uid');
+  $query->condition('m.status', 0, '<>');
+  $query->condition('m.date', $range['min_date_sse'], '>=');
+  $query->condition('m.date', $range['max_date_sse'], '<');
+  $query->condition('m.activity_tid', $activities);
+  $query->condition('u.status', 0, '>');
+  $query->condition('r.rid', array($verified_role->rid, $admin_role->rid));
+  $query->distinct();
+  
+  $result = $query->execute();
+  $uid_count = $result->rowCount();
+
+  return $uid_count;
+}
+
+
+
+/**
+ *  @brief  Gets the node ids of all mileage nodes for the supplied user
+ *  
+ *  @param [in] $uid User entity uid
+ *  @return array of mileage entity ids
+ *  
+ *  @details  2013
+ *  converted 2014-09-26 
+ */
+function mo_miles_get_mileage_ids($uid) {
+  $first_dates = mo_project_get_challenge_dates_by_year(2013);
+  $current_dates = mo_project_get_challenge_dates_by_year();
+
+  $query = db_select('mo_miles_mileage', 'm');
+  $query->condition('m.status', 0, '<>');
+  $query->condition('m.date', $first_dates['start'], '>=');
+  $query->condition('m.date', $current_dates['end'], '<');
+  $query->condition('m.uid', $uid);
+  $query->addField('m', 'id');
+  $mids = $query->execute()->fetchCol();
+
+  return $mids;
+}
+
+
+/**
+ *  @brief  Gets the date range for the supplied time period
+ *  
+ *  @param [in] $period Optional. Time period to query. ('all', '30day', 'current')
+ *  @return array of dates
+ *  
+ *  @details 2014-09-26 
+ */
+function mo_miles_get_date_range_by_period($period) {
+  $first_dates = mo_project_get_challenge_dates_by_year(2013);
+  $current_dates = mo_project_get_challenge_dates_by_year(FALSE);
+  switch($period) {
+    case 'all':
+      $min_date = $first_dates['start'];
+      $max_date = $current_dates['end'];
+      break;
+    case '30day':
+      $min_date = date('Y-m-d 00:00:00', strtotime('tomorrow -31 days'));    
+      $max_date = date('Y-m-d 23:59:59', strtotime('tomorrow -1 second'));
+      break;
+    default:
+      $min_date = $current_dates['start'];
+      $max_date = $current_dates['end'];        
+  }
+
+  return array(
+    'min_date' => $min_date,
+    'min_date_sse' => strtotime($min_date),
+    'max_date' => $max_date,
+    'max_date_sse' => strtotime($max_date),
+  );
+}
+
+
+
+/**
+ *  @brief  Calculates total mileage with provided conditions
+ *  
+ *  @param [in] $uids        Optional. Array of user uids 
+ *  @param [in] $activities  Optional. Array of activity tids
+ *  @param [in] $period      Optional. Time period to calculate mileage for. ('current', 'all', '30day', [ChallengeYear], array of 2 dates)
+ *  @param [in] $average     Optional. Boolean. TRUE if seeking the average total mileage
+ *  @param [in] $leader      Optional. Boolean. TRUE if seeking the leader's (highest) total mileage
+ *  @return  Double. Total mileage value
+ *  
+ *  @details  Edit 2014-05-15 
+ *  converted 2014-09-26 
+ */
+function mo_miles_get_total_mileage($uids=array(), $activities=array(), $period='current', $average=FALSE, $leader=FALSE) {
+
+  if (is_array($period)) {
+    $min_date = strtotime($period[0]);
+    $max_date = strtotime($period[1]);
+  } else if ((is_numeric($period)) AND ($period != '30day')) {
+    $query_dates = mo_project_get_challenge_dates_by_year($period);
+    $min_date = $query_dates['start_sse'];
+    $max_date = $query_dates['end_sse'];
+  } else {
+    $query_dates = mo_miles_get_date_range_by_period($period);
+    $min_date = $query_dates['min_date_sse'];
+    $max_date = $query_dates['max_date_sse'];
+  }
+
+  $mileage = 0;
+  $query = db_select('mo_miles_mileage', 'm');
+  $query->addExpression('SUM(m.distance)', 'distance');
+  $query->condition('m.status', 0, '<>');
+  $query->condition('m.date', $min_date, '>=');
+  $query->condition('m.date', $max_date, '<');
+  
+  if ($uids) {
+    $query->condition('m.uid', $uids);
+  } else {
+    $verified_role = user_role_load_by_name('verified user');
+    $admin_role = user_role_load_by_name('administrator');
+    $events_role = user_role_load_by_name('Event Aggregator');
+    $query->join('users', 'u', 'm.uid = u.uid');
+    $query->join('users_roles', 'r', 'u.uid = r.uid');
+    $query->condition('u.status', 0, '>');
+    $query->condition('r.rid', array($verified_role->rid, $admin_role->rid, $events_role->rid));
+  }
+  if ($activities) {
+    $query->condition('m.activity_tid', $activities);
+  }
+  if ($leader) {
+    $query->groupBy('m.uid');
+    $query->orderBy('distance', 'DESC');
+    $query->range(0,1);
+  }
+
+  $result = $query->execute();
+  foreach ($result as $row) {
+    $mileage += $row->distance;
+  }
+  
+  if ($average and !empty($activities)) {
+    $uid_count = mo_miles_get_activity_uids($activities, $period);
+    if ($uid_count == 0) {
+      $mileage = 0;
+    } else {
+      $mileage /= $uid_count;
+    }
+  }
+
+  return $mileage;
+}
+
+
+/**
+ *  @brief  Send the email to send to users upon reaching a mileage threshold
+ *  
+ *  @param [in] $node  Mileage node entity
+ *  @return  void (FALSE on failure)
+ *  
+ *  @details  2013
+ *  converted 2014-09-26 
+ */
+//********************************************************************
+// THIS FUNCTION CAN NOT TAKE A NODE ANY LONGER
+function mo_project_send_new_notifications($node) {
+  
+  $user = user_load($node->uid);
+  $user_changed = FALSE;
+  $email_notifications_field = field_get_items('user', $user, 'field_user_email_notification');
+  if (empty($email_notifications_field[0]['value']) or !$email_notifications_field[0]['value']) {
+    return FALSE;
+  }
+  $threshold_mail_nids = mo_project_get_threshold_email_nids();
+  $thresholds = array_keys($threshold_mail_nids);
+  sort($thresholds);
+  $user_mileage = mo_miles_get_total_mileage(array($user->uid));
+  $sent_notifications_field = field_get_items('user', $user, 'field_user_sent_notifications');
+  // Check to see if current mileage is lower than a threshold for an email already
+  // sent. If so, remove it from the list. Possible to happen if user mis-entered
+  // miles and later revised.
+  $last_notification_sent = FALSE;
+  if (!empty($sent_notifications_field[0]['value'])) {
+    foreach ($sent_notifications_field as $key=>$instance) {
+      if ($instance['value'] == end($thresholds)) {
+        $last_notification_sent = TRUE;
+        break;
+      }
+      if ($user_mileage < $instance['value'] or !in_array($instance['value'], $thresholds)) {
+        unset($sent_notifications_field[$key]);
+        $user_changed = TRUE;
+      } else {
+        unset($threshold_mail_nids[$instance['value']]);
+      }
+    }
+  }
+  if ($last_notification_sent and $user_mileage >= end($thresholds)) {
+    return FALSE;
+  }
+  foreach (array_keys($threshold_mail_nids) as $threshold) {
+    if ($user_mileage < $threshold) {
+      unset($threshold_mail_nids[$threshold]);
+    }
+  }
+  foreach ($threshold_mail_nids as $threshold=>$nid) {
+    $threshold_node = node_load($nid);
+    $to = $user->mail;
+    $from = 'emailaddress@mail.com';
+    $params = array(
+      'subject' => array(
+        'field' => 'field_threshold_email_subject',
+        'value' => NULL,
+      ),
+      'html_body' => array(
+        'field' => 'body',
+        'value' => NULL,
+      ),
+    );
+    foreach (array_keys($params) as $key) {
+      $field = field_get_items('node', $threshold_node, $params[$key]['field']);
+      if (!empty($field[0]['value'])) {
+        $params[$key]['value'] = t($field[0]['value']);
+      } else {
+        return FALSE;
+      }
+    }
+    $sent = drupal_mail('mo_project_mileage_threshold_notification', 'threshold', $to, language_default(), $params, $from, TRUE);
+    $sent_notifications_field[]['value'] = $threshold;
+    $user_changed = TRUE;
+  }
+  if ($user_changed) {
+    $edit = array(
+      'field_user_sent_notifications' => array(
+        'und' => array_values($sent_notifications_field),
+      ),
+    );
+    user_save($user, $edit);
+  }
+}

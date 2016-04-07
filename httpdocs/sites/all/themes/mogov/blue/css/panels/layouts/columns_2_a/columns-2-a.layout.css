@@ -1,0 +1,51 @@
+/******************************************************************************
+ * columns-2-a.layout.scss
+ *
+ * Styling of the "2 Columns A" layout.
+ ***************************************************************************** */
+/******************************************************************************
+ * _variables.sass: sets variables for the standard layout
+ ***************************************************************************** */
+.panel-display--columns-2-a .l-container {
+  *zoom: 1;
+  max-width: 1190px;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+.panel-display--columns-2-a .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .panel-display--columns-2-a .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--columns-2-a .l-container .columns-2-a-region--column-1 {
+    width: 47.82609%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--columns-2-a .l-container .columns-2-a-region--column-2 {
+    width: 47.82609%;
+    float: right;
+    margin-right: 0;
+  }
+}
+@media (min-width: 992px) {
+  .panel-display--columns-2-a .l-container .columns-2-a-region--column-1 {
+    width: 48.93617%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--columns-2-a .l-container .columns-2-a-region--column-2 {
+    width: 48.93617%;
+    float: right;
+    margin-right: 0;
+  }
+}

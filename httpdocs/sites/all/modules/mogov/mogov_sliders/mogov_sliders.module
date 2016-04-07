@@ -1,0 +1,23 @@
+<?php
+
+module_load_include('inc', 'mogov_sliders', 'includes/menu');
+module_load_include('inc', 'mogov_sliders', 'includes/entities');
+
+// This implements hook_node_view(), forcing the slider nodes to display as sliders
+module_load_include('inc', 'mogov_sliders', 'includes/view');
+
+// This implements hook_block_info() and hook_block_view()
+module_load_include('inc', 'mogov_sliders', 'includes/blocks');
+
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mogov_sliders_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' and !empty($plugin)) {
+    return 'plugins/' . $plugin;
+  }
+  if ($module == 'panels' and !empty($plugin)) {
+    return 'plugins/' . $plugin;
+  }
+}

@@ -1,0 +1,132 @@
+@import "susy"
+@import "../variables/_layout"
+
+.flexslider
+  margin-bottom: 30px
+  
+  ul, 
+  ol,
+  .item-list ul li 
+    margin: 0
+    padding: 0
+
+  li 
+    list-style-type: none
+
+  .slides img
+    height: auto
+  
+  .flex-direction-nav li a 
+    background-image: $bg_direction_nav
+    width: 27px
+    height: 26px
+  
+  .flex-direction-nav li .flex-prev 
+    left: 10px
+    background-position: -1px -1px
+
+  .flex-direction-nav li .flex-next 
+    right: 10px
+    background-position: -31px -1px
+
+.ie7 .flex-direction-nav .flex-prev, 
+.ie7 .flexslider:hover .flex-prev,
+.ie7 .flex-direction-nav .flex-next, 
+.ie7 .flexslider:hover .flex-next 
+  display: none
+
+.ie8 .flex-direction-nav .flex-prev, 
+.ie8 .flexslider:hover .flex-prev 
+  left: 10px
+
+.ie8 .flex-direction-nav .flex-next, 
+.ie8 .flexslider:hover .flex-next 
+  right: 10px
+
+.flex-direction-nav a:hover,
+.flex-direction-nav a:focus, 
+.flex-control-nav li a:hover,
+.flex-control-nav li a:focus  
+  border-bottom: none
+
+.flexslider .slides 
+  zoom: 1
+
+.flexslider .slides > li 
+  position: relative
+
+.flex-container 
+  zoom: 1
+  position: relative
+
+.flex-caption,
+.mogov-slider-caption 
+  width: 100%
+  padding: 2%
+  position: absolute
+  left: 0
+  bottom: 0
+  background: rgba(0,0,0,.6)
+  color: $white
+  text-align: center
+  text-shadow: 0 -1px 0 rgba(0,0,0,.3)
+  font-size: $font-size-base
+  line-height: 18px
+
+.flex-caption 
+  font-size: $font-size-small
+
+.flex-pauseplay a  
+  color: $white
+  right: 10px
+  height: 25px
+
+.flexslider ul li 
+  list-style: none
+
+.node .flexslider ol,
+.node .flexslider  ul 
+  padding-left: 0px
+
+
+.related-content-alt .flexslider ul li 
+  margin: 0!important
+
+.carousel-slider 
+  border: none
+  box-shadow: none
+  margin-bottom: 20px
+
+
+  .flex-direction-nav a.flex-next 
+    display: none
+
+  .flex-direction-nav a.flex-prev 
+    display: none
+
+  &:before 
+    line-height: 40px 
+
+  a 
+    color: $gray-light
+
+
+/*hide next and prev text*/
+.flex-prev,
+.flex-next
+  display: block
+  text-indent: -999em
+  overflow: hidden
+  background-repeat: no-repeat
+  text-align: left!important
+  direction: ltr /* For image replacement */
+
+//title slider
+.flexslider.mogov-slider-content.title-slider
+  background: #d9edf7
+  padding: 10px 5px
+  border: 1px solid transparent
+  border-radius: 4px
+  display: inline-block
+  position: relative
+  width: 100%

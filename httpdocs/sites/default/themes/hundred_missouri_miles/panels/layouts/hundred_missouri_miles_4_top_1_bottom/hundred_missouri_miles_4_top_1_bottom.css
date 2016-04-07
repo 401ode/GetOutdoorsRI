@@ -1,0 +1,20 @@
+.hundred-missouri-miles-4-top-1-bottom .top {
+  float: left; 
+  width: 25%; 
+}
+
+.hundred-missouri-miles-4-top-1-bottom .top .inside { 
+  margin: 0 .5em 1em .5em;
+}
+
+.hundred-missouri-miles-4-top-1-bottom .top.first .inside { 
+  margin-left: 0;
+}
+
+.hundred-missouri-miles-4-top-1-bottom .top.last .inside { 
+  margin-right: 0;
+}
+
+.hundred-missouri-miles-4-top-1-bottom .top .panel-separator {
+  margin: 0 0 1em 0;
+}

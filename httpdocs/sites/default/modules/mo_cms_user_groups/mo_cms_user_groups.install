@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * @file
+ * Installer code for the MO CMS: User Groups feature.
+ */
+
+/**
+* Implements hook_schema().
+*/
+function mo_cms_user_groups_schema() {
+
+$schema['mo_cms_user_groups_membership'] = array(
+  'description' => 'The groups to users to groups relationship table.',
+  'fields' => array(
+    'row_id' => array(
+      'description' => 'The primary identifier for a row.',
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ),
+    'entity_id' => array(
+      'description' => 'The entity id of the group node.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'uid' => array(
+      'description' => 'The users.uid of the group member.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'created' => array(
+      'description' => 'The Unix timestamp when the row was created.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'changed' => array(
+      'description' => 'The Unix timestamp when the row was most recently saved.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'changed_by' => array(
+      'description' => 'The users.uid who most recently saved the row.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'deleted' => array(
+      'description' => 'A boolean indicating whether this data item has been deleted',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'requested' => array(
+      'description' => 'A boolean indicating this user has requested to join this group',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'invited' => array(
+      'description' => 'A boolean indicating this user has been invited to join this group',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'approved' => array(
+      'description' => 'A boolean indicating whether this groups owner has approved this user to join this group',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'blocked' => array(
+      'description' => 'A boolean indicating whether this groups owner has blocked this user from membership in this group',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+  ),
+  'primary key' => array('row_id'),
+  'indexes' => array(
+    'approved' => array('approved'),
+    'deleted' => array('deleted'),
+    'entity_id' => array('entity_id'),
+    'invited' => array('invited'),
+    'blocked' => array('blocked'),
+    'requested' => array('requested'),
+    'row_changed' => array('changed'),
+    'row_created' => array('created'),
+    'uid' => array('uid'),
+  ),
+);
+
+  return $schema;
+}

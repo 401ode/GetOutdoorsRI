@@ -1,0 +1,2226 @@
+<?php
+/**
+ *  @file mo_cms_user_groups.module
+ *  @brief  Code for the MO CMS: User Groups feature.
+ *
+ *  @details
+ *  mo_cms_user_groups_ctools_plugin_directory = Implements hook_ctools_plugin_directory
+ *  mo_cms_user_groups_menu = Implements hook_menu
+ *  mo_cms_user_groups_permission = Implements hook_permission
+ *  mo_cms_user_groups_create_unpub_node = Creates an unpublished node of the mo_cms_user_groups type 
+ *  mo_cms_user_groups_node_presave = Ensure the unpublished User Group node remains unpublished and gets the proper user attached
+ *  mo_cms_user_groups_strip_mo_cms_user_group_node_form = Alter the render array of the unpublished User Group node to limit the fields and options a user can access
+ *  mo_cms_user_groups_form_mo_cms_user_group_node_form_alter = #TODO
+ *  mo_cms_user_groups_custom_node_form_submit = Remove the Drupal-generated "MO CMS User Group [title] has been created" status message.
+ *  mo_cms_user_groups_user_presave = Save the User Groups selected via the user profile form to the mo_cms_user_groups_membership table
+ *  mo_cms_user_groups_user_groups_membership_save = Save or update a record to the mo_cms_user_groups_membership table
+ *  mo_cms_user_groups_block_info = Creates blocks my_user_groups, public_user_groups, private_user_groups
+ *  mo_cms_user_groups_block_view = Populates blocks my_user_groups, public_user_groups, private_user_groups 
+ *  mo_cms_user_groups_my_groups_block_content = Generates render array for block my_user_groups
+ *  mo_cms_user_groups_directory_block_content = Lists all User Groups set to visible, grouped by public groups, then private groups
+ *  mo_cms_user_groups_get_members = Gets the users who are members of provided group
+ *  mo_cms_user_groups_get_membership_status = Gets the status of provided user within provided group
+ *  mo_cms_user_groups_preprocess_node = Implements hook_preprocess_node
+ *  mo_cms_user_groups_preprocess_user_group = #TODO
+ *  mo_cms_user_groups_preprocess_umbrella_group = #TODO
+ *  mo_cms_user_groups_get_umbrellas = Gets Umbrella Group(s) of provided group
+ *  mo_cms_user_groups_group_buttons = Gets appropriate buttons for the group detail page, dependent upon the user's status with relation to the group
+ *  mo_cms_user_groups_group_action_form = Alter the group detail form to display appropriate buttons
+ *  mo_cms_user_groups_group_action_form_submit = Respond to the various actions from the group detail page buttons
+ *  mo_cms_user_groups_get_join_requests = Gets outstanding requests to join group
+ *  mo_cms_user_groups_admin_access_callback = Checks user access permissions to admin provided group
+ *  mo_cms_user_groups_admin_membership_requests_title = Gets the User Group name to provide the title for the Membership Requests page
+ *  mo_cms_user_groups_membership_requests_form = #TODO
+ *  mo_cms_user_groups_membership_requests_form_confirm = Confirm group owner's response to membership request(s)
+ *  mo_cms_user_groups_membership_requests_form_actions = Display group membership request approval form
+ *  mo_cms_user_groups_membership_requests_form_submit = Verify group owner's response to membership request(s) and begin processing
+ *  mo_cms_user_groups_membership_requests_process = Update group membership table based on group owner's response to join request
+ *  mo_cms_user_groups_update_7110 = Add a "blocked" column to the MO CMS: Groups user memberships table
+ *  mo_cms_user_groups_group_roster_access_callback = Checks user access permissions to view roster of group
+ *  mo_cms_user_groups_roster_title = Gets the User Group name to provide the title for the Roster page
+ *  mo_cms_user_groups_roster_form = #TODO 
+ *  mo_cms_user_groups_roster_form_confirm = Confirm group owner's change(s) to the membership roster
+ *  mo_cms_user_groups_roster_form_actions = Display group roster form
+ *  mo_cms_user_groups_roster_form_submit = Verify group owner's change(s) to the membership roster and begin processing
+ *  mo_cms_user_groups_roster_process = Update group membership table based on group owner's change(s) to the membership roster
+ *  mo_cms_user_groups_get_member_initials = Gets initials of the group member for anonymized display
+ *  mo_cms_user_groups_build_group_leaderboard = Creates the render array to display the group leaderboard
+ *  mo_cms_user_groups_build_umbrella_group_leaderboard = Creates the render array to display the umbrella group leaderboards
+ *  mo_cms_user_groups_get_group_mileage = Gets the total mileage for all members of the group, for the activities tracked by the group
+ *  mo_cms_user_groups_group_mileage_snapshot = Creates a Snapshot 'Moment-in-Time' comparison of all groups' total mileage
+ *   
+ *  DISABLED:
+ *  mo_cms_user_groups_form_user_profile_form_alter
+ */
+
+include_once 'mo_cms_user_groups.features.inc';
+
+/**
+ *  @brief  Implements hook_ctools_plugin_directory()
+ */
+function mo_cms_user_groups_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' and $plugin_type == 'content_types') {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+/**
+ *  @brief  Implements hook_menu()
+ */
+function mo_cms_user_groups_menu() {
+
+  $items = array();
+  
+  $items['groups/create'] = array(
+    'title' => t('Create a Group'),
+    'description' => 'Create unpublished node for a new User Group',
+    'page callback' => 'mo_cms_user_groups_create_unpub_node',   
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['groups/approval/%'] = array(
+    'title callback' => 'mo_cms_user_groups_admin_membership_requests_title',
+    'title arguments' => array(2),
+    'description' => 'Approve or deny applications for membership in a User Group',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mo_cms_user_groups_membership_requests_form', 2),
+    'access callback' => 'mo_cms_user_groups_admin_access_callback',
+    'access arguments' => array(2),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['groups/group/%/roster'] = array(
+    'title callback' => 'mo_cms_user_groups_roster_title',
+    'title arguments' => array(2),
+    'description' => 'Full user group roster',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mo_cms_user_groups_roster_form', 2),
+    'access callback' => 'mo_cms_user_groups_group_roster_access_callback',
+    'access arguments' => array(2),
+    'type' => MENU_NORMAL_ITEM,
+  );  
+
+  $items['admin/data/group-snapshot/%'] = array(
+    'title' => 'Update Group Mileage Snapshot table',
+    'description' => 'Update Group Mileage Snapshot table',
+    'page callback' => 'mo_cms_user_groups_group_mileage_snapshot',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+
+}
+
+/**
+ *  @brief  Implements hook_permission()
+ */
+function mo_cms_user_groups_permission() {
+  $permissions = array(
+//    'request mo cms user group' => array(
+//      'title' => t('MO CMS: User Groups: Request new group'),
+//      'description' => t('Request creation of a new MO CMS: User Groups group.'),
+//    ),
+    'administer all mo cms user groups' => array(
+      'title' => t('MO CMS: User Groups: Administer all groups'),
+      'description' => t('Perform administrative functions for all MO CMS: User Groups groups.'),
+    ),
+  );
+  return $permissions;
+}
+
+
+/**
+ *  @brief  Creates an unpublished User Group node, for not-yet-approved requests to create a new group
+ *  
+ *  @return  form render array
+ *  
+ *  @details  2013-06-25 
+ *  Edit 2014-03-19 - Display something else to people who haven't logged in
+ */ 
+function mo_cms_user_groups_create_unpub_node() {
+  // get current user's info
+  global $user;
+  if (!$user->uid) {
+    drupal_set_title('Log in to create a group');
+    $instructions = array(
+      'type' => 'ol',
+      'title' => NULL,
+      'attributes' => array(),
+      'items' => array(
+	t('Please <a href="http://100missourimiles.com/user/login?current=groups/create">log in with your username and password</a>.. You\'ll be redirected back to this page afterward.'),
+	t('Please <a href="http://100momiles.uservoice.com/">contact us</a> if the issue persists or you need access.'),
+      ),
+    );
+    $output = array(
+      array(
+	'#prefix' => t('<h3>'),
+	'#markup' => t('You must be logged in to create a group!'),
+	'#suffix' => t('</h3>'),
+      ),
+      array(
+	'#markup' => theme_item_list($instructions),
+      ),
+    );
+    return drupal_render($output);
+  }
+  // get a node edit form
+  module_load_include('inc', 'node', 'node.pages'); 
+  
+  $check_roles = array(
+    'anonymous user',
+    'authenticated user',
+    'Official',
+  );
+  $extra_roles = array_diff($user->roles, $check_roles);
+  
+//  if ($extra_roles) {
+//    drupal_set_message('Privileged users should use the standard content forms; you have been redirected.');
+//    drupal_goto('node/add/mo-cms-user-group');
+//  } else {
+    $node_type = 'mo_cms_user_group';
+    $form_id = $node_type . '_node_form';
+    
+    // create a blank node
+		$newNode = new stdClass();
+    $newNode->uid = $user->uid;
+		$newNode->status = 0;
+		$newNode->comment = 0;
+		$newNode->promote = 0;
+		$newNode->sticky = 0;   
+		$newNode->type = $node_type;
+		$newNode->language = LANGUAGE_NONE;
+		$newNode->revision = 0;
+    $newNode->path['pathauto'] = 1;
+		node_object_prepare($newNode);
+    
+    // get the form
+    $render = drupal_get_form($form_id, $newNode);
+    
+    // remove fields we don't want J. Random User to have access to
+    $strip_form_func = 'mo_cms_user_groups_strip_' . $form_id;
+    $render = $strip_form_func($render);
+    
+    $output = drupal_render($render);
+//  }
+  
+  return $output;
+}
+
+
+ /**
+ *  @brief  Ensure the unpublished User Group node remains unpublished and gets the proper user attached
+ *  
+ *  @param [in] $node  node object
+ *  @return  void
+ *  
+ *  @details  2013-06-25 
+ */
+function mo_cms_user_groups_node_presave($node) {
+  $dest = drupal_get_destination();
+  if ($node->type == 'mo_cms_user_group' and $dest['destination'] == 'groups/create') {
+    global $user;
+    $node->uid = $user->uid;
+    $node->status = 0;
+  }
+}
+
+
+/**
+ *  @brief  Alter the render array of the unpublished User Group node to limit the fields and options a user can access
+ *  
+ *  @param [in] $render  node render array
+ *  @return  modified node render array
+ *  
+ *  @details  2013-06-25 
+ */
+function mo_cms_user_groups_strip_mo_cms_user_group_node_form($render) {
+  unset($render['#fieldgroups']);
+  unset($render['additional_settings']);
+  unset($render['body']['und'][0]['summary']);
+  unset($render['body']['und'][0]['format']);
+  unset($render['field_url']['und'][0]['title']);
+  unset($render['actions']['preview']);
+//  unset($render['field_mo_cms_user_groups_owners']['und'][0]['target_id']['#title']);
+  
+//  unset($render['field_mo_cms_user_groups_vis']);
+  unset($render['field_mo_cms_user_groups_owners']);
+
+  $render['body']['und'][0]['#format'] = 'filtered_html';
+  $render['body']['und'][0]['value']['#title'] = 'Group Description:';
+  $render['body']['und'][0]['value']['#description'] = 'Tell us about your group.  This description will be displayed to the public.';
+  $render['body']['und'][0]['value']['#format'] = 'filtered_html';
+  $render['body']['und'][0]['value']['#resizable'] = 0;
+  $render['body']['und'][0]['value']['#rows'] = 10;
+  $render['field_mo_cms_user_groups_vis']['und']['#title'] = 'Groups Directory and Listings';
+  $render['field_url']['und'][0]['#title'] = 'Group Website URL:';
+  $render['field_mo_cms_user_groups_join']['#weight'] = 10;
+  $render['field_mo_cms_user_group_type']['#weight'] = 20;
+  $render['field_mo_cms_user_groups_vis']['#weight'] = 30;
+  $render['field_mo_cms_postal_address']['#weight'] = 40;
+  $render['body']['#weight'] = 50;
+  $render['field_url']['#weight'] = 60;
+  $render['field_trail_activity']['#weight'] = 70;
+  
+//  $render['field_mo_cms_user_groups_owners']['und']['#title'] = 'Group Owner(s)';
+//  $render['field_mo_cms_user_groups_owners']['und']['#description'] = 'Enter the username of the Members who will be able to administer this group.';
+//  $render['field_mo_cms_user_groups_owners']['und']['add_more']['#value'] = 'Add another';
+
+  return $render;
+}
+
+/**
+ * Add a multiselect field of User Groups to the User Profile Form
+ * 2013-06-25 
+ * Disabled for present to prevent malformed entity errors on profile save
+ * ideally rebuild as a custom tab alongside view/edit/etc
+ */
+/*function mo_cms_user_groups_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+
+  // Get all groups
+  $query = db_select('node', 'n');
+  $query->fields('n', array('nid','title'));
+  $query->condition('type', 'mo_cms_user_group', '=');
+  $query->condition('status', 1, '=');
+  $query->orderBy('title', 'ASC');
+
+  $result = $query->execute();
+  if ($result) {
+    foreach ($result as $row) {
+      $key = $row->nid;
+      $options[$key] = $row->title;
+    }
+  }
+  $group_nodes = entity_load('node', array_keys($options));
+  foreach ($group_nodes as $nid=>$group_node) {
+    $members = mo_cms_user_groups_get_members($nid);
+    $user_is_member = in_array($form_state['user']->uid, array_keys($members));
+    $visibility_field = field_get_items('node', $group_node, 'field_mo_cms_user_groups_vis');
+    $is_owner = FALSE;
+    $owners_field = field_get_items('node', $group_node, 'field_mo_cms_user_groups_owners');
+    foreach ($owners_field as $owner) {
+      if ($form_state['user']->uid == $owner['target_id']) {
+	$is_owner = TRUE;
+	break;
+      }
+    }
+    if ((!empty($visibility_field[0]['value']) and $visibility_field[0]['value'] == 'visible') or $is_owner or $user_is_member) {
+      continue;
+    }
+    unset($options[$nid]);
+  }
+
+  // Get groups user is currently a member of
+  $query2 = db_select('node', 'n');
+  $query2->fields('n', array('nid','title'));
+  $query2->join('mo_cms_user_groups_membership', 'm', 'n.nid = m.entity_id');  
+  $query2->condition('type', 'mo_cms_user_group', '=');
+  $query2->condition('m.uid', $form_state['user']->uid, '=');
+  $query2->condition('m.deleted', 0, '=');
+  $query2->condition('n.status', 1, '=');
+  $query2->orderBy('n.title', 'ASC');
+ 
+  $result2 = $query2->execute();
+  if ($result2) {
+    foreach ($result2 as $row2) {
+      $sel_options[] = $row2->nid;
+   }
+  }
+
+  if (empty($sel_options)) {
+    $sel_options = NULL;
+  }
+  $form['mo_cms_user_groups_membership'] = array (
+    '#type' => 'select',
+    '#title' => t('User Groups:'),
+    '#multiple' => TRUE,
+    '#size' => 15,
+    '#options' => $options,
+    '#description' => t('Select the group or groups you would like to join.'),
+    '#default_value' => $sel_options,
+    '#attributes' => array(
+      'class' => array(
+	'chosen-select',
+      ),
+    ),
+  );
+} */
+
+
+/**
+ *  @brief  Implements hook_node_form_alter()
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_form_mo_cms_user_group_node_form_alter(&$form, $form_state, $form_id) {
+  $destination = drupal_get_destination();  
+  if ($destination['destination'] == 'groups/create') {
+    $editorial_terms = taxonomy_get_term_by_name('groups', 'workbench_sections');
+    foreach ($editorial_terms as $tid=>$editorial_term) {
+      break;
+    }
+    $form['field_mo_cms_editorial_section']['und']['#type'] = 'hidden';
+    unset($form['field_mo_cms_editorial_section']['und']['#options']);
+    unset($form['field_mo_cms_map_coords']);
+    unset($form['actions']['preview']);
+    $form['actions']['submit']['#value'] = t('Submit for review');
+    $form['actions']['submit']['#submit'][] = 'mo_cms_user_groups_custom_node_form_submit';
+    
+  }
+}
+
+
+/**
+ *  @brief  Remove the Drupal-generated "MO CMS User Group [title] has been created" status message.
+ *  
+ *  @return  void
+ *  
+ *  @details  2013-07-05 
+ */
+function mo_cms_user_groups_custom_node_form_submit() {
+  //Get current messages.
+  $messages = drupal_get_messages();
+  //Remove only the "MO CMS User Group [title] has been created" message, other messages should remain.
+  foreach($messages as $type => $message) {
+    foreach($message as $m) {
+      if( ($type != 'status') OR (substr($m, -17) != 'has been created.') ) {
+        drupal_set_message($m, $type);
+      }
+    }
+  }
+  drupal_set_message(t('Your request has been submitted to our team for review. Thank you for your involvement!'));
+}
+
+
+/**
+ *  @brief  Implements hook_user_presave() Save the User Groups selected via the user profile form to the mo_cms_user_groups_membership table
+ *  
+ *  @details  Refactored 2013-07-02 
+ */
+function mo_cms_user_groups_user_presave(&$edit, $account, $category) {
+
+  if(isset($edit['mo_cms_user_groups_membership'])) {
+    $in_slist = array();
+    $in_table = array();
+
+    // Get selected group ids from user profile form
+    $in_slist = $edit['mo_cms_user_groups_membership'];
+
+    // Get group ids that this user is already a member of from mo_cms_user_groups_membership
+    $query = db_select('mo_cms_user_groups_membership', 'g');
+    $query->fields('g', array('row_id', 'entity_id'));
+    $query->condition('uid', $account->uid, '=');
+    $query->condition('deleted', 0, '=');
+
+    $result = $query->execute();
+    $count_results = $result->rowCount();
+    
+    // If the user is already a member of at least one group
+    if ($count_results > 0) {
+      foreach ($result as $row) {
+	// if group id (entity_id from $result) IS IN $in_slist, add to the $in_table array
+	// because in_array() doesn't work with objects
+	// if entity_id from $result IS NOT IN $in_slist, mark as deleted in table mo_cms_user_groups_membership (unsubscribed from group)
+	if (in_array($row->entity_id, $in_slist)) {
+	  $in_table[] = $row->entity_id;
+	} else {
+	  mo_cms_user_groups_user_groups_membership_save($row->entity_id, $account->uid, 'leave');
+	}
+      }
+    }
+      
+    if (!empty($in_slist)) {
+
+      foreach ($in_slist as $value) {
+	// if group id from $in_slist IS IN $in_table, skip
+	// if group id from $in_slist IS NOT IN $in_table, insert new row
+	if (!in_array($value, $in_table)) {
+	  mo_cms_user_groups_user_groups_membership_save($value, $account->uid);          
+        //else, insert new row(s)
+	} else {
+          foreach ($in_slist as $value) {
+            mo_cms_user_groups_user_groups_membership_save($value, $account->uid);          
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/**
+ *  @brief  Save or update a record to the mo_cms_user_groups_membership table
+ *  
+ *  @param [in] $entity_id  The nid of the group node.
+ *  @param [in] $uid        The uid of the user.
+ *  @param [in] $action     Optional. String indicating user's relationship to group. Defaults to 'join'. ('join', 'leave', 'approve', 'block', 'deny') 
+ *  @return void
+ *  
+ *  @details 2013-07-02 
+ *  Edit 2014-03-19
+ */ 
+function mo_cms_user_groups_user_groups_membership_save($entity_id, $uid, $action='join') {
+  // Is this group Open to Join? (that is, automatically approved)
+  $group = node_load($entity_id);
+  $join_val = field_get_items('node', $group, 'field_mo_cms_user_groups_join');
+  if ($join_val[0]['value'] == 'open') {
+    $public = TRUE; 
+  } else {
+    $public = FALSE;
+  }
+
+  // Is this user already a member of this group?
+  $query = db_select('mo_cms_user_groups_membership', 'g');
+  $query->fields('g', array('row_id', 'entity_id', 'deleted'));
+  $query->condition('uid', $uid, '=');
+  $query->condition('entity_id', $entity_id, '=');
+  $result = $query->execute();
+  $count_results = $result->rowCount();
+
+  // If one or more rows, then user is already a member of the group or has requested to join.
+  // Leave group, rejoin group, deny user, block user, or skip this record.
+  if ($count_results > 0) {
+    foreach ($result as $row) {
+      // If user is leaving the group, mark as deleted in table mo_cms_user_groups_membership (unsubscribed from group)
+      if (($action == 'leave') AND ($row->deleted == 0)) {
+        $num_updated = db_update('mo_cms_user_groups_membership')
+          ->fields(array(
+              'deleted' => 1,
+              'changed' => REQUEST_TIME,
+              'changed_by' => $uid,
+          ))
+          ->condition('row_id', $row->row_id, '=')
+          ->execute();
+	watchdog('MO CMS: User Groups', 'Marked user ' . $uid . ' deleted in group ' . $group->title . ' (' . $entity_id . ')');
+      } elseif (($action == 'join' and $row->deleted == 1) or $action == 'approve') {
+        // Rejoin group
+        $num_updated = db_update('mo_cms_user_groups_membership')
+          ->fields(array(
+              'deleted' => 0,
+              'approved' => 1,
+              'changed' => REQUEST_TIME,
+              'changed_by' => $uid,
+          ))
+          ->condition('row_id', $row->row_id, '=')
+          ->execute();      
+	watchdog('MO CMS: User Groups', 'Unmarked user ' . $uid . ' deleted in group ' . $group->title . ' (' . $entity_id . ')');
+      } elseif (($action == 'block')) {
+        $num_updated = db_update('mo_cms_user_groups_membership')
+          ->fields(array(
+              'deleted' => 1,
+              'approved' => 0,
+              'blocked' => 1,
+              'changed' => REQUEST_TIME,
+              'changed_by' => $uid,
+          ))
+          ->condition('row_id', $row->row_id, '=')
+          ->execute();      
+	watchdog('MO CMS: User Groups', 'Unmarked user ' . $uid . ' deleted in group ' . $group->title . ' (' . $entity_id . ')');
+      } elseif (($action == 'deny')) {
+        $num_updated = db_delete('mo_cms_user_groups_membership')
+          ->condition('uid', $uid)
+	  ->condition('entity_id', $entity_id)
+          ->execute();      
+	watchdog('MO CMS: User Groups', 'Deleted request from user ' . $uid . ' for group ' . $group->title . ' (' . $entity_id . ')');
+      }
+    }
+  } else {
+    // Insert new row. If public group, new request is automatically approved
+    // If approval action, request is approved
+    if($public or $action == 'approve') {
+      $inserted_id = db_insert('mo_cms_user_groups_membership')
+          ->fields(array(
+              'entity_id' => $entity_id,
+              'uid' => $uid,
+              'created' => REQUEST_TIME,
+              'changed' => REQUEST_TIME,
+              'changed_by' => $uid,
+              'requested' => 1,
+              'approved' => 1,
+          ))
+          ->execute();
+    } else {
+      $inserted_id = db_insert('mo_cms_user_groups_membership')
+          ->fields(array(
+              'entity_id' => $entity_id,
+              'uid' => $uid,
+              'created' => REQUEST_TIME,
+              'changed' => REQUEST_TIME,
+              'changed_by' => $uid,
+              'requested' => 1, 
+          ))
+          ->execute();
+      watchdog('MO CMS: User Groups', 'Added user ' . $uid . ' to group ' . $group->title . ' (' . $entity_id . ')');
+    }
+  }
+}
+
+
+/**
+ *  @brief  Implements hook_block_info()
+ *
+ *  @details  2013-06-25 
+ */
+function mo_cms_user_groups_block_info() {
+  $blocks = array();
+  $blocks['my_user_groups']['info'] = t('MO CMS: User Groups: My Groups');
+  $blocks['public_user_groups']['info'] = t('MO CMS: User Groups: Public Groups');
+  $blocks['private_user_groups']['info'] = t('MO CMS: User Groups: Private Groups');
+  return $blocks;
+}
+
+
+/**
+ *  @brief  Implements hook_block_view()
+ *
+ *  @details  2013-06-25 
+ */
+function mo_cms_user_groups_block_view($delta='') {
+  $block = array();
+  switch ($delta) {
+    case 'my_user_groups':
+      $block['subject'] = t('My Groups');
+      if ($content = mo_cms_user_groups_my_groups_block_content()) {
+        $block['content'] = render($content);
+      } else {
+	return FALSE;
+      }
+      break;
+    case 'public_user_groups':
+      $block['subject'] = t('Public Groups');
+      $block['content'] = render(mo_cms_user_groups_directory_block_content('public'));
+      break;
+    case 'private_user_groups':
+      $block['subject'] = t('Private Groups');
+      $block['content'] = render(mo_cms_user_groups_directory_block_content('private'));
+      break;
+  }
+  
+  return $block;
+}
+
+
+/**
+ *  @brief  Listing of the User Groups the logged in user has joined. If a private group has been requested but not yet approved, indicate as 'pending'
+ *  
+ *  @return  render array
+ *  
+ *  @details  2013-06-26 
+ */
+function mo_cms_user_groups_my_groups_block_content() {
+  global $user;
+  
+  //Get groups
+  $query = db_select('node', 'n');
+  $query->join('mo_cms_user_groups_membership', 'm', 'n.nid = m.entity_id AND m.deleted = :deleted', array(':deleted' => 0));
+  $query->join('field_data_field_mo_cms_user_groups_join', 'j', 'n.nid = j.entity_id AND (j.entity_type = :type2 AND j.deleted = :deleted2)', array(':type2' => 'node', ':deleted2' => 0));
+  $query->fields('n', array('title', 'nid'));
+  $query->fields('m', array('approved'));
+  $query->fields('j', array('field_mo_cms_user_groups_join_value'));  
+  $query->condition('n.status', 1, '=');
+  $query->condition('n.type', 'mo_cms_user_group', '=');
+  $query->condition('m.uid', $user->uid, '=');  
+  $query->orderBy('n.title','ASC');
+  
+  $result = $query->execute();
+  $count_results = $result->rowCount();
+  if (!$count_results) {
+    return NULL;
+  }
+
+  $groups = array(
+    'type' => 'ul',
+    'title' => NULL,
+    'attributes' => array(
+      'id' => 'my-groups',
+      'class' => array(
+	'menu', 
+	'my-groups-content',
+      ),
+    ),
+    'items' => array(),
+  );
+  $group_nids = array();
+  $umbrella_groups = $groups;
+  $umbrella_groups['title'] = t('Umbrella Groups');
+  $umbrella_groups['attributes']['id'] = 'my-groups-umbrellas';
+  
+  foreach ($result AS $row) {
+    // If a private group has been requested but not yet approved, skip
+    if ( ($row->field_mo_cms_user_groups_join_value == 'approve') AND ($row->approved == 0) ) {
+      continue;
+    }
+    $groups['items'][] = array(
+      'data' => t('<a href="@alias" alt="' . $row->title . '" title="' . $row->title . '">' . $row->title . '</a>', array('@alias' => url('node/' . $row->nid))),   
+      'class' => array(
+	'leaf',
+      ),
+    );
+    $group_nids[] = $row->nid;
+  }
+  if (!$groups['items']) {
+    return FALSE;
+  }
+  
+  $output = array(
+    0 => array(
+      '#type' => 'markup',
+      '#markup' => theme_item_list($groups),
+    ),
+  );
+
+  if ($group_nids) {
+    $umbrellas = array();
+    foreach ($group_nids as $group_nid) {
+      $new_umbrellas = mo_cms_user_groups_get_umbrellas($group_nid);
+      foreach ($new_umbrellas as $key=>$node) {
+	if (!in_array($key, array_keys($umbrellas))) {
+	  $umbrellas[$key] = $node;
+	}
+      }
+    }
+    foreach ($umbrellas as $key=>$node) {
+      $umbrella_groups['items'][] = array(
+	'data' => l($node->title, 'node/' . $key),
+	'class' => array(
+	  'leaf',
+	),
+      );
+    }
+    if ($umbrella_groups['items']) {
+      $output[1] = array(
+	'#type' => 'markup',
+	'#markup' => theme_item_list($umbrella_groups),
+      );
+    }
+  }
+
+  return $output;
+
+}
+
+
+/**
+ *  @brief  Listing all User Groups set to visible, grouped by public groups, then private groups
+ *  
+ *  @param $can_join  Optional. ('public' or 'private')
+ *  @return render array
+ *  
+ *  @details  2013-06-26 
+ */
+function mo_cms_user_groups_directory_block_content($can_join = 'public') {
+  //Get groups
+  $query = db_select('node', 'n');
+  $query->join('field_data_body', 'b', 'n.nid = b.entity_id');
+  $query->join('field_data_field_mo_cms_user_groups_vis', 'v', 'n.nid = v.entity_id AND (v.entity_type = :type AND v.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $query->join('field_data_field_mo_cms_user_groups_join', 'j', 'n.nid = j.entity_id AND (j.entity_type = :type2 AND j.deleted = :deleted2)', array(':type2' => 'node', ':deleted2' => 0));
+  $query->fields('n', array('title', 'nid'));
+  $query->fields('b', array('body_summary', 'body_value'));
+  $query->condition('n.status', 1, '=');
+  $query->condition('n.type', 'mo_cms_user_group', '=');
+  $query->condition('v.field_mo_cms_user_groups_vis_value', 'visible', '=');  
+  if ($can_join == 'private') {
+    $query->condition('j.field_mo_cms_user_groups_join_value', 'open', '!=');
+  } else {
+    $query->condition('j.field_mo_cms_user_groups_join_value', 'open', '=');
+  }
+  $query->orderBy('n.title','ASC');
+  
+  $result = $query->execute();
+  $count_results = $result->rowCount();  
+
+  if ($can_join == 'private') {
+    $output = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'id' => 'private-groups',
+        'class' => array(
+          'private-groups-content',
+        ),
+      ),
+    );
+  } else {
+    $output = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'id' => 'public-groups',
+        'class' => array(
+          'public-groups-content',
+        ),
+      ),
+    );
+  }
+    
+  $i = 1;
+  foreach($result AS $row) {
+      $is_odd_str = (($i % 2) ? 'odd' : 'even' );
+      if(!empty($row->body_summary)) {
+        $description = trim($row->body_summary);
+      } else {
+        $description = trim(substr($row->body_value,0,97));
+        if (strlen($description) == 97) {
+          $description .= "...";
+        }
+      }
+
+      if ($can_join == 'private') {
+        $row_class_num = 'private-groups-row-' . $i;
+        $button_txt = 'Request';
+      } else {
+        $row_class_num = 'public-groups-row-' . $i;
+        $button_txt = 'Join';
+      }
+      
+      
+      $output[] = array(
+          '#type' => 'container',
+          '#attributes' => array(
+            'class' => array(
+              $row_class_num,
+              $is_odd_str,
+            ),
+          ),
+          0 => array(
+            '#type' => 'markup',
+            '#prefix' => t('<header><h3 property="dc:title" datatype="" class="node-title">'),
+            '#markup' => t('<a href="@alias" alt="' . $row->title . '" title="' . $row->title . '">' . $row->title . '</a>', array('@alias' => url('node/' . $row->nid))),
+            '#suffix' => t('</h3></header>'),
+          ),
+          1 => array(
+            '#type' => 'container',
+            '#attributes' => array(
+              'class' => array(
+                'clearfix',
+              ),
+            ),
+          ),
+          2 =>  array(
+            '#type' => 'markup',
+            '#prefix' => t('<div class="field field-name-body field-type-text-with-summary field-label-hidden"><div class="field-items"><div class="field-item ' . $is_odd_str . '" property="content:encoded">'),
+            '#markup' => t('<p>' . $description . '</p>'),
+            '#suffix' => t('</div></div></div>'),
+          ),
+          3 => array(
+            '#type' => 'container',
+            '#attributes' => array(
+              'class' => array(
+                'clearfix',
+              ),
+            ),
+          ),
+          4 =>  array(
+            '#type' => 'markup',
+            '#prefix' => t('<nav class="links node-links clearfix"><ul class="links inline"><li class="first last">'),
+            '#markup' => t('<a href="@alias" alt="' . $button_txt . ' to join ' . $row->title . '" title="' . $button_txt . ' to join ' . $row->title . '">' . $button_txt . '</a>', array('@alias' => url('node/' . $row->nid))),
+            '#suffix' => t('</li></ul></nav>'),
+          ),
+          5 => array(
+            '#type' => 'container',
+            '#attributes' => array(
+              'class' => array(
+                'clearfix',
+              ),
+            ),
+          ),
+      );
+      $i++;
+  }
+
+  return $output;
+}
+
+
+/**
+ *  @brief  Gets the users who are members of provided group
+ *  
+ *  @param [in] $nid  User Group nid
+ *  @return  Array of uids
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_get_members($nid) {
+  $uids = array();
+  $query = db_select('mo_cms_user_groups_membership', 'm');
+  $query->condition('m.entity_id', $nid);
+  $query->condition('m.deleted', 0, '=');
+  $query->condition('m.approved', 1, '=');
+  $query->addField('m', 'uid');
+  $result = $query->execute();
+  foreach ($result as $row) {
+    $uids[] = $row->uid;
+  }
+  $users = user_load_multiple($uids);
+  return $users;
+  
+}
+
+/**
+ *  @brief  Get status of member
+ *  
+ *  @param [in] $nid  User Group node nid
+ *  @param [in] $uid  User uid
+ *  @return  array of status(es) for supplied member within supplied group
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_get_membership_status($nid, $uid) {
+  $status = array(
+    'owner' => FALSE,
+    'member' => FALSE,
+    'approved' => FALSE,
+    'requested' => FALSE,
+    'invited' => FALSE,
+    'blocked' => FALSE,
+  );
+  $query = db_select('mo_cms_user_groups_membership', 'm');
+  $query->condition('m.entity_id', $nid);
+  $query->condition('m.uid', $uid);
+  $query->addField('m', 'approved');
+  $query->addField('m', 'requested');
+  $query->addField('m', 'invited');
+  $query->addField('m', 'deleted');
+  $query->addField('m', 'blocked');
+  $result = $query->execute();
+  if ($result->rowCount()) {
+    $row = $result->fetchAssoc();
+    if ($row['approved']) {
+      $status['approved'] = TRUE;
+      if (!$row['deleted']) {
+        $status['member'] = TRUE;
+      }
+    }
+    if ($row['requested']) {
+      $status['requested'] = TRUE;
+    }
+    if ($row['invited']) {
+      $status['invited'] = TRUE;
+    }
+  }
+  $node = node_load($nid);
+  $field = field_get_items('node', $node, 'field_mo_cms_user_groups_owners');
+  foreach ($field as $field_item) {
+    if ($field_item['target_id'] == $uid) {
+      $status['owner'] = TRUE;
+      if (!$status['member']) {
+	mo_cms_user_groups_user_groups_membership_save($nid, $uid, 'approve');
+	$status['member'] = TRUE;
+      }
+      break;
+    }
+  }
+  return $status;
+}
+
+
+/**
+ *  @brief  Implements hook_preprocess_node()
+ *
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_preprocess_node(&$vars) {
+  switch($vars['type']) {
+    case 'mo_cms_user_group':
+      $vars = mo_cms_user_groups_preprocess_user_group($vars);
+      break;
+    case 'mo_cms_umbrella_group':
+      $vars = mo_cms_user_groups_preprocess_umbrella_group($vars);
+      break;
+  }
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $vars  node variable array
+ *  @return  node variable array
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_preprocess_user_group($vars) {
+  global $user;
+
+  $vars['show_roster'] = FALSE;
+  $user_status = mo_cms_user_groups_get_membership_status($vars['nid'], $user->uid);
+  $members = mo_cms_user_groups_get_members($vars['nid']);
+
+  $vis_value = strtolower($vars['field_mo_cms_user_groups_vis'][0]['value']);
+  switch ($vars['field_mo_cms_user_groups_join'][0]['value']) {
+    case 'open':
+      $join_value = 'open';
+      break;
+    default:
+      $join_value = 'by approval only';
+  }
+  $vars['content']['group_privacy']['field_mo_cms_user_groups_vis'][0]['#markup'] = t('This group is <b>' . $vis_value . '</b> in group directories.');
+  $vars['content']['group_privacy']['field_mo_cms_user_groups_join'][0]['#markup'] = t('Membership in this group is <b>' . $join_value . '</b>.');
+
+  $vars['button'] = mo_cms_user_groups_group_buttons($user_status, $vars['node'], $user->uid, $join_value);
+  if ($user_status['member']) {
+    $vars['show_roster'] = TRUE;
+  }
+
+  $vars['members_data'] = $members;
+  $vars['members'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'group-' . $vars['nid'] . '-members-count',
+      'class' => 'group-members-count',
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#markup' => t('Members: ' . number_format(count($members), 0)),
+    ),
+  );
+  $vars['user_status'] = $user_status;
+  $vars['admin_link'] = FALSE;
+  if ($user_status['owner'] and $waiting = mo_cms_user_groups_get_join_requests($vars['nid'])) {
+    $text = 'There ';
+    $link_text = count($waiting) . ' join request';
+    if (count($waiting) > 1) {
+      $text .= 'are ';
+      $link_text .= 's';
+    } else {
+      $text .= 'is ';
+    }
+    $link = l($link_text, 'groups/approval/' . $vars['nid']);
+    $text .= $link . ' awaiting approval.';
+    $vars['admin_link'] = t($text);
+  }
+  $umbrellas = mo_cms_user_groups_get_umbrellas($vars['nid']);
+  if (!empty($umbrellas)) {
+    $umbrella_list = array(
+      'type' => 'ul',
+      'title' => 'Parent Groups',
+      'attributes' => array(
+	'class' => array(
+	  'umbrella-groups-list',
+	),
+      ),
+      'items' => array(),
+    );
+    foreach ($umbrellas as $umbrella) {
+      $umbrella_list['items'][] = l($umbrella->title, 'node/' . $umbrella->nid);
+    }
+    $vars['umbrellas'] = theme_item_list($umbrella_list);
+  }
+  return $vars;
+
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $vars  node variable array
+ *  @return  node variable array
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_preprocess_umbrella_group($vars) {
+  $groups = array();
+  $field = field_get_items('node', $vars['node'], 'field_mo_cms_user_groups_memgrps');
+  foreach ($field as $group) {
+    if (!empty($group['target_id']) and !empty($group['entity'])) {
+      $groups[$group['target_id']] = l($group['entity']->title, 'node/' . $group['target_id']);
+    }
+  }
+  $vars['groups'] = $groups;
+  return $vars;
+}
+
+
+/**
+ *  @brief  Gets Umbrella Group(s) of provided group
+ *  
+ *  @param [in] $nid  User Group node nid
+ *  @return  array of Umbrella Group entities
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_get_umbrellas($nid) {
+  $query = db_select('field_data_field_mo_cms_user_groups_memgrps', 'g');
+  $query->addField('g', 'entity_id', 'nid');
+  $query->condition('g.field_mo_cms_user_groups_memgrps_target_id', $nid);
+  $query->condition('g.deleted', 0);
+  $result = $query->execute();
+  $nids = array();
+  $umbrellas = array();
+  foreach ($result as $row) {
+    $nids[] = $row->nid;
+  }
+  if ($nids) {
+    $umbrellas = entity_load('node', $nids);
+  }
+  return $umbrellas;
+}
+
+/**
+ *  @brief  Gets appropriate buttons for the group detail page, dependent upon the user's status with relation to the group
+ *  
+ *  @param [in] $status       Status provided user with relation to provided group ('owner', 'member', 'requested', 'approved')
+ *  @param [in] $node         User Group node nid
+ *  @param [in] $uid          User uid
+ *  @param [in] $join_policy  String indicating public or private group. ('open')
+ *  @return  a form
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_group_buttons($status, $node, $uid, $join_policy) {
+  $button_images = array(
+    'invite' => array(
+      'path' => 'sites/default/themes/hundred_missouri_miles/img/invite.png',
+      'alt' => 'Invite Members',
+      'title' => 'Invite Members',
+    ),
+    'roster' => array(
+      'path' => 'sites/default/themes/hundred_missouri_miles/img/view_roster.png',
+      'alt' => 'View Full Roster',
+      'title' => 'View Full Roster',
+    ),
+    'leave' => array(
+      'path' => 'sites/default/themes/hundred_missouri_miles/img/leavegroup.png',
+      'alt' => 'Leave Group',
+      'title' => 'Leave Group',
+    ),
+    'rejoin' => array(
+      'path' => 'sites/default/themes/hundred_missouri_miles/img/rejoingroup.png',
+      'alt' => 'Rejoin Group',
+      'title' => 'Rejoin Group',
+    ),
+    'join' => array(
+      'path' => 'sites/default/themes/hundred_missouri_miles/img/jointhisgroup.png',
+      'alt' => 'Join Group',
+      'title' => 'Join Group',
+    ),
+    'apply' => array(
+      'path' => 'sites/default/themes/hundred_missouri_miles/img/applytojoin.png',
+      'alt' => 'Apply to Join',
+      'title' => 'Apply to Join',
+    ),
+  );
+  $destination = drupal_get_destination();
+  if ($uid === 0) {
+    $link_options = array();
+    if (!empty($destination['destination'])) {
+      $link_options['query'] = array('current' => $destination['destination']);
+    }
+    $login_link = l('Login', 'user/login', $link_options);
+    $register_link = l('register', 'user/register');
+    $links = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array(
+          'group-login-links',
+        ),
+      ),
+      0 => array(
+        '#type' => 'markup',
+        '#markup' => $login_link . ' or ' . $register_link . ' to join this group.',
+      ),
+    );
+    return render($links);
+  }
+  $buttons = array();
+  if ($status['owner']) {
+    global $base_url;
+    $body = 'You are invited to join the group "' . $node->title . '" on 100MissouriMiles.com at:' . "\n\n" . $base_url . '/' . drupal_lookup_path('alias', 'node/' . $node->nid);
+    $options = array(
+      'absolute' => TRUE,
+      'html' => TRUE,
+      'query' => array(
+      'subject' => t('Join my group on 100MissouriMiles.com!'),
+      'body' => t($body),
+      ),
+    );
+    $image_vars = array(
+      'path' => $button_images['invite']['path'],
+      'alt' => $button_images['invite']['alt'],
+      'title' => $button_images['invite']['title'],
+      'attributes' => array(),
+    );
+    $buttons['invite'] = array(
+      '#type' => 'markup',
+      '#markup' => l(theme_image($image_vars), 'mailto:', $options),
+    );
+  }
+  if ($status['owner'] or $status['member'] or user_access('administer all mo cms user groups')) {
+    if (!empty($destination['destination'])) {
+      $path = drupal_lookup_path('alias', $destination['destination']) . '/roster';
+      $options = array(
+        'html' => TRUE,
+      );
+      $image_vars = array(
+        'path' => $button_images['roster']['path'],
+        'alt' => $button_images['roster']['alt'],
+        'title' => $button_images['roster']['title'],
+        'attributes' => array(),
+      );
+      $buttons['roster'] = array(
+        '#type' => 'markup',
+        '#markup' => l(theme_image($image_vars), $path, $options),
+      );
+    }
+  }
+  if (!$status['owner']) {
+    if ($status['member']) {
+      $buttons['submit'] = array(
+        '#type' => 'image_button',
+        '#src' => '/' . $button_images['leave']['path'],
+        '#value' => t('Leave Group'),
+      );
+    } elseif ($status['requested'] and !$status['approved']) {
+      $buttons['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Request Submitted'),
+        '#disabled' => TRUE,
+      );
+    } elseif ($status['approved']) {
+      $buttons['submit'] = array(
+        '#type' => 'image_button',
+        '#src' => '/' . $button_images['rejoin']['path'],
+        '#value' => t('Rejoin Group'),
+      );
+    } elseif ($join_policy == 'open') {
+      $buttons['submit'] = array(
+        '#type' => 'image_button',
+        '#src' => '/' . $button_images['join']['path'],
+        '#value' => t('Join Group'),
+      );
+    } else {
+      $buttons['submit'] = array(
+        '#type' => 'image_button',
+        '#src' => '/' . $button_images['apply']['path'],
+        '#value' => t('Apply to Join'),
+      );
+    }
+  }
+  return drupal_get_form('mo_cms_user_groups_group_action_form', $buttons, $node->nid, $uid);
+}
+
+
+/**
+ *  @brief  Alter the group detail form to display appropriate buttons
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $buttons    array of button render arrays
+ *  @param [in] $nid        User Group node nid
+ *  @param [in] $uid        User uid
+ *  @return  form
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_group_action_form($form, &$form_state, $buttons, $nid, $uid) {
+  $form = array();
+  foreach ($buttons as $key=>$button) {
+    $form[$key] = $button;
+  }
+  return $form;
+}
+
+
+/**
+ *  @brief  Respond to the various actions from the group detail page buttons
+ *  
+ *  @param [in] $form_id    
+ *  @param [in] $form_state 
+ *  @return void
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_group_action_form_submit($form_id, &$form_state) {
+  global $user;
+  $path = explode('/', drupal_lookup_path('source', substr($form_state['complete form']['#action'], 1)));
+  if (count($path) == 2 and is_numeric($path[1])) {
+    $nid = $path[1];
+  }
+  $allowed_actions = array(
+    'Join Group',
+    'Rejoin Group',
+    'Apply to Join',
+    'Leave Group',
+  );
+  $action = $form_state['values']['submit'];
+  if (isset($nid) and $user->uid and in_array($action, $allowed_actions)) {
+    if ($action == 'Leave Group') {
+      mo_cms_user_groups_user_groups_membership_save($nid, $user->uid, 'leave');
+      $verb = 'left';
+    } elseif ($action == 'Apply to Join') {
+      mo_cms_user_groups_user_groups_membership_save($nid, $user->uid);
+      $verb = 'applied to join';
+    } else {
+      mo_cms_user_groups_user_groups_membership_save($nid, $user->uid);
+      $verb = 'joined';
+    }
+    drupal_set_message('You have ' . $verb . ' this group.');
+  }
+}
+
+
+/**
+ *  @brief  Gets outstanding requests to join group
+ *  
+ *  @param [in] $nid  User Group node nid
+ *  @return  array of users and request dates
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_get_join_requests($nid) {
+  $query = db_select('mo_cms_user_groups_membership', 'm');
+  $query->condition('m.entity_id', $nid);
+  $query->condition('m.requested', 1);
+  $query->condition('m.approved', 0);
+  $query->condition('m.deleted', 0);
+  $query->condition('m.blocked', 0);
+  $query->fields('m', array('row_id', 'uid', 'created'));
+  $result = $query->execute();
+  $requests = array();
+  foreach ($result as $row) {
+    $requests[$row->row_id] = $row;
+  }
+  return $requests;
+}
+
+
+/**
+ *  @brief  Check user access permissions to admin provided group
+ *  
+ *  @param [in] $nid  User Group node nid
+ *  @return  Boolean. TRUE if user has permission to admin the provided group
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_admin_access_callback($nid) {
+  $access = FALSE;
+  if (user_access('administer all mo cms user groups')) {
+    $access = TRUE;
+  } else {
+    global $user;
+    $status = mo_cms_user_groups_get_membership_status($nid, $user->uid);
+    if ($status['owner']) {
+      $access = TRUE;
+    }
+  }
+  return $access;
+}
+
+
+/**
+ *  @brief  Gets the User Group name to provide the title for the Membership Requests page
+ *  
+ *  @param [in] $nid  User Group node nid
+ *  @return  String. [User Group name]: Membership Requests
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_admin_membership_requests_title($nid) {
+  $node = node_load($nid);
+  return $node->title . ': Membership Requests';
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $nid        User Group node nid
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_membership_requests_form($form, &$form_state, $nid) {
+  if (!empty($form_state['input']['admin_action'])) {
+    return mo_cms_user_groups_membership_requests_form_confirm($form, $form_state, $nid);
+  }
+  return mo_cms_user_groups_membership_requests_form_actions($form, $form_state, $nid);
+}
+
+
+/**
+ *  @brief  Confirm group owner's response to membership request(s)
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $nid        User Group node nid
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_membership_requests_form_confirm($form, &$form_state, $nid) {
+  $requests = mo_cms_user_groups_get_join_requests($nid);
+  $desc = array(
+    '#type' => 'markup',
+    '#markup' => t('<p>Are you sure you wish to <b>' . $form_state['input']['admin_action'] . '</b> the following users?</p>'),
+  );
+  $items_list = array(
+    'type' => 'ul',
+    'title' => NULL,
+    'attributes' => array(),
+    'items' => array(),
+  );
+  $uids = array();
+  foreach ($form_state['input']['table'] as $row_id) {
+    $request = $requests[$row_id];
+    $uids[] = $request->uid;
+  }
+  $users = user_load_multiple($uids);
+  foreach ($users as $user) {
+    $items_list['items'][] = format_username($user);
+  }
+  $desc['#markup'] .= theme_item_list($items_list);
+  $desc['#markup'] .= t('<p>This action cannot be undone.');
+  $form['admin_action'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['admin_action'],
+  );
+  $form['table'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['table'],
+  );
+  $form['nid'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['nid'],
+  );
+  $form['process'] = array(
+    '#type' => 'hidden',
+    '#value' => 'true',
+  );
+  $form['destination'] = array(
+    '#type' => 'hidden',
+    '#value' => 'groups/approval/' . $nid,
+  );
+  return confirm_form($form, 'Are you sure?', 'groups/approval/' . $nid, render($desc), 'Continue', 'Cancel');
+}
+
+
+/**
+ *  @brief  Display group membership request approval form
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $nid        User Group node nid
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_membership_requests_form_actions($form, &$form_state, $nid) {
+  
+  $node = node_load($nid);
+  $requests = mo_cms_user_groups_get_join_requests($nid);
+  if (!$requests) {
+    return array(
+      0 => array(
+	'#type' => 'markup',
+	'#markup' => t('There are no pending membership requests for this group.'),
+      ),
+    );
+  }
+  $uids = array();
+  foreach ($requests as $request) {
+    $uids[] = $request->uid;
+  }
+  $users = user_load_multiple($uids);
+  
+  $header = array(
+    'id' => array(
+      'data' => t('ID'),
+      'style' => 'display: none;',
+    ),
+    'nid' => array(
+      'data' => t('NID'),
+      'style' => 'display: none;',
+    ),
+    'uid' => array(
+      'data' => t('UID'),
+      'style' => 'display: none;',
+    ),
+    'requested' => t('Requested'),
+    'name' => t('Name'),
+  );
+  $options = array();
+  foreach ($requests as $row_id=>$request) {
+    $user = $users[$request->uid];
+    $options[$row_id] = array(
+      'id' => array(
+        'data' => $request->row_id,
+        'style' => 'display: none;',
+      ),
+      'nid' => array(
+        'data' => $nid,
+        'style' => 'display: none;',
+      ),
+      'uid' => array(
+        'data' => $user->uid,
+        'style' => 'display: none;',
+      ),
+      'requested' => format_date($request->created),
+      'name' => format_username($user),
+    );
+  }
+ 
+  $form = array(
+    'admin_action' => array(
+      '#type' => 'select',
+      '#title' => t('Action'),
+      '#attributes' => array(),
+      '#options' => array(
+        'none' => t('- Select -'),
+        'approve' => t('Approve'),
+        'deny' => t('Deny'),
+        'block' => t('Block'),
+      ),
+      '#description' => t('Approve: add the user to your group.<br>Deny: inform the user that the request was denied; the user may re-apply.<br>Block: inform the user that the request was denied; the user will be unable to re-apply.'),
+    ),
+    'table' => array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#multiple' => TRUE,
+    ),
+    'nid' => array(
+      '#type' => 'hidden',
+      '#value' => $nid,
+    ),
+    'submit' => array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+      '#attributes' => array(
+        'id' => 'membership-requests-action',
+      ),
+    ),
+  );
+ 
+  return $form;  
+}
+
+
+/**
+ *  @brief  Verify group owner's response to membership request(s) and begin processing
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $nid        User Group node nid
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_membership_requests_form_submit($form_id, &$form_state) {
+  if (empty($form_state['input']['admin_action']) or $form_state['input']['admin_action'] == 'none') {
+    drupal_set_message('No action selected.', 'warning');
+    return;
+  } elseif (isset($form_state['input']['admin_action']) and in_array($form_state['input']['admin_action'], array('register', 'delete'))) {
+    if (empty($form_state['input']['table'])) {
+      drupal_set_message('No submissions were selected.', 'warning');
+      return;
+    }
+  }
+  if (isset($form_state['input']['process']) and $form_state['input']['process']) {
+    $all_requests = mo_cms_user_groups_get_join_requests($form_state['values']['nid']);
+    $requests = array();
+    foreach ($form_state['values']['table'] as $row_id) {
+      $requests[$row_id] = $all_requests[$row_id];
+    }
+    mo_cms_user_groups_membership_requests_process($requests, $form_state['values']['nid'], $form_state['values']['admin_action']);
+  } else {
+    $form_state['rebuild'] = TRUE;
+  }  
+}
+
+
+/**
+ *  @brief  Update group membership table based on group owner's response to join request
+ *  
+ *  @param [in] $requests array of requests to be processed
+ *  @param [in] $nid      User Group node nid
+ *  @param [in] $action   String. Response to join request. ('approve', 'deny', 'block')
+ *  @return  void
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_membership_requests_process($requests, $nid, $action) {
+  switch($action) {
+    case 'approve':
+      $verb = 'approved';
+      break;
+    case 'deny':
+      $verb = 'denied';
+      break;
+    case 'block':
+      $verb = 'blocked';
+      break;
+  }
+  $results = array(
+    'type' => 'ul',
+    'title' => 'The following users\' requests were ' . $verb . ':',
+    'attributes' => array(),
+    'items' => array(),
+  );
+  foreach ($requests as $request) {
+    $user = user_load($request->uid);
+    $results['items'][] = format_username($user);
+    mo_cms_user_groups_user_groups_membership_save($nid, $request->uid, $action);
+  }
+  drupal_set_message(theme_item_list($results));
+}
+
+
+/**
+ *  @brief  Add a "blocked" column to the MO CMS: Groups user memberships table
+ *  
+ *  @return void
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_update_7110() {
+  $col_def = array(
+    'description' => 'A boolean indicating whether this groups owner has blocked this user from membership in this group',
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('mo_cms_user_groups_membership', 'blocked', $col_def);
+}
+
+
+/**
+ *  @brief  Checks user access permissions to view roster of group
+ *  
+ *  @param [in] $title  #TODO
+ *  @return  Boolean. TRUE if user has permission to view roster of group
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_group_roster_access_callback($title) {
+  $node_path = drupal_lookup_path('source', 'groups/group/' . $title);
+  $ex = explode('/', $node_path);
+  $nid = end($ex);
+  $node = node_load($nid);
+  $access = FALSE;
+  if (user_access('administer all mo cms user groups')) {
+    $access = TRUE;
+  } else {
+    global $user;
+    $status = mo_cms_user_groups_get_membership_status($nid, $user->uid);
+    if ($status['owner'] or $status['member']) {
+      $access = TRUE;
+    }
+  }
+  return $access;
+}
+
+
+/**
+ *  @brief  Gets the User Group name to provide the title for the Roster page
+ *  
+ *  @param [in] $title   #TODO
+ *  @return  String. [User Group name]: Roster
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_roster_title($title) {
+  $node_path = drupal_lookup_path('source', 'groups/group/' . $title);
+  $ex = explode('/', $node_path);
+  $nid = end($ex);
+  $node = node_load($nid);
+  return $node->title . ': Roster';
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $nid        User Group node nid
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_roster_form($form, &$form_state, $nid) {
+  if (!empty($form_state['input']['admin_action'])) {
+    return mo_cms_user_groups_roster_form_confirm($form, $form_state, $nid);
+  }
+  return mo_cms_user_groups_roster_form_actions($form, $form_state, $nid);
+}
+
+
+/**
+ *  @brief  Confirm group owner's change to the membership roster
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $nid        User Group node nid
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_roster_form_confirm($form, &$form_state, $nid) {
+  $desc = array(
+    '#type' => 'markup',
+    '#markup' => t('<p>Are you sure you wish to <b>' . $form_state['input']['admin_action'] . '</b> the following users?</p>'),
+  );
+  $items_list = array(
+    'type' => 'ul',
+    'title' => NULL,
+    'attributes' => array(),
+    'items' => array(),
+  );
+  $uids = array();
+  foreach ($form_state['input']['table'] as $uid) {
+    $uids[] = $uid;
+  }
+  $users = user_load_multiple($uids);
+  foreach ($users as $user) {
+    $items_list['items'][] = format_username($user);
+  }
+  $desc['#markup'] .= theme_item_list($items_list);
+  $desc['#markup'] .= t('<p>This action cannot be undone.');
+  $form['admin_action'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['admin_action'],
+  );
+  $form['table'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['table'],
+  );
+  $form['nid'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['nid'],
+  );
+  $form['process'] = array(
+    '#type' => 'hidden',
+    '#value' => 'true',
+  );
+  $form['destination'] = array(
+    '#type' => 'hidden',
+    '#value' => drupal_get_path_alias('node/' . $nid) . '/roster',
+  );
+  return confirm_form($form, 'Are you sure?', drupal_get_path_alias('node/' . $nid) . '/roster', render($desc), 'Continue', 'Cancel');
+}
+
+
+/**
+ *  @brief  Display group roster form
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @param [in] $title       #TODO
+ *  @return  
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_roster_form_actions($form, &$form_state, $title) {
+  
+  global $user;
+  
+  $node_path = drupal_lookup_path('source', 'groups/group/' . $title);
+  $ex = explode('/', $node_path);
+  $nid = end($ex);
+  $show_form = FALSE;
+  $user_status = mo_cms_user_groups_get_membership_status($nid, $user->uid);
+  if ($user_status['owner'] or user_access('administer all mo cms user groups', $user)) {
+    $show_form = TRUE;
+  }
+
+  $v = taxonomy_vocabulary_machine_name_load('mo_gov_counties');
+  $v_tree = taxonomy_get_tree($v->vid);
+  $counties = array();
+  foreach ($v_tree as $county) {
+    $counties[$county->tid] = $county;
+  }
+
+  $header = array(
+    'id' => array(
+      'data' => t('ID'),
+      'style' => 'display: none;',
+    ),
+    'name' => t('Name'),
+    'county' => t('County'),
+    'mileage' => t('Mileage'),
+  );
+  $options = array();
+  $members = mo_cms_user_groups_get_members($nid);
+  foreach ($members as $uid=>$member) {
+    $user_county = NULL;
+    $user_county_tid = mo_project_get_county($member);
+    if ($user_county_tid and in_array($user_county_tid, array_keys($counties))) {
+      $user_county = $counties[$user_county_tid]->name;
+    }
+    if ($show_form) {
+      $member_name = format_username($member);
+    } else {
+      $member_name = mo_cms_user_groups_get_member_initials($member);
+    }
+    $member_mileage_array = mo_project_get_mileage_per_subuser(array($member->uid), array('Me'));
+    $member_mileage = count($member_mileage_array) == 0 ? 0 : $member_mileage_array[0]->distance;
+    $options[$uid] = array(
+      'id' => array(
+        'data' => $uid,
+        'style' => 'display: none;',
+      ),
+      'name' => $member_name,
+      'county' => $user_county,
+      'mileage' => number_format($member_mileage, 2),
+    );
+  }
+ 
+  if ($show_form) {
+    $form = array(
+      'admin_action' => array(
+        '#type' => 'select',
+        '#title' => t('Action'),
+        '#attributes' => array(),
+        '#options' => array(
+          'none' => t('- Select -'),
+          'remove' => t('Remove'),
+          'block' => t('Block'),
+        ),
+        '#description' => t('Remove: remove the user from your group.<br>Block: remove the user from the group; the user will be unable to rejoin.'),
+      ),
+      'table' => array(
+        '#type' => 'tableselect',
+        '#header' => $header,
+        '#options' => $options,
+        '#multiple' => TRUE,
+      ),
+      'nid' => array(
+        '#type' => 'hidden',
+        '#value' => $nid,
+      ),
+      'submit' => array(
+        '#type' => 'submit',
+        '#value' => t('Submit'),
+        '#attributes' => array(
+          'id' => 'roster-action',
+        ),
+      ),
+    );
+    foreach ($form['table']['#options'] as $option_uid=>$option) {  
+      $member_status = mo_cms_user_groups_get_membership_status($nid, $option_uid);
+      if ($member_status['owner']) {
+	$form['table'][$option_uid]['#disabled'] = TRUE;
+	$form['table']['#options'][$option_uid]['#attributes'] = array(
+	  'class' => array(
+	    'owner',
+	  ),
+	);
+      }
+    }
+  } else {
+    $table = array(
+      'header' => $header,
+      'rows' => $options,
+      'attributes' => array(),
+      'caption' => NULL,
+      'colgroups' => array(),
+      'sticky' => FALSE,
+      'empty' => NULL,
+    );
+    $form = array(
+      0 => array(
+        '#type' => 'markup',
+        '#markup' => theme_table($table),
+      ),
+    );
+  }
+ 
+  return $form;  
+}
+
+
+/**
+ *  @brief  Verify group owner's changes to the roster and begin processing
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @return  #TODO
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_roster_form_submit($form_id, &$form_state) {
+  if (empty($form_state['input']['admin_action']) or $form_state['input']['admin_action'] == 'none') {
+    drupal_set_message('No action selected.', 'warning');
+    return;
+  } elseif (isset($form_state['input']['admin_action']) and in_array($form_state['input']['admin_action'], array('leave', 'block'))) {
+    if (empty($form_state['input']['table'])) {
+      drupal_set_message('No submissions were selected.', 'warning');
+      return;
+    }
+  }
+  if (isset($form_state['input']['process']) and $form_state['input']['process']) {
+    $uids = array();
+    foreach ($form_state['values']['table'] as $uid) {
+      $uids[] = $uid;
+    }
+    $users = user_load_multiple($uids);
+    mo_cms_user_groups_roster_process($users, $form_state['values']['nid'], $form_state['values']['admin_action']);
+  } else {
+    $form_state['rebuild'] = TRUE;
+  }
+  
+}
+
+
+/**
+ *  @brief  Update group membership table based on group owner's change(s) to the membership roster
+ *  
+ *  @param [in] $users    array of user entities to be processed
+ *  @param [in] $nid      User Group node nid
+ *  @param [in] $action   String. Response to join request. ('approve', 'deny', 'block')
+ *  @return  void
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_roster_process($users, $nid, $action) {
+  switch($action) {
+    case 'remove':
+      $action = 'leave';
+      $verb = 'removed';
+      break;
+    case 'block':
+      $verb = 'blocked';
+      break;
+  }
+  $results = array(
+    'type' => 'ul',
+    'title' => 'The following users were ' . $verb . ' from your group:',
+    'attributes' => array(),
+    'items' => array(),
+  );
+  foreach ($users as $uid=>$user) {
+    $results['items'][] = format_username($user);
+    mo_cms_user_groups_user_groups_membership_save($nid, $uid, $action);
+  }
+  drupal_set_message(theme_item_list($results));
+}
+
+
+/**
+ *  @brief  Gets initials of the group member for anonymized display
+ *  
+ *  @param [in] $member  User entity
+ *  @return  String. Group member initials or '(Name withheld)'
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_get_member_initials($member) {
+  $first_initial = FALSE;
+  $last_initial = FALSE;
+  $first_name_field = field_get_items('user', $member, 'field_user_first_name');
+  if (!empty($first_name_field[0]['value']) and $first_name_field[0]['value']) {
+    $first_initial = substr($first_name_field[0]['value'], 0, 1);
+  }
+  $last_name_field = field_get_items('user', $member, 'field_user_last_name');
+  if (!empty($last_name_field[0]['value']) and $last_name_field[0]['value']) {
+    $last_initial = substr($last_name_field[0]['value'], 0, 1);
+  }
+  if ($first_initial and $last_initial) {
+    $member_name = $first_initial . '. ' . $last_initial . '.';
+  } else {
+    $member_name = t('(Name withheld)');
+  }
+  return $member_name;
+}
+
+
+/**
+ *  @brief  Creates the render array to display the group leaderboard
+ *  
+ *  @param [in] $range         #TODO
+ *  @param [in] $members_keys  #TODO
+ *  @param [in] $users         #TODO
+ *  @param [in] $max           #TODO
+ *  @param [in] $user          Logged in user's User uid
+ *  @param [in] $user_position Logged in user's rank in the group
+ *  @param [in] $title         #TODO
+ *  @param [in] $full_names    Boolean. Optional. FALSE to display only member initials
+ *  @return  render array
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_build_group_leaderboard($range, $members_keys, $users, $max, $user, $user_position, $title, $full_names=FALSE) {
+  $output = array(
+    'header' => array(
+      0 => array(
+        'data' => t('Rank'),
+        'width' => '9%',
+      ),
+      1 => array(
+        'data' => t('Initials'),
+        'width' => '10%',
+      ),
+      2 => array(
+        'data' => t('County'),
+        'width' => '18%',
+      ),
+      3 => array(
+        'data' => t('Total Mileage'),
+        'width' => '63%',
+      ),
+    ),
+    'rows' => array(),
+    'attributes' => array(),
+    'caption' => NULL,
+    'colgroups' => array(),
+    'sticky' => TRUE,
+    'empty' => NULL,
+  );
+  foreach ($range as $i) {
+    $member_uid = $members_keys[$i];
+    $member = $users[$member_uid]['member'];
+    if ($full_names) {
+      $member_name = format_username($member);
+    } else {
+      $member_name = mo_cms_user_groups_get_member_initials($member);
+    }
+    $county_field = field_get_items('user', $member, 'field_user_county');
+    if (!empty($county_field[0]['tid'])) {
+      $term = taxonomy_term_load($county_field[0]['tid']);
+      $county = $term->name;
+    } else {
+      $county = NULL;
+    }
+    $mileage = $users[$member_uid]['mileage'];
+    $output['rows'][$i] = array(
+      'data' => array(
+        'rank' => t($i + 1),
+        'initials' => t($member_name),
+        'county' => t($county),
+        'mileage' => render(mo_project_progress_bar($mileage, $max, FALSE, 'top', FALSE)),
+      ),
+    );
+    if ($member_uid == $user->uid) {
+      $output['rows'][$i]['class'] = array(
+        'self',
+      );
+    }
+  }
+  $leaderboard = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'leaderboard',
+      ),
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#prefix' => t('<h3>' . $title . '</h3>'),
+      '#markup' => theme_table($output),
+    ),
+  );
+  return $leaderboard;
+}
+
+
+/**
+ *  @brief  Creates the render array to display the umbrella group leaderboards
+ *  
+ *  @param [in] $miles   #TODO
+ *  @param [in] $mileage #TODO
+ *  @param [in] $groups  #TODO
+ *  @param [in] $max     #TODO
+ *  @param [in] $label   #TODO
+ *  @return  render array
+ *  
+ *  @details  2014-03-19
+ */
+function mo_cms_user_groups_build_umbrella_group_leaderboard($miles, $mileage, $groups, $max, $label) {
+  switch($label) {
+    case 'Total':
+      $title = 'Total mileage for all group members';
+      break;
+    case 'Average':
+      $title = 'Average mileage per group member';
+      break;
+  }
+  $output = array(
+    'header' => array(
+      0 => array(
+        'data' => t('Rank'),
+        'width' => '9%',
+      ),
+      1 => array(
+        'data' => t('Group'),
+        'width' => '21%',
+      ),
+      2 => array(
+        'data' => t($label . ' Mileage'),
+        'width' => '70%',
+      ),
+    ),
+    'rows' => array(),
+    'attributes' => array(),
+    'caption' => NULL,
+    'colgroups' => array(),
+    'sticky' => TRUE,
+    'empty' => NULL,
+  );
+  $i = 0;
+  foreach ($miles as $miles_value) {
+    $mileage_nids = $mileage[$miles_value];
+    foreach ($mileage_nids as $nid) {
+      $group = $groups[$nid];
+      $output['rows'][$i] = array(
+        'data' => array(
+          'rank' => t($i + 1),
+          'group' => $group,
+          'mileage' => render(mo_project_progress_bar($miles_value, $max, FALSE, 'top', FALSE)),
+        ),
+      );
+      $i++;
+    }
+  }
+  $leaderboard = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'leaderboard',
+      ),
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#prefix' => t('<h3>' . $title . '</h3>'),
+      '#markup' => theme_table($output),
+    ),
+  );
+  return $leaderboard;
+}
+
+
+/**
+ *  @brief  Gets the total mileage for all members of the group, for the activities tracked by the group
+ *  
+ *  @param [in] $node   User Group node entity
+ *  @param [in] $period Optional. Time period to calculate mileage for. ('current', 'all', '30day', [ChallengeYear], array of 2 dates)
+ *  @return  Double. Total mileage value
+ *  
+ *  @details  2014-03-19
+ *  updated 2014-05-15  to exclude sub-user miles
+ */
+function mo_cms_user_groups_get_group_mileage($node, $period='current') {
+  $members = mo_cms_user_groups_get_members($node->nid);
+  $activities_field = field_get_items('node', $node, 'field_trail_activity');
+  $activity_tids = array();
+  if (isset($activities_field[0]['tid'])) {
+    foreach ($activities_field as $activities_field_item) {
+      $activity_tids[] = $activities_field_item['tid'];
+    }
+  }
+  $group_mileage = 0;
+  if (!empty($members) and $member_uids = array_keys($members)) {
+    $group_mileage_array = mo_project_get_mileage_per_subuser(array_keys($members), array('Me'), $activity_tids, $period);
+    foreach ($group_mileage_array AS $record) {
+      $group_mileage = $group_mileage + $record->distance;
+    }
+  }
+  return $group_mileage;
+}
+
+
+/**
+ *  @brief  Creates a Snapshot 'Moment-in-Time' comparison of all groups' total mileage
+ *  
+ *  @return  nothing
+ *  
+ *  @details  2014-07-09 
+ *  updated 2014-05-15  to exclude sub-user miles
+ */
+function mo_cms_user_groups_group_mileage_snapshot($year) {
+  $problem_groups = '';
+
+  if ( (empty($year)) OR (!isset($year)) ) {
+    $year = date('Y');
+  }
+
+  // Get all groups with at least one member
+  $query = db_select('mo_cms_user_groups_membership', 'm');
+  $query->join('node', 'n', 'm.entity_id = n.nid AND (n.type = :type AND n.status <> :deleted)', array(':type' => 'mo_cms_user_group', ':deleted' => 0));
+  $query->fields('m', array('entity_id'));
+  $query->distinct();
+  $result = $query->execute();
+
+  if ($result) {
+    foreach ($result as $row) {
+      $node = node_load($row->entity_id);
+      if (!empty($node)) {
+        
+        $distance = mo_cms_user_groups_get_group_mileage($node, $year);
+
+        if ( (!empty($distance)) AND ($distance != 0) ) {
+          $distance = round($distance, 3);
+          
+          $owner_uid = 1;
+          $owners_field = field_get_items('node', $node, 'field_mo_cms_user_groups_owners');
+          foreach ($owners_field as $owner) {
+            if ($owner['target_id'] != 1) {
+              $owner_uid = $owner['target_id'];
+              break;
+            }
+          }
+
+          $grp_mem = mo_cms_user_groups_get_members($node->nid);
+          foreach ($grp_mem as $member) {
+            $grp_members[] = $member->uid;
+          }
+          $grp_member_total = count($grp_members);
+          $grp_members_s = serialize($grp_members);      
+          
+          $find_query = db_select('mo_cms_user_groups_snapshot', 's');
+          $find_query->fields('s', array('row_id'));
+          $find_query->condition('s.grp_id', $node->nid, '=');
+          $find_query->condition('s.challenge_year', $year, '=');
+          $find_row = $find_query->execute()->fetchCol();
+          
+          if ( (!empty($find_row)) AND (count($find_row) == 1) ) {
+            // Record already exists, update
+            $num_updated = db_update('mo_cms_user_groups_snapshot')
+              ->fields(array(
+                'owner_uid' => $owner_uid, 
+                'grp_distance' => $distance,
+                'grp_members' => $grp_members_s, 
+                'grp_member_total' => $grp_member_total,
+                'last_updated' => time(),
+              ))
+              ->condition('row_id', $find_row[0], '=')
+              ->execute();            
+            
+          } else if ( (!empty($find_row)) AND (count($find_row) > 1) ) {
+            // There is a problem
+            $problem_groups = $problem_groups . ' ' . $row->entity_id . ',';
+          } else { 
+            // New record, insert
+            $i_query = db_insert('mo_cms_user_groups_snapshot');
+            $i_query->fields(array(
+                'grp_id' => $node->nid,
+                'challenge_year' => (int)$year,
+                'owner_uid' => $owner_uid, 
+                'grp_distance' => $distance,
+                'grp_members' => $grp_members_s, 
+                'grp_member_total' => $grp_member_total,
+                'last_updated' => time(),
+            ));
+            $i_query->execute();
+          }
+         
+          unset($grp_members);
+        }
+        
+      } else {
+        $problem_groups = $problem_groups . ' ' . $row->entity_id . ',';
+      }
+    }
+  }
+
+  mo_cms_dump('Completed updating table mo_cms_user_groups_snapshot for ' . $year);
+  if ($problem_groups <> '') {
+    mo_cms_dump('Unable to load groups: ' . $problem_groups);
+  }
+  
+  $content = mo_project_blank_page();
+  return render($content);
+}

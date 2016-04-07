@@ -1,0 +1,31 @@
+/**
+ * This file will hold styles that are loaded using the same media query as the
+ * normal grid.
+ * 
+ * If you are using the default media queries provided by Omega, these styles
+ * will also apply to the widescreen layout unless they are overridden by the
+ * widescreen styles.
+ */
+ 
+/*content front page not logged in*/
+
+
+.welcome-msg {
+	height: auto; 
+}
+
+.welcome-msg p {
+	width: 60%;
+	font-size: .9em;
+}
+
+.welcome-msg .governor {
+	height: 300px;
+	width: 295px;
+	bottom: 5px;
+}
+
+.pane-current-challenge-miles-home h2.pane-title {
+	font-size: 20px;
+}
+

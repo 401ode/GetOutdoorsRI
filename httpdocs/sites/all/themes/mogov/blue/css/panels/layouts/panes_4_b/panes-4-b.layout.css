@@ -1,0 +1,86 @@
+/******************************************************************************
+ * panes-4-b.layout.sass
+ *
+ * Styling of the "4 Panes B" layout.
+ ***************************************************************************** */
+/******************************************************************************
+ * _variables.sass: sets variables for the standard layout
+ ***************************************************************************** */
+/* line 11, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+.panel-display--panes-4-b .l-container {
+  *zoom: 1;
+  max-width: 1190px;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+/* line 38, ../../../../../../../../../../../../Ruby193/lib/ruby/gems/1.9.1/gems/compass-0.12.7/frameworks/compass/stylesheets/compass/utilities/general/_clearfix.scss */
+.panel-display--panes-4-b .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  /* line 18, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container {
+    max-width: 1190px;
+  }
+  /* line 20, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row1-col1 {
+    width: 65.21739%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  /* line 22, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row1-col2 {
+    width: 30.43478%;
+    float: right;
+    margin-right: 0;
+  }
+  /* line 24, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row2-col1 {
+    width: 47.82609%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  /* line 26, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row2-col2 {
+    width: 47.82609%;
+    float: right;
+    margin-right: 0;
+  }
+}
+@media (min-width: 992px) {
+  /* line 32, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container {
+    max-width: 1190px;
+  }
+  /* line 34, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row1-col1 {
+    width: 65.95745%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  /* line 36, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row1-col2 {
+    width: 31.91489%;
+    float: right;
+    margin-right: 0;
+  }
+  /* line 38, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row2-col1 {
+    width: 48.93617%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  /* line 40, ../../../../sass/panels/layouts/panes_4_b/panes-4-b.layout.sass */
+  .panel-display--panes-4-b .l-container .panes-4-b-region--row2-col2 {
+    width: 48.93617%;
+    float: right;
+    margin-right: 0;
+  }
+}

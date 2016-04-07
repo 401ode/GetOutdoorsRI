@@ -1,0 +1,202 @@
+/* Non-semantic Helper Classes */
+@import "susy"
+@import "../variables/_layout"
+
+// Mobile
+.hide 
+  position: absolute 
+  height: 0 
+  width: 0 
+  overflow: hidden
+.no-border  
+  border: 0 !important
+.no-margin  
+  margin: 0!important
+.float-left
+  float: left
+.float-right
+  float: right
+.float-left-add-margin,
+img[data-picture-align="left"]
+  float: left
+  margin: 0 10px 10px 0
+.float-right-add-margin,
+img[data-picture-align="right"]
+  float: right
+  margin: 0 0 10px 10px
+.align-left  
+  text-align: left 
+.align-right  
+  text-align: right 
+.center 
+  text-align: center
+.smaller  
+  font-size: 80% 
+.nowrap  
+  white-space: nowrap
+.clear-left  
+  clear: left 
+.clear-right  
+  clear: right 
+.ir  
+  display: block 
+  text-indent: -999em 
+  overflow: hidden 
+  background-repeat: no-repeat 
+  text-align: left 
+  direction: ltr /* For image replacement */
+.hidden  
+  display: none 
+  visibility: hidden  /* Hide for both screenreaders and browsers: css-discuss.incutio.com/wiki/Screenreader_Visibility */
+.visuallyhidden  
+  border: 0 
+  clip: rect(0 0 0 0) 
+  height: 1px 
+  margin: -1px 
+  overflow: hidden 
+  padding: 0 
+  position: absolute 
+  width: 1px /* Hide only visually, but have it available for screenreaders: by Jon Neal. www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus  
+  clip: auto 
+  height: auto 
+  margin: 0 
+  overflow: visible 
+  position: static 
+  width: auto /* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: drupal.org/node/897638 */
+.invisible  
+  visibility: hidden /* Hide visually and from screenreaders, but maintain layout */
+/* http://sonspring.com/journal/clearing-floats */
+.sr-only 
+  position: absolute
+  width: 1px
+  height: 1px
+  margin: -1px
+  padding: 0
+  overflow: hidden
+  clip: rect(0, 0, 0, 0)
+  border: 0
+.sr-only-focusable:active,
+.sr-only-focusable:focus
+  position: static
+  width: auto
+  height: auto
+  margin: 0
+  overflow: visible
+  clip: auto
+.mobile-only
+  display: block
+.mobile-hide
+  display: none
+    
+.margin-top-5 
+  margin-top: 5px !important
+
+.margin-top-15 
+  margin-top: 15px !important
+
+.margin-top-25 
+  margin-top: 25px !important
+
+.margin-top-30 
+  margin-top: 30px !important
+
+.margin-top-35 
+  margin-top: 35px !important
+
+.margin-top-45 
+  margin-top: 45px !important
+
+.margin-top-60 
+  margin-top: 60px !important
+
+.margin-top-90 
+  margin-top: 90px !important
+
+.margin-top-120 
+  margin-top: 120px !important
+
+.margin-bottom-5 
+  margin-bottom: 5px !important
+
+.margin-bottom-15 
+  margin-bottom: 15px !important
+
+.margin-bottom-25 
+  margin-bottom: 25px !important
+
+.margin-bottom-30 
+  margin-bottom: 30px !important
+
+.margin-bottom-35 
+  margin-bottom: 35px !important
+
+.margin-bottom-45 
+  margin-bottom: 45px !important
+
+.margin-bottom-60 
+  margin-bottom: 60px !important
+
+.margin-bottom-90 
+  margin-bottom: 90px !important
+
+.margin-bottom-120 
+  margin-bottom: 120px !important
+
+.padding-top-15 
+  padding-top: 15px !important
+
+.padding-top-30 
+  padding-top: 30px !important
+
+.padding-top-45 
+  padding-top: 45px !important
+
+.padding-top-60 
+  padding-top: 60px !important
+
+.padding-top-90 
+  padding-top: 90px !important
+
+.padding-top-120 
+  padding-top: 120px !important
+
+.padding-top-130 
+  padding-top: 130px !important
+
+.padding-bottom-15 
+  padding-bottom: 15px !important
+
+.padding-bottom-30 
+  padding-bottom: 30px !important
+
+.padding-bottom-45 
+  padding-bottom: 45px !important
+
+.padding-bottom-60 
+  padding-bottom: 60px !important
+
+.padding-bottom-90 
+  padding-bottom: 90px !important
+
+.padding-bottom-120 
+  padding-bottom: 120px !important
+
+.padding-bottom-130 
+  padding-bottom: 130px !important
+
+
+// Tablet
+@include at-breakpoint($tab)
+  .mobile-only
+    display: none
+  .mobile-hide
+    display: block
+    
+
+// Desktop
+@include at-breakpoint($desk)
+  .mobile-only
+    display: none
+  .mobile-hide
+    display: block

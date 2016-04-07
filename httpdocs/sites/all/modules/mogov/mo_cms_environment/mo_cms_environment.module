@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Code for the MO CMS: Environment feature.
+ */
+
+function mo_cms_environment_menu() {
+
+  $items = array();
+  
+  $items['admin/config/mo-cms/environment'] = array(
+    'title' => 'MO CMS: Environment',
+    'description' => 'Environmental configuration options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('variable_module_form', 'mo_cms_environment'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['nscache_inval'] = array(
+    'title' => t('Clear the NetScaler cache'),
+    'description' => 'NetScaler will intercept this path and invalidate its cache.',
+    'page callback' => 'mo_cms_environment_blank_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+
+}
+
+function mo_cms_environment_blank_page() {
+  return NULL;
+}
+
+/**
+ * Implements hook_variable_info().
+ */
+function mo_cms_environment_variable_info($options) {
+  $variables = array(
+    'mo_cms_environment_nscache_clear' => array(
+      'title' => t('NetScaler cache active', array(), $options),
+      'description' => t('There is a NetScaler cache active for this site.'),
+      'type' => 'boolean',
+      'access' => 'access administration pages',
+      'default' => FALSE,
+      'element' => array(
+        '#type' => 'checkbox',
+      ),
+    ),
+  );
+
+  return $variables;
+}
+
+function mo_cms_environment_form_system_performance_settings_alter(&$form, $form_state, $form_id) {
+  if (variable_get_value('mo_cms_environment_nscache_clear')) {
+    $form['clear_cache']['clear']['#submit'][] = 'mo_cms_environment_clear_cache_submit';
+  }
+}
+
+function mo_cms_environment_clear_cache_submit($form, &$form_state) {
+  global $base_url;
+  $url = $base_url . '/nscache_inval';
+  $response = drupal_http_request($url);
+  if ($response->code == 200) {
+    drupal_set_message(t('NetScaler caches cleared.'));
+  } else {
+    drupal_set_message(t('NetScaler caches may have failed to clear. Please contact an administrator.'));
+  }
+}

@@ -1,0 +1,58 @@
+@import 'compass/css3/border-radius'
+@import 'compass/css3/transition'
+
+.page-admin-dashboard
+  background: #eee
+
+  .panel-pane
+    @include border-radius(10px, 10px)
+    padding: 4px 12px 30px 12px
+    margin-bottom: 25px
+    background: #fff
+    @include transition-property(background)
+    @include transition-duration(400ms)
+
+    h2
+      font-size: 1.85em
+      font-weight: bold
+      color: #225378
+      padding-top: 0.2em
+      border-bottom: 2px solid #eb7f00
+      margin: 0 0 0.5em 0
+      @include transition-property(color)
+      @include transition-duration(400ms)
+    
+    &:hover
+      background: #F5FAFD
+
+      h2
+        color: #555
+    
+    .pane-content
+      padding-bottom: 4px
+      
+      .edit-link
+        float: right
+      
+  ul.admin-list
+    margin-bottom: 0
+    .label
+      font-size: 1.1em
+  
+  table
+    .views-field-title
+      max-width: 300px
+      
+    
+  .views-exposed-form .views-exposed-widget .form-submit
+    margin-top: 0
+    
+  input
+    @include placeholder
+      color: $color-grey-placeholder
+      font-weight: bold
+
+  .views-widget-filter-filename,
+  .views-widget-filter-title
+    label
+      display: none

@@ -1,0 +1,68 @@
+/******************************************************************************
+ * panes-5-a.layout.sass
+ *
+ * Styling of the "5 Panes A" layout.
+ ***************************************************************************** */
+/******************************************************************************
+ * _variables.sass: sets variables for the standard layout
+ ***************************************************************************** */
+.panel-display--panes-5-a .l-container {
+  *zoom: 1;
+  max-width: 1190px;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+.panel-display--panes-5-a .l-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .panel-display--panes-5-a .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row1-col1 {
+    width: 65.21739%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row1-col2,
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row2-col3 {
+    width: 30.43478%;
+    float: right;
+    margin-right: 0;
+  }
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row2-col1,
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row2-col2 {
+    width: 30.43478%;
+    float: left;
+    margin-right: 4.34783%;
+  }
+}
+@media (min-width: 992px) {
+  .panel-display--panes-5-a .l-container {
+    max-width: 1190px;
+  }
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row1-col1 {
+    width: 65.95745%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row1-col2,
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row2-col3 {
+    width: 31.91489%;
+    float: right;
+    margin-right: 0;
+  }
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row2-col1,
+  .panel-display--panes-5-a .l-container .panes-5-a-region--row2-col2 {
+    width: 31.91489%;
+    float: left;
+    margin-right: 2.12766%;
+  }
+}

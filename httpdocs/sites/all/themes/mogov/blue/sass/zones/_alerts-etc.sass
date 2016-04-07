@@ -1,0 +1,35 @@
+/*******************************************************************************
+ * _header.sass: defines header styles for the standard layout
+ ******************************************************************************/
+
+@import "susy"
+@import "../variables/_layout"
+
+.l-zone.l-alerts,
+.l-zone.l-warnings,
+.l-zone.l-advisories,
+.l-zone.l-notices
+  padding: 10px 0
+  color: $white
+  h2
+    margin: 0
+    color: $white
+    float: left
+    width: 20%
+  .block__content
+    float: left
+    margin-left: 20px
+  .l-container
+    margin-bottom: 0
+
+.l-alerts
+  background: $brand-danger
+
+.l-warnings
+  background: $brand-warning
+
+.l-advisories
+  background: $brand-advisory
+
+.l-notices
+  background: $brand-success

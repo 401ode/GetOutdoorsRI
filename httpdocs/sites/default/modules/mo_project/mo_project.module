@@ -1,0 +1,3149 @@
+<?php
+/**
+ *  @file  mo_project.module
+ *  @brief  Code for the MO project: 100 Missouri Miles.com
+ *
+ *  @details
+ *  mo_project_init = Implements hook_init
+ *  mo_project_variable_info = Implements hook_variable_info
+ *  mo_project_views_api = Implements hook_views_api
+ *  mo_project_menu = Implements hook_menu
+ *  mo_project_add_ajax_block_script = Creates the JavaScript wrapper and includes the js code
+ *  mo_project_block_info = Implements hook_block_info
+ *  mo_project_block_view = Implements hook_block_view
+ *  mo_project_ctools_plugin_directory = Implements hook_ctools_plugin_directory
+ *  mo_project_permission = Implements hook_permission 
+ *  mo_project_rules_action_info = Implements hook_rules_action_info
+ *  mo_cms_project_theme_registry_alter = Implements hook_theme_registry_alter
+ *  _mo_cms_project_insert_after_first_element = Helper function for re-ordering arrays
+ *  mo_project_theme = Implements hook_theme
+ *  mo_project_add_webform_support = Includes the path to the webform submissions
+ *  mo_project_webform_validation_validate = Implements hook_webform_validation_validate
+ *  mo_project_webform_validation_validators = Implements hook_webform_validation_validators
+ *
+ *  mo_project_get_achievements = Get achievements
+ *  mo_project_get_activity_uids = Get count of users logging supplied activities
+ *  mo_project_get_age = Get age bracket of supplied user
+ *  mo_project_get_all_facilities = Get facilities
+ *  mo_project_get_allowed_term_reference_values = Get the main activities (excluding 'Other' and any convertible activities)
+ *  mo_project_get_county = Get county of residence of supplied user
+ *  mo_project_get_gender = Get gender of supplied user
+ *  mo_project_get_leaderboard_activity_stats = Queries the leaderboard_activity_stats for the supplied user's peer group totals
+ *  mo_project_get_mileage_form = Includes the add mileage form from the fapi_forms.inc file
+ *  mo_project_get_mileage_form_mobile = Includes the add mileage form from the fapi_forms.inc file *  mo_project_get_mileage_nids = Gets the node ids of all mileage nodes for the supplied user
+ *  mo_project_get_query_dates = Gets the MySQL dates to use in queries, for the supplied time period
+ *  mo_project_get_query_string = Gets the human-readable SQL query, with arguments in place, useful for debugging
+ *  mo_project_get_total_mileage = Calculates total mileage with provided conditions
+ *  mo_project_update_total_mileage = Update the all time total mileage in the header, and check if exceeds threshold
+ *  mo_project_check_email_exists = Checks that the supplied email address is in the users table
+ *  mo_project_check_username_exists = Checks that the supplied username is in the users table
+ *
+ *  mo_project_progress_bar = Creates a simple set of div wrappers with styles necessary to look like a progress bar.
+ *  mo_project_build_blue_header_content_1 = Displays Missouri Blue Miles Dashboard header - section Info
+ *  mo_project_build_blue_header_content_2 = Displays Missouri Blue Miles Dashboard header - section Progress Bars
+ *  mo_project_build_blue_header_content_3 = Displays Missouri Blue Miles Dashboard header - section Total Blue Miles
+ *  mo_project_build_global_stats_content = Displays User and Mileage count flippers for the website header
+ *  mo_project_build_activity_converter = Includes the activity converter form from the fapi_forms.inc file
+ *  mo_project_build_activity_log_exporter = Includes Export Activity Log form from the fapi_forms.inc file
+ *  mo_project_build_calories_calculator = Includes the calorie calculator form from the fapi_forms.inc file
+ *  mo_project_build_km_to_miles_converter = Includes the kilometers to miles conversion form from the fapi_forms.inc file
+ *  
+ *  mo_project_form_achievement_node_form_alter = Implements hook_form_alter
+ *  mo_project_form_article_node_form_alter = Implements hook_form_alter
+ *  mo_project_form_mo_cms_event_node_form_alter = Implements hook_form_alter
+ *  mo_project_strip_mo_cms_event_node_form = Remove fields from the Event node form that don't need to be completed to suggest an event
+ *  mo_project_form_mileage_node_form_alter = Implements hook_form_alter
+ *  mo_project_form_trail_node_form_alter = Implements hook_form_alter
+ *  mo_project_strip_trail_node_form = Remove fields from the Trail node form that don't need to be completed to suggest a trail
+ *  mo_project_approve_trail_submit = Add notification requesting trailhead and coordinate info before publishing a trail node
+ *  mo_project_create_unpub_node = Creates an unpublished node when a user suggests an event or trail
+ *  mo_project_node_presave = Presave the node to ensure the node remains unpublished and to attach the user as the node's creator
+ *  mo_project_form_user_profile_form_alter = Implements hook_form_alter
+ *  mo_project_form_user_register_form_alter = Implements hook_form_alter 
+ *  mo_project_element_info_alter = Implements hook_element_info_alter
+ *  mo_project_proximity_element_process = #TODO 
+ *  mo_project_addressfield_element_process = Hide organization, street, street2, zip code. Set state to MO and disable.
+ *  mo_project_honeypot_form_protections_alter = Implements hook_honeypot_form_protections_alter
+ *  mo_project_score_string_match = #TODO
+ *
+ *  mo_project_verify_users_form = Create and populate admin/people/verify
+ *  mo_project_verify_users_form_confirm = #TODO
+ *  mo_project_verify_users_form_actions = #TODO
+ *  mo_project_verify_users_form_submit = #TODO
+ *  mo_project_verify_users = #TODO
+ *  mo_project_block_users = #TODO
+ *  mo_project_blank_page = Creates a themed, empty webpage useful for displaying debug output
+ *  mo_project_button_test = Twitter button test
+ *  mo_project_get_leaderboard_mileage = Deprecated. Long slow query returning all the leaderboard mileage totals Statewide
+ *  
+ *  DISABLED
+ *  mo_project_action_info
+ *  mo_project_use_admin_theme
+ *  mo_project_get_walks
+ *  
+ */
+
+ 
+// Get protocol
+global $protocol;
+if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+  $protocol = 'https://';
+} else {
+  $protocol = 'http://';
+}
+
+// Define static users
+global $static_users;
+$static_users = array(
+  'Governor' => 162,
+  'First Lady' => 163,
+);
+
+
+/**
+ *  @brief  Implements hook_init()
+ *
+ *  @details  2013
+ */
+function mo_project_init() {
+  $module_path = drupal_get_path('module', 'mo_project');
+  module_load_include('inc', 'mo_project', 'includes/mileage_hooks');
+  module_load_include('inc', 'mo_project', 'includes/badges');
+  module_load_include('inc', 'mo_miles_mileage', 'includes/batch_ops');  
+  module_load_include('inc', 'mo_project', 'includes/subusers');
+  module_load_include('inc', 'mo_project', 'includes/challenge_dates');
+  module_load_include('inc', 'mo_project', 'includes/statistics');
+  module_load_include('inc', 'mo_project', 'includes/thresholds');  
+  module_load_include('inc', 'mo_project', 'includes/trailheads'); 
+  module_load_include('inc', 'mo_project', 'includes/autologger');  
+  drupal_add_js($module_path . '/js/mo_project.js', array('type' => 'file'));
+//  drupal_add_js($module_path . '/js/rrssb.js', array('type' => 'file')); // Do not enable without fixing error on test server first!
+  drupal_add_js($module_path . '/js/jquery.countTo.js', array('type' => 'file'));
+  drupal_add_css($module_path . '/css/mo_project.css', array('group' => CSS_DEFAULT));
+  drupal_add_css($module_path . '/css/rrssb.css', array('group' => CSS_DEFAULT));
+  if (drupal_is_front_page()) {
+    drupal_add_library('system','ui.datepicker');
+  }
+}
+
+
+/**
+ *  @brief  Implements hook_variable_info()
+ *
+ *  @details  2013
+ */
+function mo_project_variable_info($options) {
+  $variables = array();
+
+  $variables['total_mileage'] = array(
+    'title' => t('Total Mileage', array(), $options),
+    'description' => t('Total mileage logged by all members; updated when mileage nodes are submitted or modified.'),
+    'type' => 'number',
+    'access' => 'access administration pages',
+    'default' => 0,
+  );
+  $variables['total_mileage_threshold'] = array(
+    'title' => t('Total Mileage Threshold', array(), $options),
+    'description' => t('If total mileage logged by all members exceeds this value, an email alerts admins and devs.'),
+    'type' => 'number',
+    'access' => 'access administration pages',
+    'default' => 0,
+  );
+  $variables['current_challenge_start_date'] = array(
+    'title' => t('Current Challenge Start Date', array(), $options),
+    'description' => t('Miles with dates before this value will not be included in current challenge totals.'),
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => 0,
+  );
+  $variables['current_challenge_end_date'] = array(
+    'title' => t('Current Challenge End Date', array(), $options),
+    'description' => t('Miles with dates after this value will not be included in current challenge totals.'),
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => 0,
+  );
+  
+  return $variables;
+}
+
+
+/**
+ * Implements hook_views_api.
+ *  
+ *  @details 2015-02-17 
+ */
+function mo_project_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'mo_project') . '/views',
+  );
+}
+
+
+/**
+ *  @brief  Implements hook_menu()
+ *
+ *  @details  2014-03-16 
+ */
+function mo_project_menu() {
+
+  $items = array();
+
+  $items['test-button'] = array(
+    'title' => 'button test',
+    'description' => 'button test',
+    'page callback' => 'mo_project_button_test',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['admin/badge_recheck/%'] = array(
+    'title' => 'Re-check user badges',
+    'description' => 'Re-checks all badges for current challenge year for the supplied user.',
+    'page callback' => 'mo_project_badge_recheck',
+    'page arguments' => array(2),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/config/mo-cms/100-missouri-miles'] = array(
+    'title' => '100 Missouri Miles Config',
+    'description' => '100 Missouri Miles Config',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mo_project_100_missouri_miles_config'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/content/mileage-nodes'] = array(
+    'title' => 'Mileage',
+    'access arguments' => array('access administration pages'),
+    'description' => 'View and edit all the available mileage nodes on your site.',
+    'type' => MENU_LOCAL_TASK,
+  );  
+  
+  $items['admin/on-site-signups'] = array(
+    'title' => 'On-Site Signups',
+    'description' => 'On-Site Signups',
+    'page callback' => 'mo_project_on_site_signups_list',
+    'access arguments' => array('administer users'),
+    'type' => MENU_CALLBACK,
+    'file' => 'on_site_signups.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+  
+  $items['admin/on-site-signups/%'] = array(
+    'title callback' => 'mo_project_on_site_signups_details_title',
+    'title arguments' => array(2),
+    'description' => 'On-Site Signups',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mo_project_on_site_signups_details_form', 2),
+    'access arguments' => array('administer users'),
+    'type' => MENU_CALLBACK,
+    'file' => 'on_site_signups.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+  
+  $items['admin/people/verify'] = array(
+    'title callback' => t('Verify Users'),
+    'description' => 'Verify Users',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mo_project_verify_users_form'),
+    'access arguments' => array('verify users'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['admin/trailheads'] = array(
+    'title' => t('Mass Create Trailheads'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'mo_project_helper_get_trails_needing_trailheads',
+    'access arguments' => array('access administration pages'),
+  );
+  
+  $items['ajax/badge_detail/%'] = array(
+    'title' => 'Badge detail for colorbox display',
+    'page callback' => 'mo_project_badge_detail',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+
+  $items['ajax/block_content'] = array(
+    'title' => 'AJAX Block Content',
+    'description' => 'Retrieves block content via AJAX',
+    'page callback' => 'mo_project_ajax_block_content',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+  
+  $items['ajax/calculate_calories'] = array(
+    'title' => 'AJAX Calculate Calories',
+    'description' => 'Calculates calories burned by activity',
+    'page callback' => 'mo_project_ajax_calculate_calories',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+
+  $items['ajax/convert_activity'] = array(
+    'title' => 'AJAX Convert Activity',
+    'description' => 'Converts activity time into mileage',
+    'page callback' => 'mo_project_ajax_convert_activity',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+    
+  $items['ajax/convert_km'] = array(
+    'title' => 'AJAX Convert KM',
+    'description' => 'Converts kilometers into miles',
+    'page callback' => 'mo_project_ajax_convert_km',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+    
+  $items['ajax/mileage_location_autocomplete'] = array(
+    'title' => 'Autocomplete for Locations on Mileage Form',
+    'page callback' => 'mo_project_mileage_location_autocomplete',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+  
+  $items['ajax/submit_mileage'] = array(
+    'title' => 'AJAX Submit Mileage',
+    'description' => 'Submits new mileage via AJAX',
+    'page callback' => 'mo_project_ajax_submit_mileage',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+    
+  $items['ajax/total_mileage'] = array(
+    'title' => 'AJAX Total Mileage',
+    'description' => 'Retrieves current total mileage via AJAX',
+    'page callback' => 'mo_project_ajax_total_mileage',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+    
+  $items['ajax/user_current_stats.json'] = array(
+    'title' => 'AJAX User Get Current Stats',
+    'description' => 'Retrieves current stats for user',
+    'page callback' => 'mo_project_get_user_current_stats',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ajax.inc',
+    'file path' => drupal_get_path('module', 'mo_project') . '/includes',
+  );
+  
+  $items['archive/trophy'] = array(
+    'title' => 'Trophy Archive',
+    'description' => 'Trophy Archive',
+    'page callback' => 'mo_project_build_badge_archive',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['events/share'] = array(
+    'title' => t('Suggest an Event'),
+    'description' => 'Create unpublished nodes for events',
+    'page callback' => 'mo_project_create_unpub_node',
+    'page arguments' => array('event'),     
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['subuser/%/edit'] = array(
+		'title' => 'Edit Sub-user',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('subuser_edit', 1),
+    'theme callback' => 'variable_get',
+    'theme arguments' => array('admin_theme'),
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+  
+  $items['subuser/%/delete'] = array(
+		'title' => 'Delete Sub-user',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('subuser_delete', 1),
+    'theme callback' => 'variable_get',
+    'theme arguments' => array('admin_theme'),
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+  
+  $items['trails/share'] = array(
+    'title' => t('Suggest a Trail'),
+    'description' => 'Create unpublished nodes for trails and trailheads',
+    'page callback' => 'mo_project_create_unpub_node',
+    'page arguments' => array('trail'),    
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  // Tabbed trophy room page
+      $items['trophy'] = array(
+        'title' => t('Trophy Room'),
+        'type' => MENU_NORMAL_ITEM,
+        'description' => 'Display all badges earned by a single user',
+        'page callback' => 'mo_project_build_badge_gallery',
+        'page arguments' => array('2015'),
+        'access arguments' => array('access content'),
+      );
+      
+      $items['trophy/2015'] = array(
+        'title' => t('2015'),
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => -10,
+      );
+      
+      $items['trophy/2014'] = array(
+        'title' => t('2014'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_build_badge_gallery',
+        'page arguments' => array('2014'),
+        'access arguments' => array('access content'),
+        'weight' => -4,
+      );
+
+      $items['trophy/2013'] = array(
+        'title' => t('2013'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_build_badge_gallery',
+        'page arguments' => array('2013'),
+        'access arguments' => array('access content'),
+        'weight' => -3,    
+      );
+
+      $items['trophy/upcoming'] = array(
+        'title' => t('Upcoming Badges'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_build_upcoming_gallery',
+        'access arguments' => array('access content'),
+        'weight' => 50,    
+      );
+
+  // Tabbed stats pages
+      $items['stats'] = array(
+        'title' => t('Statistics'),
+        'type' => MENU_NORMAL_ITEM,
+        'description' => t('Various stats about site users and mileage.'),
+        'page callback' => 'mo_project_stats_overview',
+        'access arguments' => array('view user mileage statistics'),
+      );
+      $items['stats/overview'] = array(
+        'title' => t('Overview'),
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => -10,
+      );
+      $items['stats/users'] = array(
+        'title' => t('Users'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_demographics',
+        'access arguments' => array('view user mileage statistics'),
+      );  
+      $items['stats/trends'] = array(
+        'title' => t('Trends'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_trends',
+        'access arguments' => array('view user mileage statistics'),
+      );
+      $items['stats/county'] = array(
+        'title' => t('Counties'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_counties',
+        'access arguments' => array('view user mileage statistics'),
+      );
+      $items['stats/groups'] = array(
+        'title' => t('Groups'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_groups',
+        'access arguments' => array('view user mileage statistics'),
+      );
+      $items['stats/leaders'] = array(
+        'title' => t('Leaders'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_leaders',
+        'access arguments' => array('view user mileage statistics'),
+      );
+      $items['stats/activities'] = array(
+        'title' => t('Activities'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_activities',
+        'access arguments' => array('view user mileage statistics'),
+      );  
+      $items['stats/badges'] = array(
+        'title' => t('Badges'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_badges',
+        'access arguments' => array('view user mileage statistics'),
+      );
+      $items['stats/miles'] = array(
+        'title' => t('Distances'),
+        'type' => MENU_LOCAL_TASK,
+        'page callback' => 'mo_project_stats_milestones',
+       'access arguments' => array('view user mileage statistics'),
+      );
+
+      $items['stats/county/export'] = array(
+        'title' => t('Counties_csv'),
+        'type' => MENU_NORMAL_ITEM,
+        'page callback' => 'mo_project_stats_counties_csv',
+        'access arguments' => array('view user mileage statistics'),
+      );
+
+/*  $items['medals/approve'] = array(
+    'title' => t('Approve Medal Requests'),
+    'description' => 'Track and approve requests for completion medals',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mo_project_medal_request_details_form'),
+    'access arguments' => array('approve medals'),
+    'theme callback' => 'mo_project_use_admin_theme',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['medals/locate'] = array(
+    'title' => t('Locate Medalists'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'mo_project_locate_medalists',
+    'access arguments' => array('approve medals'),
+  );*/
+
+  return $items;
+}
+
+
+/**
+ *  @brief  Creates the JavaScript wrapper and includes the js code
+ *  
+ *  @param [in] $delta  block delta
+ *  @return void
+ *  
+ *  @details  2013
+ */
+function mo_project_add_ajax_block_script($delta) {
+  $wrapper_id = drupal_clean_css_identifier($delta) . '-ajax-wrapper';
+  $js = 'jQuery(document).ready(function($) {'
+      . '  selector = "#' . $wrapper_id . '";'
+      . '  update_block(selector, "' . $delta . '");'
+      . '});';
+  drupal_add_js($js, array('type' => 'inline', 'scope' => 'footer'));
+}
+
+
+/**
+ *  @brief  Implements hook_block_info()
+ *
+ *  @details  2013
+ */
+function mo_project_block_info() {
+  $blocks = array();
+  
+  $blocks['achievements']['info'] = t('Achievements');
+  $blocks['activity_converter']['info'] = t('Activity Converter');
+  $blocks['activity_log_export']['info'] = t('Export Activity Log');
+  $blocks['add_subuser_form']['info'] = t('Add A Buddy');
+  $blocks['add_subuser_form_mobile']['info'] = t('Add A Buddy (mobile)');
+  $blocks['addthis_menu'] = array(
+    'info' => t('AddThis Menu'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  $blocks['bluemiles_info']['info'] = t('Blue Miles Header Info');
+  $blocks['bluemiles_bars']['info'] = t('Blue Miles Header Bars');
+  $blocks['bluemiles_total']['info'] = t('Blue Miles Header Total');
+  $blocks['calories_calculator']['info'] = t('Calories Calculator');
+  $blocks['event_search'] = array(
+    'info' => t('Event Search'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  $blocks['global_stats']['info'] = t('Statistics (global)');
+  $blocks['gov_progress']['info'] = t('Governor & First Lady Progress');
+  $blocks['km_to_miles_converter']['info'] = t('KM to Miles Converter');
+  $blocks['leaderboard']['info'] = t('Leaderboard');
+  $blocks['log_mileage_form']['info'] = t('Submit Mileage');
+  $blocks['log_mileage_form_front']['info'] = t('Submit Mileage (front page)');
+  $blocks['log_mileage_form_mobile']['info'] = t('Submit Mileage (mobile)');
+  $blocks['miles_by_subuser']['info'] = t('My Family');  
+  $blocks['report_bugs']['info'] = t('Report Bugs');
+  $blocks['trophy_sidebar']['info'] = t('Badges');
+  $blocks['upcoming_trophy']['info'] = t('Upcoming Badges');
+//  $blocks['medal_status']['info'] = t('Medal Status');
+//  $blocks['user_stats']['info'] = t('Statistics (user)');
+  
+  return $blocks;
+}
+
+
+/**
+ *  @brief  Implements hook_block_view()
+ *
+ *  @details  2013
+ */
+function mo_project_block_view($delta='') {
+  $block = array();
+  global $user;
+  $id_string = drupal_clean_css_identifier($delta);
+
+  switch ($delta) {
+
+    case 'activity_converter':
+      $block['subject'] = 'Activity Converter';
+      $content = mo_project_build_activity_converter();
+      $block['content'] = render($content);
+      break;
+    
+    case 'activity_log_export':
+      $block['subject'] = 'Export Activity Log';
+      $content = mo_project_build_activity_log_exporter();
+      $block['content'] = render($content);
+      break;
+      
+    case 'add_subuser_form':
+      $block['subject'] = 'Add A Buddy';
+      $content = mo_project_get_subuser_form();
+      $block['content'] = render($content);
+      break;
+
+    case 'add_subuser_form_mobile':
+      $block['subject'] = 'Add A Buddy';
+      $content = mo_project_get_subuser_form(TRUE);
+      $block['content'] = render($content);
+      break;
+      
+    case 'addthis_menu':
+      global $protocol;
+      $block['subject'] = 'AddThis';
+      $content = array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => array(
+            'addthis_toolbox',
+            'addthis_peekaboo_style',
+            'addthis_default_style',
+            'addthis_label_style',
+            'addthis_32x32_style',
+          ),
+        ),
+      );
+      $link_attributes = array(
+        'external' => TRUE,
+        'attributes' => array(
+          'class' => array(
+            'addthis_button_more',
+          ),
+        )
+      );
+      $markup = l('Share', '', $link_attributes)
+              . '<ul>'
+              . '<li><a class="addthis_button_preferred_1"></a></li>'
+              . '<li><a class="addthis_button_preferred_2"></a></li>'
+              . '<li><a class="addthis_button_preferred_3"></a></li>'
+              . '</ul>';
+      $content[0] = array(
+        '#type' => 'markup',
+        '#markup' => $markup,
+      );
+      $block['content'] = render($content);
+      drupal_add_js($protocol . 's7.addthis.com/js/300/addthis_widget.js#pubid=ra-51a785ac09fcb114', array('type' => 'external', 'scope' => 'footer'));
+      break;
+    
+    case 'bluemiles_info':
+      $block['subject'] = 'Blue Miles Header Info';
+      $content = mo_project_build_blue_header_content_1();
+      $block['content'] = render($content);
+      break;
+    case 'bluemiles_bars':
+      $block['subject'] = 'Blue Miles Header Bars';
+      $content = mo_project_build_blue_header_content_2();
+      $block['content'] = render($content);
+      break;
+    case 'bluemiles_total':
+      $block['subject'] = 'Blue Miles Header Total';
+      $content = mo_project_build_blue_header_content_3();
+      $block['content'] = render($content);
+      break;
+
+    case 'calories_calculator':
+      $block['subject'] = 'Calories Calculator';
+      $block['content'] = render(mo_project_build_calories_calculator());
+      break;
+    
+    case 'event_search':
+      $block['subject'] = 'Find Events';
+      $view = views_get_view('mo_cms_events_lists');
+      $view->set_display('mo_cms_events_search');
+      $view->init_handlers();
+      $exposed_form = $view->display_handler->get_plugin('exposed_form');
+      $block['content'] = $exposed_form->render_exposed_form();
+      break;
+    
+    case 'global_stats':
+      $block['subject'] = 'Global Statistics';
+      $content = mo_project_build_global_stats_content();
+      $block['content'] = render($content);
+      break;
+    
+    case 'gov_progress':
+      global $static_users;
+      $governor_mileage = mo_project_get_total_mileage(array($static_users['Governor']));
+//      $first_lady_mileage = mo_project_get_mileage_per_subuser(array($static_users['First Lady']));
+//      $huck_mileage[] = array_shift($first_lady_mileage);     
+      $huck_mileage = mo_project_get_mileage_per_subuser(array($static_users['First Lady']));
+      if (count($huck_mileage) == 0) {
+              $huck_mileage = 0.0;
+              $first_lady_mileage = 0.0;
+      } else {
+	      $first_lady_mileage[] = array_shift($huck_mileage);     
+              $huck_mileage = $huck_mileage[0]->distance;
+              $first_lady_mileage = $first_lady_mileage[0]->distance;
+      }
+      $block['subject'] = t('Governor & First Lady Progress');
+      $content = array(
+        'type' => 'ul',
+        'title' => NULL,
+        'attributes' => array(),
+        'items' => array(
+          0 => array(
+            'data' => t('<span class="name">Governor:</span> <span class="mileage">' . number_format($governor_mileage, 1) . ' mi</span>'),
+            'class' => array('Gov'),
+          ),
+          1 => array(
+            'data' => t('<span class="name">First Lady:</span> <span class="mileage">' . number_format($first_lady_mileage, 1) . ' mi</span>'),
+            'class' => array('FL'),
+          ),
+          2 => array(
+            'data' => t('<span class="name">Huck:</span> <span class="mileage">' . number_format($huck_mileage, 1) . ' mi</span>'),
+            'class' => array('Dog'),
+          ),
+        ),
+      );
+      $block['content'] = theme_item_list($content);
+      break;
+    
+    case 'km_to_miles_converter':
+      $block['subject'] = 'KM to Miles Converter';
+      $block['content'] = render(mo_project_build_km_to_miles_converter());
+      break;
+    
+    case 'leaderboard':
+      $block['subject'] = 'Leaderboard';
+      $block['content'] = t('<div id="' . $id_string . '-ajax-wrapper" class="block-content-ajax-wrapper"></div>');
+      mo_project_add_ajax_block_script($delta);
+      break;
+    
+    case 'log_mileage_form':
+    case 'log_mileage_form_front':
+      $block['subject'] = 'Submit An Activity';
+      $content = mo_project_get_mileage_form();
+      $block['content'] = render($content);
+      break;
+    
+    case 'log_mileage_form_mobile':
+      $block['subject'] = 'Submit An Activity';
+      $content = mo_project_get_mileage_form_mobile();
+      $block['content'] = render($content);
+      break;
+    
+    case 'miles_by_subuser':
+      $block['subject'] = 'My Family';
+      $content = mo_project_build_mileage_by_subuser();
+      $block['content'] = render($content);
+      break;
+      
+    case 'report_bugs':
+      $block['subject'] = 'Report Bugs';
+      $link = l('reporting bugs', 'content/100-mo-miles-bug-tracker');
+      $content = array(
+        '#type' => 'markup',
+        '#markup' => t('Welcome to our open beta! You can help us by ' . $link . '.'),
+      );
+      $block['content'] = render($content);
+      break;
+    
+    case 'trophy_sidebar':
+      $block['subject'] = 'Badges';
+      $content = mo_project_build_trophy_sidebar();
+      $block['content'] = render($content);
+      break;
+
+    case 'upcoming_trophy':
+      $block['subject'] = 'Upcoming Badges';
+      $content = mo_project_build_upcoming_trophy_block();
+      $block['content'] = render($content);
+      break;
+
+//    case 'medal_status':
+//      $block['subject'] = 'Medal Status';
+//      $block['content'] = render(mo_project_show_medal_status($id_string));
+//      break;
+
+  }
+
+  return $block;
+}
+
+
+/**
+ *  @brief  Implements hook_ctools_plugin_directory()
+ *  
+ *  @details  2013
+ */
+function mo_project_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' and $plugin_type == 'content_types') {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+
+/**
+ *  @brief  Implements hook_permission()
+ *
+ *  @details  2013   
+ */
+function mo_project_permission() {
+  $permissions = array(
+    'verify users' => array(
+      'title' => t('100 Missouri Miles: Verify Users'),
+      'description' => t('Access to the Verify Users page.'),
+    ),
+    'view user mileage statistics' => array(
+      'title' => t('100 Missouri Miles: View Statistics'),
+      'description' => t('View user and mileage statistics for 100 Missouri Miles.'),
+    ),
+    'approve medals' => array(
+      'title' => t('100 Missouri Miles: Approve Medals'),
+      'description' => t('Access to the Approve Medals pages.'),
+    ),
+  );
+  return $permissions;
+}
+
+
+/**
+ *  @brief  Implements hook_rules_action_info()
+ *
+ *  @details  2013   
+ */
+function mo_project_rules_action_info() {
+  $actions = array(
+    'mo_project_update_total_mileage' => array(
+      'label' => t('mo_project: Update total mileage'),
+      'group' => t('100 Missouri Miles'),
+      'parameter' => array(
+        'node' => array(
+          'type' => 'node',
+          'label' => t('Content'),
+        ),
+      ),
+    ),
+    'mo_project_send_new_notifications' => array(
+      'label' => t('mo_project: Send new notifications'),
+      'group' => t('100 Missouri Miles'),
+      'parameter' => array(
+        'node' => array(
+          'type' => 'node',
+          'label' => t('Content'),
+        ),
+      ),
+    ),
+    'mo_project_locate_medalists'=> array(
+      'label' => t('mo_project: Locate Users requesting medals'),
+      'group' => t('100 Missouri Miles'),
+      'parameter' => array(
+        'webform' => array(
+          'type' => 'webform',
+          'label' => t('Webform'),
+        ),
+      ),
+    ),
+  );
+  return $actions;
+}
+
+
+/**
+ *  @brief  Implements hook_theme_registry_alter()
+ *
+ *  @details  2013
+ */
+function mo_cms_project_theme_registry_alter(&$theme_registry) {
+  $mod_path = drupal_get_path('module', 'mo_cms_project');
+  $theme_registry_copy = $theme_registry;
+  _theme_process_registry($theme_registry_copy, 'phptemplate', 'theme_engine', 'pow', $mod_path);
+  $theme_registry += array_diff_key($theme_registry_copy, $theme_registry);
+  $hooks = array('node');
+  foreach ($hooks as $h) {
+    _mo_cms_project_insert_after_first_element($theme_registry[$h]['theme paths'], $mod_path);
+  }
+}
+
+
+/**
+ *  @brief  Helper function for re-ordering arrays (needed by theme_registry_alter)
+ *
+ *  @details  2013
+ */
+function _mo_cms_project_insert_after_first_element(&$a, $element) {
+  if(is_array($a)) {
+    $first_element = array_shift($a);
+    array_unshift($a, $first_element, $element);
+  }
+}
+
+
+/**
+ *  @brief  Implements hook_theme()
+ *
+ *  @details  2013 
+ */
+function mo_project_theme() {
+  return array(
+    'twitter_button' => array(
+      'arguments' => array(
+        'content' => NULL,
+      ),
+      'template'  => 'twitter-button',
+    ),
+  );
+}
+
+
+/**
+ *  @brief  Includes the path to the webform submissions
+ *  
+ *  @return  void
+ *  
+ *  @details  2013
+ */
+function mo_project_add_webform_support() {
+  $webform_path = drupal_get_path('module', 'webform');
+  $include_path = $_SERVER['DOCUMENT_ROOT'] . '/' . $webform_path . '/includes/webform.submissions.inc';
+  require_once($include_path);
+}
+
+
+/**
+ *  @brief  Implements hook_webform_validation_validate()
+ *
+ *  @details  2013
+ *            Edit 2013-07-17 
+ *            Edit 2014-03-12 
+ */
+function mo_project_webform_validation_validate($validator_name, $items, $components, $rule) {
+  if (!$items) {
+    return;
+  }
+  $errors = array();
+  switch($validator_name) {
+    
+    case 'validate_username':
+      foreach ($items as $key=>$value) {
+        $username_error = user_validate_name($value);
+        if ($username_error) {
+          $errors[$key] = t($username_error);
+        }
+      }
+      break;
+    
+    case 'email_address_available':
+      foreach ($items as $key=>$value) {
+        if (db_query('SELECT COUNT(*) FROM {users} WHERE mail = :mail', array(':mail' => $value))->fetchField()) {
+          $errors[$key] = t('The <i>Email</i> field matches an active email address.');
+        }
+      }
+      break;
+    
+    case 'group_name_available':
+      foreach ($items as $key=>$value) {
+        if (db_query('SELECT COUNT(*) FROM {node} WHERE title = :title AND type = :type', array(':title' => $value, ':type' => 'mo_cms_user_group'))->fetchField()) {
+          $errors[$key] = t('The <i>Group Name</i> field matches an existing group.');
+        }
+      }
+      break;
+    
+/*    case 'validate_miles':
+
+      foreach ($items as $key => $val) { 
+        $requestor = user_load_by_name(check_plain($val));     
+        $mileage = mo_project_get_total_mileage(array($requestor->uid));
+      
+        if ( (empty($mileage)) OR ($mileage < 100.00) ) {
+          $errors[$key] = t("We're sorry, you must complete 100 miles before requesting a medal.<br>You have logged %item miles.", array('%item' => $mileage));
+        }
+      }
+      break;
+*/
+  }
+  return $errors;
+}
+
+
+/**
+ *  @brief  Implements hook_webform_validation_validators()
+ *
+ *  @details  2013
+ *            Edit 2013-07-17 
+ *            Edit 2014-03-12 
+ */
+function mo_project_webform_validation_validators() {
+  $validators = array(
+    
+    /**
+     * Perform registration-like checks to ensure username and email address are available and valid.
+     */
+    'validate_username' => array(
+      'name' => 'Validate username',
+      'component_types' => array(
+        'textfield',
+      ),
+      'description' => t('Ensure that the entry meets Drupal\'s username requirements.'),
+    ),
+    'email_address_available' => array(
+      'name' => 'Email address is available',
+      'component_types' => array(
+        'email',
+      ),
+      'description' => t('Ensure that the entry does not match an existing email address.'),
+    ),
+    'group_name_available' => array(
+      'name' => 'Group name is available',
+      'component_types' => array(
+        'textfield',
+      ),
+      'description' => t('Ensure that the entry title does not match an existing group title.'),
+    ),
+    
+/**
+     * Custom webform validator to ensure that user has logged 100 miles before submitting 
+     * the Request a Medal form. 
+     * References https://drupal.org/node/908600 'Adding custom validation rules - Webform Validation hooks'
+     *   https://drupal.org/node/822146#comment-3080360 'How do I validate a number...'
+     * 2013-07-17 
+      'validate_miles' => array(
+      'name' => 'Mileage',
+      'component_types' => array(
+        'all',
+      ),
+      'description' => t('Ensure user has logged at least 100 miles'),
+    ),*/
+  );
+  return $validators;
+}
+
+
+/**
+ *  @brief  Get achievements
+ *  
+ *  @param [in] $activity  Optional. Activity tid
+ *  @return  array of achievements
+ *  
+ *  @details  2013
+ */
+function mo_project_get_achievements($activity=FALSE) {
+  $achievements = array();
+  $query = db_select('node', 'n');
+  $query->join('field_data_field_achievement_threshold', 'm', 'n.nid = m.entity_id AND (m.entity_type = :type AND m.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $query->leftJoin('field_data_field_achievement_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $query->addField('n', 'nid');
+  $query->addField('m', 'field_achievement_threshold_value', 'threshold');
+  $query->addField('a', 'field_achievement_activity_tid', 'activity_tid');
+  $query->condition('n.type', 'achievement');
+  $query->condition('n.status', 0, '<>');
+  if ($activity and $activity == 'all') {
+    $query->condition('a.field_achievement_activity_tid', NULL);
+  } elseif ($activity) {
+    $query->condition('a.field_achievement_activity_tid', $activity);
+  }
+  $result = $query->execute();
+  foreach ($result as $row) {
+    if (empty($row->activity_tid)) {
+      $activity = 'all';
+    } else {
+      $activity = $row->activity_tid;
+    }
+    if (!in_array($activity, array_keys($achievements))) {
+      $achievements[$activity] = array();
+    }
+    $achievements[$activity][$row->threshold] = $row->nid;
+  }
+  return $achievements;
+}
+
+
+/**
+ *  @brief  Get count of users logging supplied activities
+ *  
+ *  @param [in] $activities Parameter_Description
+ *  @param [in] $period     Optional. Time period to cover
+ *  @return  count of users
+ *  
+ *  @details  2013
+ */
+function mo_project_get_activity_uids($activities, $period='current') {
+
+  list($min_date, $max_date) = mo_project_get_query_dates($period);
+  $verified_role = user_role_load_by_name('verified user');
+  $admin_role = user_role_load_by_name('administrator');
+
+  $query = db_select('node', 'n');
+  $query->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));  
+  $query->join('field_data_field_mileage_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $query->join('users', 'u', 'n.uid = u.uid');
+  $query->join('users_roles', 'r', 'u.uid = r.uid');
+  $query->addField('n', 'uid', 'uid');
+  $query->condition('n.type', 'mileage');
+  $query->condition('n.status', 0, '<>');
+  $query->condition('t.field_mileage_date_value', $min_date, '>=');
+  $query->condition('t.field_mileage_date_value', $max_date, '<');
+  $query->condition('a.field_mileage_activity_tid', $activities);
+  $query->condition('u.status', 0, '>');
+  $query->condition('r.rid', array($verified_role->rid, $admin_role->rid));
+  $query->distinct();
+  
+  $result = $query->execute();
+  $uid_count = $result->rowCount();
+
+  return $uid_count;
+}
+
+
+/**
+ *  @brief Get age of supplied user
+ *  
+ *  @param [in] $user User entity
+ *  @return  Age bracket term tid
+ *  
+ *  @details  2013 
+ */
+function mo_project_get_age($user) {
+  $query = db_select('field_data_field_user_age', 'f');
+  $query->fields('f', array('field_user_age_tid'));
+  $query->condition('f.entity_id', $user->uid, '=');
+  $age_tid = $query->execute()->fetchField();
+  return $age_tid;
+}
+
+
+/**
+ *  @brief  Get facilities
+ *  
+ *  @param [in] $type Optional. Type of facilities
+ *  @return  array of facility tids and names
+ *  
+ *  @details  2013
+ */
+function mo_project_get_all_facilities($type=FALSE) {
+
+  $v = taxonomy_vocabulary_machine_name_load('facilities');
+  $query = db_select('taxonomy_term_data', 't');
+  $query->fields('t', array('tid', 'name'));
+  $query->condition('t.vid', $v->vid);
+  $query->distinct();
+  $query->orderBy('name');
+  if ($type) {
+    $query->join('field_data_field_facility_type', 'ft', 't.tid = ft.entity_id AND (ft.entity_type = :type AND ft.deleted = :deleted)', array(':type' => 'taxonomy_term', ':deleted' => 0));
+    $query->condition('ft.field_facility_type_value', $type);
+  }
+  $result = $query->execute();
+  $facilities = array();
+  foreach ($result as $row) {
+    $facilities[$row->tid] = $row->name;
+  }
+  asort($facilities);
+  return $facilities;
+}
+
+
+/**
+ *  @brief  Get the main activities (excluding 'Other' and any convertable activities)
+ *  
+ *  @param [in] $field  field to retrieve list of activities for
+ *  @return  array of activity tids and names
+ *  
+ *  @details  2013
+ */
+function mo_project_get_allowed_term_reference_values($field) {
+  $v = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
+  $v_tree = taxonomy_get_tree($v->vid, $field['settings']['allowed_values'][0]['parent'], 1);
+  $allowed_values = array();
+  foreach ($v_tree as $t) {
+    if ($t->name == 'Other') {
+      continue;
+    }
+    $allowed_values[$t->tid] = t($t->name);
+  }
+  return $allowed_values;
+}
+
+
+/**
+ *  @brief Get county of residence of supplied user
+ *  
+ *  @param [in] $user User entity
+ *  @return  County term tid
+ *  
+ *  @details  2013 
+ */
+function mo_project_get_county($user) {
+  $query = db_select('field_data_field_user_county', 'f');
+  $query->fields('f', array('field_user_county_tid'));
+  $query->condition('f.entity_id', $user->uid, '=');
+  $county_tid = $query->execute()->fetchField();
+  return $county_tid;
+}
+
+
+/**
+ *  @brief Get gender of supplied user
+ *  
+ *  @param [in] $user User entity
+ *  @return  string ('male', 'female', 'undisclosed')
+ *  
+ *  @details  2013 
+ */
+function mo_project_get_gender($user) {
+  $query = db_select('field_data_field_user_gender', 'f');
+  $query->fields('f', array('field_user_gender_value'));
+  $query->condition('f.entity_id', $user->uid, '=');
+  $gender_val = $query->execute()->fetchField();
+  return $gender_val;
+}
+
+
+/**
+ *  @brief  Queries the leaderboard_activity_stats for the supplied user's peer group totals
+ *  
+ *  @param [in] $stat    Optional. The value searched for. ('average', 'leader')
+ *  @param [in] $act_tid Activity term tid
+ *  @param [in] $usr_uid User uid
+ *  @return  float distance value
+ *  
+ *  @details 2014-05-20 
+ */
+function mo_project_get_leaderboard_activity_stats($stat='average', $act_tid=NULL, $usr_uid) {
+  if ($act_tid == NULL) {
+    // Can't be used for leaderboard without activity
+    return FALSE;
+  } else {
+  
+    $user = user_load($usr_uid);
+    
+    $c = field_get_items('user', $user, 'field_user_county');
+    if (empty($c[0]['tid']) or !$c[0]['tid']) {
+      // User has not selected a county, return Statewide numbers
+      $reg = FALSE;
+    } else {
+      $term = taxonomy_term_load($c[0]['tid']);
+      $reg = $term->description;
+    }
+
+    $a = field_get_items('user', $user, 'field_user_age');
+    if (empty($a[0]['tid']) or !$a[0]['tid']) {
+      // User has not selected an age bracket, return all bracket numbers
+      $age = FALSE;
+    } else {
+      $age = $a[0]['tid'];  
+    }
+  
+    $g = field_get_items('user', $user, 'field_user_gender');
+    if (empty($g[0]['value']) or !$g[0]['value']) {
+      // User has not selected a gender, return 'undisclosed' numbers
+      $gen = 'undisclosed';
+    } else {
+      $gen = $g[0]['value'];
+    }
+
+    $query = db_select('leaderboard_activity_stats', 'las');
+    
+    if ($stat == 'leader') {
+      if ( ($reg !== FALSE) and ($age !== FALSE) ) {
+        $query->fields('las', array('field_leaderboard_max_distance_value'));
+      } else {
+        $query->addExpression('MAX(las.field_leaderboard_max_distance_value)', 'mo_leader');
+      }
+    } else {
+      if ( ($reg !== FALSE) and ($age !== FALSE) ) {    
+        $query->fields('las', array('field_leaderboard_avg_distance_value'));
+      } else {
+        $query->addExpression('AVG(las.field_leaderboard_avg_distance_value)', 'mo_average');
+        $query->condition('las.field_leaderboard_avg_distance_value', 0, '>');
+      }
+    }
+    
+    $query->condition('las.field_leaderboard_activity_tid', $act_tid, '=');
+    if ($reg !== FALSE) {
+      $query->condition('las.field_leaderboard_region_code', $reg, '=');
+    }
+    if ($age !== FALSE) {
+      $query->condition('las.field_leaderboard_ages_tid', $age, '=');
+    }
+    $query->condition('las.field_leaderboard_gender', $gen, '=');
+
+    $result = $query->execute()->fetchCol();
+
+    if (empty($result)) {
+      return FALSE;
+    } else {
+      return $result[0];
+    }
+  }
+}
+
+
+/**
+ *  @brief  Includes the add subuser form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2015-05-04 
+ */
+function mo_project_get_subuser_form($mobile=FALSE) {
+  global $user;
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  $content = drupal_get_form('mo_project_add_subuser_form');
+
+  $container = array();  
+  $container[] = array(
+    '#type' => 'markup',
+    '#markup' => render($content),
+  );
+
+  // Below the Add Sub-user form, provide a display of five most-recently-added sub-users
+  // (exclude the "Me" sub-user)
+  $query = db_select('subuser', 's');
+  $query->join('taxonomy_term_data', 'x', 's.type_tid = x.tid');
+  $query->fields('s', array('suid', 'name', 'type_tid'));
+  $query->addField('x', 'name', 'type_name');
+  $query->condition('s.uid', $user->uid, '=');
+  $query->condition('x.name', array('Child', 'Pet', 'Other'), 'IN');
+  $query->orderBy('s.created', 'DESC');
+  if($mobile == TRUE) {
+    $query->range(0, 3);
+  } else {  
+    $query->range(0, 5);
+  }
+  $results = $query->execute()->fetchAll();
+ 
+  $headers = array(
+    array(
+      'data' => t('My Buddies'),
+      'field' => 'name',
+    ),
+    array(
+      'data' => t('Type'),
+      'field' => 'type_name',
+    ),
+  );
+  $rows = array(); 
+
+  foreach ($results as $sub) { 
+    $rows[] = array(
+        $sub->name,
+        '<span class="' . $sub->type_name . '"></span>' . $sub->type_name,
+    );
+  }
+
+  $output = array(
+    'header' => $headers,
+    'rows' => $rows,
+    'attributes' => array(),
+    'caption' => NULL,
+    'colgroups' => array(),
+    'sticky' => TRUE,
+    'empty' => NULL,
+  );
+
+  $container[] = array(
+    '#type' => 'markup',
+    '#markup' => theme_table($output),
+  );
+  $container[] = array(
+    '#type' => 'markup',
+    '#prefix' => '<a href="#my_family">',
+    '#markup' => t('View All Buddies'),
+    '#suffix' => '</a>',
+  );
+
+  return $container;
+}
+
+
+/**
+ *  @brief  Includes the add mileage form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2013
+ */
+function mo_project_get_mileage_form() {
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  return drupal_get_form('mo_project_add_mileage_form');
+}
+
+
+/**
+ *  @brief  Includes the add mileage form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2013
+ */
+function mo_project_get_mileage_form_mobile() {
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  return drupal_get_form('mo_project_add_mileage_form_mobile');
+}
+
+
+/**
+ *  @brief  Gets the node ids of all mileage nodes for the supplied user
+ *  
+ *  @param [in] $uid User entity uid
+ *  @return array of node nids
+ *  
+ *  @details  2013
+ */
+function mo_project_get_mileage_nids($uid) {
+  $first_dates = mo_project_get_challenge_dates_by_year(2013);
+  $current_dates = mo_project_get_challenge_dates_by_year();
+
+  $query = db_select('node', 'n');
+  $query->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));  
+  $query->condition('n.type', 'mileage');
+  $query->condition('n.status', 0, '<>');
+  $query->condition('t.field_mileage_date_value', $first_dates['start'], '>=');
+  $query->condition('t.field_mileage_date_value', $current_dates['end'], '<');
+  $query->condition('n.uid', $uid);
+  $query->addField('n', 'nid');
+  $result = $query->execute();
+  $nids = array();
+  foreach ($result as $row) {
+    $nids[] = $row->nid;
+  }
+  return $nids;
+}
+
+
+/**
+ *  @brief  Gets the MySQL dates to use in queries, for the supplied time period
+ *  
+ *  @param [in] $period Optional. Time period to query. ('all', '30day', 'current')
+ *  @return array of dates
+ *  
+ *  @details 2014 
+ */
+function mo_project_get_query_dates($period) {
+  $first_dates = mo_project_get_challenge_dates_by_year(2013);
+  $current_dates = mo_project_get_challenge_dates_by_year(FALSE);
+  switch($period) {
+    case 'all':
+      $min_date = $first_dates['start'];
+      $max_date = $current_dates['end'];
+      break;
+    case '30day':
+      $min_date = date('Y-m-d 00:00:00', strtotime('tomorrow -31 days'));    
+      $max_date = date('Y-m-d 23:59:59', strtotime('tomorrow -1 second'));
+      break;
+    default:
+      $min_date = $current_dates['start'];
+      $max_date = $current_dates['end'];        
+  }
+  return array(
+    $min_date,
+    $max_date,
+  );
+}
+
+
+/**
+ *  @brief  Gets the human-readable SQL query, with arguments in place, useful for debugging
+ *  
+ *  @param [in] $query The SelectQuery object
+ *  @return  String containing the human-readable SQL query.
+ *  
+ *  @details 2014 
+ */
+function mo_project_get_query_string(SelectQueryInterface $query) {
+  $string = (string) $query;
+  $arguments = $query->arguments();
+
+  if (!empty($arguments) && is_array($arguments)) {
+    foreach ($arguments as $placeholder => &$value) {
+      if (is_string($value)) {
+        $value = "'$value'";
+      }
+    }
+
+    $string = strtr($string, $arguments);
+  }
+
+  return $string;
+}
+
+
+/**
+ *  @brief  Calculates total mileage with provided conditions
+ *  
+ *  @param [in] $uids        Optional. Array of user uids 
+ *  @param [in] $activities  Optional. Array of activity tids
+ *  @param [in] $period      Optional. Time period to calculate mileage for. ('current', 'all', '30day', [ChallengeYear], array of 2 dates)
+ *  @param [in] $average     Optional. Boolean. TRUE if seeking the average total mileage
+ *  @param [in] $leader      Optional. Boolean. TRUE if seeking the leader's (highest) total mileage
+ *  @return  Double. Total mileage value
+ *  
+ *  @details  Edit 2014-05-15 
+ */
+function mo_project_get_total_mileage($uids=array(), $activities=array(), $period='current', $average=FALSE, $leader=FALSE) {
+
+  if (is_array($period)) {
+    $min_date = $period[0];
+    $max_date = $period[1];
+  } else if ((is_numeric($period)) AND ($period != '30day')) {
+    $query_dates = mo_project_get_challenge_dates_by_year($period);
+    $min_date = $query_dates['start'];
+    $max_date = $query_dates['end'];
+  } else {
+    list($min_date, $max_date) = mo_project_get_query_dates($period);
+  }
+
+  $mileage = 0;
+  $query = db_select('node', 'n');
+  $query->join('field_data_field_mileage_distance', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type AND d.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $query->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));  
+  $query->addExpression('SUM(d.field_mileage_distance_value)', 'distance');
+  $query->condition('n.type', 'mileage');
+  $query->condition('n.status', 0, '<>');
+  $query->condition('t.field_mileage_date_value', $min_date, '>=');
+  $query->condition('t.field_mileage_date_value', $max_date, '<');
+  
+  if ($uids) {
+    $query->condition('n.uid', $uids);
+  } else {
+    $verified_role = user_role_load_by_name('verified user');
+    $admin_role = user_role_load_by_name('administrator');
+    $events_role = user_role_load_by_name('Event Aggregator');
+    $query->join('users', 'u', 'n.uid = u.uid');
+    $query->join('users_roles', 'r', 'u.uid = r.uid');
+    $query->condition('u.status', 0, '>');
+    $query->condition('r.rid', array($verified_role->rid, $admin_role->rid, $events_role->rid));
+  }
+  if ($activities) {
+    $query->join('field_data_field_mileage_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+    $query->condition('a.field_mileage_activity_tid', $activities);
+  }
+  if ($leader) {
+    $query->groupBy('u.uid');
+    $query->orderBy('distance', 'DESC');
+    $query->range(0,1);
+  }
+
+  $result = $query->execute();
+  foreach ($result as $row) {
+    $mileage += $row->distance;
+  }
+  
+  if ($average and !empty($activities)) {
+    $uid_count = mo_project_get_activity_uids($activities, $period);
+    if ($uid_count == 0) {
+      $mileage = 0;
+    } else {
+      $mileage /= $uid_count;
+    }
+  }
+
+  return $mileage;
+}
+
+
+/**
+ *  @brief  Update the all time total mileage in the header, and check if exceeds threshold
+ *  
+ *  @return  void
+ *  
+ *  @details  2013
+ */
+function mo_project_update_total_mileage() {
+  variable_set_value('total_mileage', mo_project_get_total_mileage(array(), array(), 'all'));
+  if (variable_get_value('total_mileage') >= variable_get_value('total_mileage_threshold')) {
+    $send_alert = mo_project_total_mileage_threshold_alert();
+  }
+}
+
+
+/**
+ *  @brief  Checks that the supplied email address is in the users table
+ *  
+ *  @param [in] $email  Email Address string
+ *  @return  Boolean. TRUE if exists
+ *  
+ *  @details  2013
+ */
+function mo_project_check_email_exists($email) {
+  $query = db_select('users', 'u');
+  $query->addField('u', 'uid');
+  $query->condition('u.mail', $email);
+  $result = $query->execute()->rowCount();
+  if ($result) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+
+/**
+ *  @brief  Checks that the supplied username is in the users table
+ *  
+ *  @param [in] $username  Username string
+ *  @return  Boolean. TRUE if exists
+ *  
+ *  @details  2013
+ */
+function mo_project_check_username_exists($username) {
+  $query = db_select('users', 'u');
+  $query->addField('u', 'uid');
+  $query->condition('u.name', $username);
+  $result = $query->execute()->rowCount();
+  if ($result) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+
+/**
+ *  @brief  Creates a simple set of div wrappers with styles necessary to look like a progress bar.
+ *  
+ *  @param [in] $actual_value value representing progress toward $max_value (the progress bar itself)
+ *  @param [in] $max_value    value representing a filled progress bar; progress % is $actual_value / $max_value
+ *  @param [in] $label        optional string to label the bar
+ *  @param [in] $show_target  optional string specifying label position. Valid positions: 'top', 'bottom'
+ *  @return  render array
+ *  
+ *  @details  2013
+ */
+function mo_project_progress_bar($actual_value, $max_value, $label=FALSE, $label_position='top', $show_target=TRUE) {
+  if (!$max_value or !isset($actual_value)) {
+    return NULL;
+  }
+  if ($actual_value > $max_value) {
+    $actual_value = $max_value;
+  }
+  $progress = number_format($actual_value / ($max_value * 1.25) * 100.0, 1);
+  $output = array();
+  $i = 0;
+  if ($label) {
+    $label = array(
+      '#type' => 'markup',
+      '#prefix' => t('<span class="progress-bar-label">'),
+      '#markup' => t($label),
+      '#suffix' => t('</span>'),
+    );
+  }
+  if ($label and $label_position == 'top') {
+    $output[$i] = $label;
+    $i++;
+  }
+  $progress_value_label = number_format($actual_value, 0);
+  if ($show_target) {
+    $progress_value_label .= '&nbsp;/&nbsp;' . number_format($max_value, 0);
+  }
+  $progress_value_label .= ' mi';
+  $output[$i] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'progress-wrapper',
+      ),
+    ),
+    0 => array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array(
+          'progress-value',
+        ),
+        'style' => 'width: ' . $progress . '%; display: block',
+      ),
+    ),
+    1 => array(
+      '#type' => 'markup',
+      '#prefix' => t('<span class="progress-value-label">'),
+      '#markup' => t($progress_value_label),
+      '#suffix' => t('</span>'),
+    ),
+  );
+  $i++;
+  if ($label and $label_position == 'bottom') {
+    $output[$i] = $label;
+    $i++;
+  }
+  $output[$i] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'clearfix',
+      ),
+    ),
+  );
+  return $output;
+}
+
+
+/**
+ *  @brief  Displays Missouri Blue Miles Dashboard header - section Info
+ *  
+ *  @return  render array
+ *  
+ *  @details  2015-02-04 
+ */
+function mo_project_build_blue_header_content_1() {
+  $image = file_create_url(file_build_uri('waterway-img.png'));
+  
+  $output = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'bluemiles-header',
+    ),
+  );
+  $output[] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'bluemiles-stats',
+      'class' => array(
+        'bluemiles-stats-section',
+      ),
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#prefix' => "<img src='" . $image . "' alt='GoRI Blue Miles' style='float:left;margin:0 5px 0 0;'>",
+      '#markup' => t("<h3>Rhode Island Blue Miles</h3><p>We are encouraging Rhode Islanders to experience Rhode Island's many waterways and to log their paddling and swimming miles.</p>"),
+    ),
+  );
+  return $output;
+}
+
+
+/**
+ *  @brief  Displays Missouri Blue Miles Dashboard header - section Progress Bars
+ *  
+ *  @return  render array
+ *  
+ *  @details  2015-02-04 
+ */
+function mo_project_build_blue_header_content_2() {
+  $pad_id = key(taxonomy_get_term_by_name('Paddling'));
+  $swm_id = key(taxonomy_get_term_by_name('Swimming'));
+  $pad_miles = 0;
+  $swm_miles = 0;  
+  $blue_miles = 0;
+
+  $blue_miles = (int) round(mo_project_get_total_mileage(array(), array($pad_id, $swm_id), 2015));
+  $pad_miles = (int) round(mo_project_get_total_mileage(array(), array($pad_id), 2015));
+  $swm_miles = (int) round(mo_project_get_total_mileage(array(), array($swm_id), 2015)); 
+    
+  $output = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'bluemiles-header',
+    ),
+  );
+  $output[] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'bluemiles-paddling',
+      'class' => array(
+        'bluemiles-stats-paddling',
+      ),
+    ),
+  );
+  $output[0][] = mo_project_progress_bar($pad_miles, $blue_miles, 'Paddling', $label_position='top', FALSE);
+  $output[] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'bluemiles-swimming',
+      'class' => array(
+        'bluemiles-stats-swimming',
+      ),
+    ),
+  );
+  $output[1][] = mo_project_progress_bar($swm_miles, $blue_miles, 'Swimming', $label_position='top', FALSE);
+
+  $output[0][0][0]['#prefix'] = '<span class="activity-icon paddling"></span>';
+  $output[1][0][0]['#prefix'] = '<span class="activity-icon swimming"></span>';
+
+  return $output;
+}
+
+
+/**
+ *  @brief  Displays Missouri Blue Miles Dashboard header - section Total Blue Miles
+ *  
+ *  @return  render array
+ *  
+ *  @details  2015-02-04 
+ */
+function mo_project_build_blue_header_content_3() {
+  $pad_id = key(taxonomy_get_term_by_name('Paddling'));
+  $swm_id = key(taxonomy_get_term_by_name('Swimming'));
+  $blue_miles = 0;
+
+  $blue_miles = (int) round(mo_project_get_total_mileage(array(), array($pad_id, $swm_id), 2015));
+    
+  $output = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'bluemiles-header',
+      'class' => array(
+        'mileage-box',
+        'thirty-day',
+      ),
+    ),
+  );
+  $output[] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'bluemileage-label',
+      ),
+    ),
+    '0' => array(
+      '#type' => 'markup',
+      '#markup' => t('Total Blue Miles'),
+    ),
+  );
+  $output[] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array(
+        'mileage',
+      ),
+    ),
+    '0' => array(
+      '#type' => 'markup',
+      '#markup' => number_format($blue_miles),
+    ),
+  );
+  return $output;
+}
+
+
+/**
+ *  @brief  Displays User and Mileage count flippers for the website header
+ *  
+ *  @return  render array
+ *  
+ *  @details  2013
+ */
+function mo_project_build_global_stats_content() {
+  $registered_users = mo_project_count_all_subusers();
+  $total_mileage = variable_get_value('total_mileage');
+  $output = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'global-stats',
+    ),
+  );
+  $output[] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'global-stats-total',
+      'class' => array(
+        'global-stats-section',
+      ),
+    ),
+    0 => array(
+      '#type' => 'markup',
+      '#prefix' => t('<h3>'),
+      '#markup' => t('<span class="user-count flipper">' . number_format($registered_users, 0) . '</span> <span class="missourians flipper">Rhode Islanders have logged</span> <span class="missouri-total-mileage flipper">' . number_format((int) round($total_mileage), 0) . '</span> <span class="miles flipper">miles</span>'),
+      '#suffix' => t('</h3>'),
+    ),
+    1 => array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array(
+          'clearfix',
+        ),
+      ),
+    ),
+  );
+  return $output;
+}
+
+
+/**
+ *  @brief  Includes the activity converter form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2013
+ */
+function mo_project_build_activity_converter() {
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  return drupal_get_form('mo_project_activity_converter_form');
+}
+
+
+/**
+ *  @brief  Includes Export Activity Log form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2015-02-09 
+ */
+function mo_project_build_activity_log_exporter() {
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  return drupal_get_form('mo_project_activity_log_export_form');
+}
+
+
+/**
+ *  @brief  Includes the calorie calculator form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2013
+ */
+function mo_project_build_calories_calculator() {
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  return drupal_get_form('mo_project_calories_calculator_form');
+}
+
+
+/**
+ *  @brief  Includes the kilometers to miles conversion form from the fapi_forms.inc file
+ *  
+ *  @return  form
+ *  
+ *  @details  2013
+ */
+function mo_project_build_km_to_miles_converter() {
+  module_load_include('inc', 'mo_project', 'includes/fapi_forms');
+  return drupal_get_form('mo_project_km_to_miles_converter_form');
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *    
+ *  @details  2015-03-09 
+ *  
+ */
+function mo_project_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+
+  // Remove the links provided by Drupal.
+  unset($form['links']);
+  // Remove the "remember me" checkbox
+  unset($form['remember_me']);
+  // Make labels and fields inline
+  $form['container_login'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+        'class' => array('container-inline', 'login'),
+    ),
+  );
+  $form['container_signup'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+        'class' => array('container-inline', 'signup'),
+    ),
+  );
+
+  $form['container_login']['name'] = $form['name'];
+  $form['container_login']['pass'] = $form['pass'];
+  $form['container_login']['actions'] = $form['actions'];
+  
+  // Add class to submit button
+  $form['container_login']['actions']['submit']['#attributes']['class'] = array('submit-green');
+  
+  // Add placeholder text
+  $form['container_login']['name']['#attributes']['placeholder'] = $form['container_login']['name']['#title'];
+  $form['container_login']['pass']['#attributes']['placeholder'] = $form['container_login']['pass']['#title'];
+
+  unset ($form['container_login']['name']['#title']);
+  unset ($form['container_login']['pass']['#title']);
+  unset ($form['name']);
+  unset ($form['pass']);
+  unset ($form['actions']);
+   
+  // Change the 'Create new account' Link
+  if (variable_get('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)) {
+    $form['container_signup']['signup'] = array();
+    $form['container_signup']['signup']['#weight'] = 10;
+    $markup = "Don't have an account? ";
+    $markup .= l(t('Register'), 'user/register', array('attributes' => array('title' => t('Create a new user account.'), 'class' => 'register-link')));
+    $markup2 = "&nbsp;&nbsp;|&nbsp;&nbsp;Forgot password? ";
+    $markup2 .= l(t('Reset'), 'user/password', array('attributes' => array('title' => t('Reset my password.'), 'class' => 'register-link')));
+    
+    $content = '<div class="clearfix">' . $markup . $markup2 . '</div>';
+    
+    $form['container_signup']['signup']['#markup'] = $content; 
+  }
+  
+//  drupal_set_message('<pre>' . print_r($form, TRUE) . '</pre>');  
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *    
+ *  @details  2015-03-30 
+ */
+function mo_project_form_article_node_form_alter(&$form, &$form_state, $form_id) {
+  // Always show the Summary field
+  $form['body'][LANGUAGE_NONE][0]['summary']['#attributes']['class'] = array('text-summary-no-links');
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *    
+ *  @details  2014-05-23 
+ *            edited 2014-06-06 
+ *  Added the Sub-badges code
+ */
+function mo_project_form_achievement_node_form_alter(&$form, &$form_state, $form_id) {
+  // Change the '- None -' option at the top of the array to '- Any -' 
+  $a_options = $form['field_achievement_activity']['und']['#options'];
+  $a_options['_none'] = '- Any -';
+  $form['field_achievement_activity']['und']['#options'] = $a_options;
+
+  // Add optgroups to the Location multiselect
+  $f_vocab = taxonomy_vocabulary_machine_name_load('facilities');
+  $f_term_entities = taxonomy_get_tree($f_vocab->vid, 0, NULL, TRUE);
+  
+  // Set Facility Types as optgroups
+  $f_options = array(
+    'STATE PARKS' => array(), 
+    'EVENT CODES' => array(),    
+    'CONSERVATION AREAS' => array(), 
+    'MUNICIPALITY PARKS' => array(), 
+    'FEDERAL LANDS' => array(), 
+    'OTHER' => array(),
+  );
+  
+  foreach ($f_term_entities as $term) { 
+    $f_optgroup = strtoupper($term->field_facility_type['und'][0]['value']);
+    switch ($f_optgroup) {
+      case 'STATE PARK':
+        $f_optgroup = 'STATE PARKS';
+        break;
+      case 'EVENT':
+        $f_optgroup = 'EVENT CODES';
+        break;
+      case 'CONSERVATION':
+        $f_optgroup = 'CONSERVATION AREAS';
+        break;        
+      case 'MUNICIPALITY':
+        $f_optgroup = 'MUNICIPALITY PARKS';
+        break;        
+      case 'FEDERAL':
+        $f_optgroup = 'FEDERAL LANDS';
+        break; 
+      default:
+        $f_optgroup = 'OTHER';
+    }
+    $f_options[$f_optgroup][$term->tid] = $term->name;
+  }
+  
+  // Add the '- Any -' option at the top of the array
+  $f_options = array('_none' => '- Any -') + $f_options;
+  $form['field_achievement_facility']['und']['#options'] = $f_options;
+
+/**********
+ *  SUB BADGES ARE A DISASTER  
+ */
+/*  // Clean up Sub-Badges multiselect options and add optgroups
+  $b_options = $form['field_achievement_subbadge']['und']['#options'];
+  
+  // Create optgroups
+  $a_options = array(  
+    'STATE PARKS' => array(),   
+    'SPECIALTY' => array(),  
+  ); 
+  $a_vocab = taxonomy_vocabulary_machine_name_load('activities');
+  $a_term_entities = taxonomy_get_tree($a_vocab->vid, 0, 1);  
+  foreach ($a_term_entities as $term) {
+    $a_optgroup = strtoupper($term->name);
+    if ($a_optgroup != 'OTHER') {
+      $a_options[$a_optgroup] = array();
+    }
+  }
+  $a_options['ALL MILES'] = array();  
+  $a_options['OTHER'] = array();
+  
+  $included = array();
+  foreach ($b_options as $opt_id => $opt_val) {
+    if (is_numeric(substr($opt_val,0,1))) {
+      foreach ($a_term_entities as $term) {
+        if (strpos($opt_val, $term->name) !== FALSE) {
+          $a_options[strtoupper($term->name)][$opt_id] = $opt_val;
+          $included[] = $opt_id;
+        }
+      }
+      if (!in_array($opt_id, $included)) {
+        $a_options['ALL MILES'][$opt_id] = $opt_val;
+      }
+    } else {
+      if ($opt_val == '- None -') {
+        $a_options = array($opt_id=>$opt_val) + $a_options;
+      } else if (stripos($opt_val, 'park') !== FALSE) {
+        $a_options['STATE PARKS'][$opt_id] = $opt_val;
+      } else if (      
+        (strpos($opt_val, 'Cycling') === 0) OR
+        (strpos($opt_val, 'Hiking') === 0) OR
+        (strpos($opt_val, 'Paddling') === 0) OR 
+        (strpos($opt_val, 'Riding') === 0) OR
+        (strpos($opt_val, 'Rolling') === 0) OR 
+        (strpos($opt_val, 'Running') === 0) OR
+        (strpos($opt_val, 'Swimming') === 0) OR         
+        (strpos($opt_val, 'Walking') === 0) ) {
+          $a_options['OTHER'][$opt_id] = $opt_val;      
+      } else {
+        $a_options['SPECIALTY'][$opt_id] = $opt_val;      
+      }
+    }
+  }
+  $form['field_achievement_subbadge']['und']['#options'] = $a_options;
+*/
+  unset($form['field_achievement_subbadge']);
+  unset($form['field_achievement_subbadge_all']);
+  unset($form['group_tab_subbadge']);
+  unset($form['field_achievement_group']);
+  unset($form['field_achievement_group_all']);
+  unset($form['group_tab_usergroup']);
+  
+  // Increase the size of the multiselect fields
+  $form['field_achievement_facility']['und']['#size'] = 15;
+  $form['field_achievement_activity']['und']['#size'] = 11;
+//  $form['field_achievement_subbadge']['und']['#size'] = 25;
+//  $form['field_achievement_group']['und']['#size'] = 25;
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *
+ *  @details  2013 
+ */
+function mo_project_form_mo_cms_event_node_form_alter(&$form, $form_state, $form_id) {
+  $destination = drupal_get_destination();
+  if ($destination['destination'] == 'events/share') {
+    // Remove internal fields from the node create form
+    $editorial_terms = taxonomy_get_term_by_name('events', 'workbench_sections');
+    foreach ($editorial_terms as $tid=>$editorial_term) {
+      break;
+    }
+    $form['field_mo_cms_editorial_section']['und']['#type'] = 'hidden';
+    unset($form['field_mo_cms_editorial_section']['und']['#options']);
+    unset($form['field_mo_cms_map_coords']);
+    unset($form['actions']['preview']);
+    $form['actions']['submit']['#value'] = t('Submit for review');
+  }
+}
+
+
+/**
+ *  @brief  Remove fields from the Event node form that don't need to be completed to submit an event
+ *  
+ *  @param [in] $render form render array
+ *  @return  modified form render array
+ *  
+ *  @details  2013 
+ */
+function mo_project_strip_mo_cms_event_node_form($render) {
+  unset($render['#fieldgroups']);
+  unset($render['additional_settings']);
+  unset($render['field_mo_cms_guid']);  
+  unset($render['field_mo_cms_event_website']['und'][0]['title']);  
+  unset($render['body']['und'][0]['summary']);
+  unset($render['body']['und'][0]['format']);
+  
+  // remove options for State dropdown that are outside the contiguous 48 states
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['AA']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['AE']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['AK']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['AP']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['AS']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['FM']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['GU']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['HI']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['MH']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['MP']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['PW']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['PR']);
+  unset($render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#options']['VI']);
+  unset($render['field_mo_cms_event_type']['und']['#options']['_none']);  
+  unset($render['field_mo_cms_event_dates']['und'][0]['show_todate']);  
+
+  $render['title']['#title'] = 'Event Name:';
+  
+  $render['field_mo_cms_event_type']['und']['#title'] = 'Activities:';
+  $render['field_mo_cms_event_type']['und']['#required'] = 1;
+  $render['field_mo_cms_event_type']['und']['#description'] = 'Choose all that apply.';
+
+  $render['field_mo_cms_event_dates']['und'][0]['#fieldset_description'] = 'All suggested events should be submitted no later than one week prior to the date of the event. We can not guarantee that events submitted within a week of the the date of the event will be included on the website.'; 
+  $render['field_mo_cms_event_dates']['und'][0]['value']['date']['#required'] = 1;
+  $render['field_mo_cms_event_dates']['und'][0]['value']['time']['#required'] = 1;
+  $render['field_mo_cms_event_dates']['und'][0]['value']['time']['#description'] = NULL; 
+  $render['field_mo_cms_event_dates']['und'][0]['value2']['#title'] = NULL; 
+  $render['field_mo_cms_event_dates']['und'][0]['value2']['#required'] = 0;
+  $render['field_mo_cms_event_dates']['und'][0]['value2']['date']['#required'] = 0;
+  $render['field_mo_cms_event_dates']['und'][0]['value2']['time']['#required'] = 0;
+  $render['field_mo_cms_event_dates']['und'][0]['value2']['time']['#description'] = NULL; 
+
+  $render['field_mo_cms_event_website']['und'][0]['#title'] = 'Event Website URL:';
+  
+  $render['body']['und'][0]['#format'] = 'filtered_html';
+  $render['body']['und'][0]['value']['#title'] = 'Event Description:';
+  $render['body']['und'][0]['value']['#required'] = 1;  
+  $render['body']['und'][0]['value']['#format'] = 'filtered_html';
+  $render['body']['und'][0]['value']['#resizable'] = 0;
+  $render['body']['und'][0]['value']['#rows'] = 10;
+  
+  $render['field_mo_cms_postal_address']['und'][0]['street_block']['thoroughfare']['#title'] = 'Street Address, Line 1:';
+  $render['field_mo_cms_postal_address']['und'][0]['street_block']['thoroughfare']['#required'] = 1;
+  $render['field_mo_cms_postal_address']['und'][0]['street_block']['thoroughfare']['#size'] = 60;
+  $render['field_mo_cms_postal_address']['und'][0]['street_block']['premise']['#title'] = 'Street Address, Line 2:';
+  $render['field_mo_cms_postal_address']['und'][0]['street_block']['premise']['#size'] = 60;
+  
+  $render['field_mo_cms_postal_address']['und'][0]['locality_block']['locality']['#required'] = 1;
+  $render['field_mo_cms_postal_address']['und'][0]['locality_block']['locality']['#size'] = 60;
+  $render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#value'] = 'RI';
+  $render['field_mo_cms_postal_address']['und'][0]['locality_block']['administrative_area']['#required'] = 1;
+  $render['field_mo_cms_postal_address']['und'][0]['locality_block']['postal_code']['#required'] = 1;
+
+  return $render;
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *    
+ *  @details  2015-04-13 
+ */
+function mo_project_form_mileage_node_form_alter(&$form, &$form_state, $form_id) {
+  // Add choices for Buddy field
+  global $user;
+  $all_subusers = mo_project_get_subusers($user->uid);
+  foreach ($all_subusers as $row) {
+    $key = $row->suid;
+    $allowed_subusers[$key] = t($row->name);
+    if ($row->type_name == "Me") {
+      $me_default = $key; 
+    }
+  }  
+  $form['field_mileage_subuser']['und'][0]['value']['#type'] = 'select';
+  $form['field_mileage_subuser']['und'][0]['value']['#size'] = 1.95;
+  $form['field_mileage_subuser']['und'][0]['value']['#options'] = $allowed_subusers;
+  $form['field_mileage_subuser']['und'][0]['value']['#default_value'] = $me_default;
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *
+ *  @details  2013 
+ *            edit 2014-05-30 
+ */
+function mo_project_form_trail_node_form_alter(&$form, $form_state, $form_id) {
+  $destination = drupal_get_destination();
+  // Remove internal fields from the node create form
+  if ($destination['destination'] == 'trails/share') {
+    $editorial_terms = taxonomy_get_term_by_name('trails', 'workbench_sections');
+    foreach ($editorial_terms as $tid=>$editorial_term) {
+      break;
+    }
+    $form['field_mo_cms_editorial_section']['und']['#type'] = 'hidden';
+    unset($form['field_mo_cms_editorial_section']['und']['#options']);
+    unset($form['actions']['preview']);
+    $form['actions']['submit']['#value'] = t('Submit for review');
+  } else {
+    $form['field_trail_description']['#disabled'] = TRUE;
+    $form['#submit'][] = 'mo_project_approve_trail_submit';
+  }
+}
+
+
+/**
+ *  @brief  Remove fields from the Trail node form that don't need to be completed to suggest a trail
+ *  
+ *  @param [in] $render form render array
+ *  @return  modified form render array
+ *  
+ *  @details  2013 
+ */
+function mo_project_strip_trail_node_form($render) {
+  unset($render['#fieldgroups']);
+  unset($render['additional_settings']);
+  unset($render['field_mo_cms_editorial_section']);
+  unset($render['field_trail_facility']);
+  unset($render['field_trail_total_length']);
+  unset($render['field_trailheads']);
+  unset($render['field_trail_accessibility']);
+  unset($render['field_trail_activity']);
+
+  $render['title']['#title'] = 'Trail Name:';
+  $render['field_url']['und'][0]['#title'] = 'Trail Website URL:';
+  $render['field_trail_description']['und'][0]['value']['#resizable'] = 0;
+  
+  return $render;
+}
+
+
+/**
+ *  @brief  Add notification requesting trailhead and coordinate info before publishing a trail node
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @return  void
+ *  
+ *  @details  2014-05-30 
+ */
+function mo_project_approve_trail_submit($form, &$form_state) {
+  // 
+  // Check user role
+  global $user;
+  
+  if ( (in_array('Suggested Nodes Moderator', array_values($user->roles))) OR
+      (in_array('administrator', array_values($user->roles))) ) {
+    
+    // Check contents of field
+    if ( empty($form['field_trailheads']['und'][0]['field_trailhead_name']['und'][0]['value']['#value']) OR
+          empty($form['field_trailheads']['und'][0]['field_trailhead_coordinates']['und'][0]['geom']['lon']['#value']) OR 
+          empty($form['field_trailheads']['und'][0]['field_trailhead_coordinates']['und'][0]['geom']['lat']['#value']) ) {
+
+          // Display message
+          drupal_set_message(t('PLEASE ADD TRAILHEAD.  Without at least one Trailhead and set of Coordinates, this trail cannot be found on the "Find A Trail" page. Publishing this INCOMPLETE trail is pointless. You can use http://itouchmap.com/latlong.html to find coordinates.'), 'error');
+    }    
+  }
+}
+
+
+/**
+ *  @brief  Creates an unpublished node when a user suggests an event or trail
+ *  
+ *  @param [in] $n_type String type of node to create. ('event', 'trail')
+ *  @return  node form
+ *  
+ *  @details  2013 
+ */
+function mo_project_create_unpub_node($n_type = "") {
+  // get current users info
+  global $user;
+  // get a node edit form
+  module_load_include('inc', 'node', 'node.pages'); 
+  
+  $node_type = "";
+  $check_roles = array(
+    'anonymous user',
+    'authenticated user',
+    'Official',
+    'verified user',
+  );
+  $extra_roles = array_diff($user->roles, $check_roles);
+  if ($extra_roles) {
+    drupal_set_message('Privileged users should use the standard content forms; you have been redirected.');
+  }
+  switch ($n_type) {
+    case 'event':
+      if ($extra_roles) {
+        drupal_goto('node/add/mo-cms-event');
+      }
+      $node_type = 'mo_cms_event';
+      break;
+    case 'trail':
+      if ($extra_roles) {
+        drupal_goto('node/add/trail');
+      }
+      $node_type = 'trail';
+      break;
+  }
+  
+  if ($node_type != "") {
+    $form_id = $node_type . '_node_form';
+    // create a blank node
+    $newNode = new stdClass();
+    $newNode->uid = $user->uid;
+    $newNode->status = 0;
+    $newNode->comment = 0;
+    $newNode->promote = 0;
+    $newNode->sticky = 0;   
+    $newNode->type = $node_type;
+    $newNode->language = LANGUAGE_NONE;
+    $newNode->revision = 0;
+    node_object_prepare($newNode);
+    // get the form
+    $render = drupal_get_form($form_id, $newNode);
+    // remove fields we don't want J. Random User to have access to
+    $strip_form_func = 'mo_project_strip_' . $form_id;
+    $render = $strip_form_func($render);
+    
+    $output = drupal_render($render);
+  }
+  
+  return $output;
+}
+
+
+/**
+ *  @brief  Presave the node to ensure the node remains unpublished and to attach the user as the node's creator
+ *  
+ *  @param [in] $node  Node entity to be saved
+ *  @return  void
+ *  
+ *  @details  2013 
+ */
+function mo_project_node_presave($node) {
+  $dest = drupal_get_destination();
+  if ($node->type == 'mo_cms_event' and $dest['destination'] == 'events/share') {
+    global $user;
+    $node->uid = $user->uid;
+    $node->status = 0;
+  }
+  if ($node->type == 'trail' and $dest['destination'] == 'trails/share') {
+    global $user;
+    $node->uid = $user->uid;
+    $node->status = 0;
+  }
+  
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *
+ *  @details  2013
+ */
+function mo_project_form_user_profile_form_alter(&$form, $form_state, $form_id) {
+    unset($form['field_user_sent_notifications']);
+    unset($form['field_user_medal']);
+    if ($form_id == 'user_profile_form') {
+      unset($form['field_send_group_instructions']);
+      $form['mimemail_textonly'] = $form['mimemail']['mimemail_textonly'];
+      unset($form['mimemail']);
+    }
+//  }
+  $form['account']['mail']['#description'] = t('<b>Each GoRI user account requires a unique and valid e-mail address</b>, which is used to provide a secure login link in the event that the user should need to reset his or her password. All e-mails from the system will be sent to this address. The e-mail address is not and will not be made public and will only be used if you wish to receive a new password or wish to receive certain news or notifications by e-mail.');
+  $form['mailchimp_lists']['#weight'] = 20;
+  $form['#group_children']['mailchimp_lists'] = 'group_tab_communication';
+  $form['#group_children']['mimemail_textonly'] = 'group_tab_communication';
+}
+
+
+/**
+ *  @brief  Implements hook_form_alter()
+ *
+ *  @details  2013
+ */
+function mo_project_form_user_register_form_alter(&$form, $form_state, $form_id) {
+  drupal_set_title(t('Create account'));
+  mo_project_form_user_profile_form_alter($form, $form_state, $form_id);
+}
+
+
+/**
+ *  @brief  Implements hook_element_info_alter().
+ *  
+ *  @details  2013
+ *  added date_popup 2015-03-10  
+ */
+function mo_project_element_info_alter(&$type) {
+  if (isset($type['geofield_proximity'])) {
+    $type['geofield_proximity']['#process'][] = 'mo_project_proximity_element_process';
+  }
+  if (isset($type['addressfield_container'])) {
+    $type['addressfield_container']['#process'][] = 'mo_project_addressfield_element_process';
+  }
+  if (isset($type['date_popup'])) {
+    $type['date_popup']['#process'][] = 'mo_project_date_popup_process_alter';
+  }
+}
+
+
+/**
+ *  @brief  #TODO 
+ *  
+ *  @param [in] $element    Parameter_Description
+ *  @param [in] $form_state 
+ *  @param [in] $form       
+ *  @return  modified element
+ *  
+ *  @details  2013
+ */
+function mo_project_proximity_element_process($element, &$form_state, $form) {
+  
+  $options = array(
+    '1' => '1 mi',
+    '5' => '5 mi',
+    '10' => '10 mi',
+    '25' => '25 mi',
+    '50' => '50 mi',
+    '100' => '100 mi',
+  );
+  $element['distance']['#type'] = 'select';
+  $element['distance']['#options'] = $options;
+  $element['distance']['#multiple'] = false;
+  $element['distance']['#default_value'] = 100;
+  $element['unit']['#type'] = 'hidden';
+  $element['origin']['#placeholder'] = t('Starting address (Zip code minimum)');
+
+  return $element;
+}
+
+
+/**
+ *  @brief  Hide organization, street, street2, zip code. Set state to MO and disable.
+ *  
+ *  @param [in] $element    Addressfield entity
+ *  @param [in] $form_state 
+ *  @param [in] $form       
+ *  @return  modified Addressfield entity
+ *  
+ *  @details  2014-03-19
+ */
+function mo_project_addressfield_element_process($element, &$form_state, $form) {
+  
+  switch ($form['#form_id']) {
+    case 'mo_cms_user_group_node_form':
+      unset($element['thoroughfare']);
+      unset($element['premise']);
+      unset($element['postal_code']);
+      unset($element['organisation_name']);
+      $element['administrative_area']['#options'] = array('RI' => 'Rhode Island');
+      $element['administrative_area']['#default_value'] = 'RI';
+      $element['administrative_area']['#disabled'] = TRUE;
+      break;
+    case 'user_register_form':
+      $element['administrative_area']['#options'] = array('RI' => 'Rhode Island');
+      $element['administrative_area']['#default_value'] = 'RI';
+      $element['administrative_area']['#disabled'] = TRUE;
+      break; 
+  }
+  return $element;
+}
+
+
+/**
+ *  @brief  Remove the date format example for popup date fields and
+ *          Adjust the html <label> for improved accessibility
+ *  
+ *  @param [in] $element    Date entity
+ *  @param [in] $form_state 
+ *  @param [in] $form       
+ *  @return  modified Date entity
+ *  
+ *  @details  2015-03-10  
+ */
+function mo_project_date_popup_process_alter(&$element, &$form_state, $context) {
+  // Make the labels match for accessibility
+  if(!empty($element['#title'])) {
+    $element['date']['#title'] = $element['#title'];
+  }
+  unset($element['date']['#description']);
+  return $element;
+}
+
+
+/**
+ *  @brief  Implements hook_honeypot_form_protections_alter()
+ *
+ *  @details  2013
+ */
+function mo_project_honeypot_form_protections_alter(&$options, $form) {
+  switch ($form['form_id']['#value']) {
+    // Disable all protection on these form IDs
+    case 'node_delete_confirm':
+      foreach (array_keys($options) as $key) {
+        unset($options[$key]);
+      }
+      break;
+    // Disable time limit protection on these form IDs
+    case 'mo_project_add_mileage_form':
+    case 'mo_project_add_mileage_form_mobile':   
+      foreach ($options as $key=>$option) {
+        if ($option == 'time_restriction') {
+          unset($options[$key]);
+        }
+      }
+      break;
+  }
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $string1 Parameter_Description
+ *  @param [in] $string2 Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details  2013
+ */
+function mo_project_score_string_match($string1, $string2) {
+  if (substr($string2, 0, strlen($string1)) == $string1) {
+    $score = 0;
+  } elseif (strpos($string2, $string1)) {
+    $score = strpos($string2, $string1);
+  } else {
+    $score = 50 + levenshtein($string1, $string2, 1, 3, 2);
+  }
+  return $score;
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @return  #TODO
+ *  
+ *  @details  2013
+ */
+function mo_project_verify_users_form($form, &$form_state) {
+  if (!empty($form_state['input']['admin_action'])) {
+    return mo_project_verify_users_form_confirm($form, $form_state);
+  }
+  return mo_project_verify_users_form_actions($form, $form_state);
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @return  #TODO
+ *  
+ *  @details  2013
+ */
+function mo_project_verify_users_form_confirm($form, &$form_state) {
+  $desc = array(
+    '#type' => 'markup',
+    '#markup' => t('<p>Are you sure you wish to <b>' . $form_state['input']['admin_action'] . '</b> the following users?</p>'),
+  );
+  $items_list = array(
+    'type' => 'ul',
+    'title' => NULL,
+    'attributes' => array(),
+    'items' => array(),
+  );
+  $uids = array();
+  foreach ($form_state['input']['table'] as $uid) {
+    $uids[] = $uid;
+  }
+  $users = entity_load('user', $uids);
+  foreach ($users as $user) {
+    $items_list['items'][] = format_username($user);
+  }
+  $desc['#markup'] .= theme_item_list($items_list);
+  $desc['#markup'] .= t('<p>This action cannot be undone.');
+  $form['admin_action'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['admin_action'],
+  );
+  $form['table'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['input']['table'],
+  );
+  $form['process'] = array(
+    '#type' => 'hidden',
+    '#value' => 'true',
+  );
+  $form['destination'] = array(
+    '#type' => 'hidden',
+    '#value' => 'admin/people/verify',
+  );
+  return confirm_form($form, 'Are you sure?', 'admin/people/verify', render($desc), 'Continue', 'Cancel');
+}
+
+
+/**
+ *  @brief  Create and populate admin/people/verify
+ *  
+ *  @param [in] $form       
+ *  @param [in] $form_state 
+ *  @return  Form
+ *  
+ *  @details  2013
+ */
+function mo_project_verify_users_form_actions($form, &$form_state) {
+  
+  $header = array(
+    'uid' => array(
+      'data' => t('uid'),
+      'style' => 'display: none;',
+    ),
+    'username' => t('Username'),
+    'name' => t('Name'),
+    'email' => t('Email'),
+    'registered' => t('Registered'),
+    'last_access' => t('Last Access'),
+    'mileage_logged' => t('Mileage Logged'),
+  );
+  
+  $verified_role = user_role_load_by_name('verified user');
+  $admin_role = user_role_load_by_name('administrator');
+  $event_role = user_role_load_by_name('Event Aggregator');
+  $query = db_select('users', 'u')->extend('PagerDefault');
+  $query->leftJoin('users_roles', 'r', 'r.uid = u.uid AND (r.rid = :vid OR r.rid = :aid OR r.rid = :eid)', array(':vid' => $verified_role->rid, ':aid' => $admin_role->rid, ':eid' => $event_role->rid));
+  $query->condition('u.status', 0, '>');
+  $query->condition('r.rid', NULL);
+  $query->addField('u', 'uid');
+  $query->orderBy('u.created', 'ASC');
+  $query->limit(100); 
+  $result = $query->execute();
+  $uids = array();
+  foreach ($result as $row) {
+    if ($row->uid) {
+      $uids[] = $row->uid;
+    }
+  }
+  $users = entity_load('user', $uids);
+  $options = array();
+  foreach ($users as $uid=>$user) {
+    if ($user->name == 'admin') {
+      continue;
+    }
+    if ($user->access == 0) {
+      $last_access_value = "never";
+    } else {
+      $last_access_value = format_date($user->access);
+    }
+    $options[$uid] = array(
+      'uid' => array(
+        'data' => t('uid'),
+        'style' => 'display: none;',
+      ),
+      'username' => t($user->name),
+      'name' => t(format_username($user)),
+      'email' => t($user->mail),
+      'registered' => t(format_date($user->created)),
+      'last_access' => t($last_access_value),
+      'mileage_logged' => t(number_format(mo_project_get_total_mileage(array($uid)), 2)),
+    );
+  }
+
+  $form = array(
+    'admin_action' => array(
+      '#type' => 'select',
+      '#title' => t('Action'),
+      '#attributes' => array(),
+      '#options' => array(
+        'none' => t('- Select -'),
+        'verify' => t('Verify'),
+        'block' => t('Block'),
+      ),
+    ),
+    'pager_top' => array(
+      '#type' => 'markup',
+      '#markup' => theme('pager'),
+    ),
+    'table' => array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#multiple' => TRUE,
+    ),
+    'pager_bottom' => array(
+      '#type' => 'markup',
+      '#markup' => theme('pager'),
+    ),
+    'submit' => array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+      '#attributes' => array(
+        'id' => 'verify-action',
+      ),
+    ),
+  );
+ 
+  return $form;
+  
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $form_id    
+ *  @param [in] $form_state 
+ *  @return  #TODO
+ *  
+ *  @details  2013
+ */
+function mo_project_verify_users_form_submit($form_id, &$form_state) {
+  if (empty($form_state['input']['admin_action']) or $form_state['input']['admin_action'] == 'none') {
+    drupal_set_message('No action selected.', 'warning');
+    return;
+  } elseif (isset($form_state['input']['admin_action']) and in_array($form_state['input']['admin_action'], array('verify', 'block'))) {
+    if (empty($form_state['input']['table'])) {
+      drupal_set_message('No users were selected.', 'warning');
+      return;
+    }
+  }
+  if (isset($form_state['input']['process']) and $form_state['input']['process']) {
+    $uids = array();
+    foreach ($form_state['values']['table'] as $uid) {
+      $uids[] = $uid;
+    }
+    $users = entity_load('user', $uids);
+    switch($form_state['values']['admin_action']) {
+      case 'verify':
+        mo_project_verify_users($users);
+        break;
+      case 'block':
+        mo_project_block_users($users);
+        break;
+    }
+  } else {
+    $form_state['rebuild'] = TRUE;
+  }
+  
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $users Parameter_Description
+ *  @return  #TODO
+ *  
+ *  @details  2013
+ */
+function mo_project_verify_users($users) {
+  $verified_role = user_role_load_by_name('verified user');
+  foreach ($users as $user) {
+    $roles = $user->roles;
+    $roles[$verified_role->rid] = 'verified user';
+    user_save($user, array('roles' => $roles));
+    drupal_set_message('Verified: ' . format_username($user) . ' (UID ' . $user->uid . ')');
+  }
+}
+
+
+/**
+ *  @brief  #TODO
+ *  
+ *  @param [in] $users Parameter_Description
+ *  @return  #TODO
+ *  
+ *  @details  2013
+ */
+function mo_project_block_users($users) {
+  foreach ($users as $user) {
+    $user->status = 0;
+    user_save($user);
+    drupal_set_message('Blocked: ' . format_username($user) . ' (UID ' . $user->uid . ')');
+  }
+}
+
+/**
+ *  @brief  Creates a themed, empty webpage useful for displaying debug output
+ *  
+ *  @return  page
+ *  
+ *  @details  2013
+ */
+function mo_project_blank_page() {
+  return t('');
+}
+
+
+/**
+ *  @brief  Twitter button test
+ *  
+ *  @return  #TODO
+ *  
+ *  @details  2013
+ */
+function mo_project_button_test() {
+  $content = array(
+    0 => array(
+      '#markup' => 'foo',
+    ),
+    1 => array(
+      '#markup' => theme('twitter_button', array('content' => 'foo')),
+    ),
+    2 => array(
+      '#markup' => 'bar',
+    ),
+  );
+  return drupal_render($content);
+}
+
+
+
+
+
+/**
+ *  @brief  DEPRECATED. Long slow query returning all the leaderboard mileage totals Statewide
+ *  
+ *  @param [in] $period:  the time period to restrict the mileage records 
+ *                        - 'all': all mileage recorded, 
+ *                        - 'current': mileage logged to the current Challenge dates, or
+ *                        - 'thirty': mileage logged to the past thirty days of the current Challenge  
+ *  @param [in] $activity Optional. Taxonomy tid of the activity type
+ *  @param [in] $county   Optional. Taxonomy tid of the county of residence for the logged in user
+ *  @param [in] $ages     Optional. Taxonomy tid of the age bracket for the logged in user
+ *  @param [in] $gender   Optional. String value of the gender for the logged in user. ('male', 'female', 'undisclosed')
+ *  @return  array of mileage, keyed by the user 'uid' ('everyone' or 'peer group' gets -9 as uid)
+ *  
+ *  @details  2013 
+ *  If the $period param is 'all', the array contains:
+ *  - Total mileage since 6/1/2013 for all users (uid = -9),
+ *  - Total mileage since 6/1/2013 for Governor and First Lady (uid 162 and 163), and 
+ *  - Total mileage since 6/1/2013 for the logged in user
+ *
+ * If the $period param is 'current', the array contains:
+ *  - Total mileage within the Current Challenge dates for Governor and First Lady, and 
+ *  - Total mileage within the Current Challenge dates for the logged in user by activity (if available)
+ *    
+ * If the $period param is 'thirty', the array contains:
+ *  - AVERAGE 30-day mileage for peer group (uid = -9),
+ *  - Total 30-day mileage for the first- and second-place leaders in peer group, and
+ *  - Total 30-day mileage for the logged in user
+ *    by activity.
+ */
+function mo_project_get_leaderboard_mileage($period='current', $activity=FALSE, $county=FALSE, $ages=FALSE, $gender=FALSE) {
+  global $user;
+  global $static_users;
+  $leaderboard = array();
+
+  $first_dates = mo_project_get_challenge_dates_by_year(2013);
+  $current_dates = mo_project_get_challenge_dates_by_year();
+  switch($period) {
+    case 'all':
+      $min_date = $first_dates['start'];
+      $max_date = $current_dates['end'];
+      break;
+    case 'thirty':
+      $min_date = date('Y-m-d H:i:s', strtotime('tomorrow -31 days'));    
+      $max_date = date('Y-m-d H:i:s', strtotime('tomorrow -1 second'));
+      break;
+    default:
+      $min_date = $current_dates['start'];
+      $max_date = $current_dates['end'];        
+  }
+
+  if ($gender == 'undisclosed') {
+    $gender = FALSE;
+  }
+  
+  // Count only verified miles
+  $verified_role = user_role_load_by_name('verified user');
+  $admin_role = user_role_load_by_name('administrator');
+  
+  //$old_miles = mo_project_get_total_mileage(array(14), array(119));
+  //drupal_set_message('<pre>old miles from mo_project_get_total_mileage ' . print_r($old_miles, TRUE) . '</pre>');
+
+  // Get total miles
+  $subqry = db_select('node', 'n');
+  $subqry->join('users', 'u', 'n.uid = u.uid');
+  $subqry->join('users_roles', 'r', 'u.uid = r.uid');
+  $subqry->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $subqry->join('field_data_field_mileage_distance', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type AND d.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+  $subqry->fields('u', array('uid'));
+  $subqry->addExpression('SUM(d.field_mileage_distance_value)', 'miles');
+  $subqry->condition('n.type', 'mileage', '=');
+  $subqry->condition('n.status', 0, '<>');  
+  $subqry->condition('t.field_mileage_date_value', $min_date, '>=');
+  $subqry->condition('t.field_mileage_date_value', $max_date, '<');
+  $subqry->condition('u.status', 0, '>');
+  $subqry->condition('r.rid', array($verified_role->rid, $admin_role->rid));
+  $subqry->groupBy('u.uid');
+  $subqry->orderBy('miles', 'DESC');
+  $subqry->addTag('node_access');
+
+  // Get aggregate total miles
+  if ($period == 'all') {
+    $agg_miles = 0;
+    $query1 = db_select($subqry, 's');
+    $query1->fields('s');
+    $result1 = $query1->execute()->fetchAll();
+    foreach ($result1 AS $row) {
+      $agg_miles += $row->miles;
+    }
+    $leaderboard[-9] = round($agg_miles);
+  }
+  
+/*  // Get Governor and First Lady's total miles
+  $query2 = db_select($subqry, 's');
+  $query2->fields('s');
+  $query2->condition('uid', $static_users, 'IN');
+  $result2 = $query2->execute()->fetchAll();
+  foreach ($result2 AS $row) {
+    $leaderboard[$row->uid] = round($row->miles);
+  }
+  if (empty($leaderboard[$static_users['Governor']])) {
+    $leaderboard[$static_users['Governor']] = 0;
+  }
+  if (empty($leaderboard[$static_users['First Lady']])) {
+    $leaderboard[$static_users['First Lady']] = 0;
+  } */
+  
+  if ($activity != FALSE) {
+    $subqry->join('field_data_field_mileage_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+    $subqry->condition('a.field_mileage_activity_tid', $activity, '=');
+  } 
+
+  // Get logged-in user's total miles
+  $query3 = db_select($subqry, 's');
+  $query3->fields('s');
+  $query3->condition('uid', $user->uid, '=');
+  $result3 = $query3->execute()->fetchAll();
+  foreach ($result3 AS $row) {
+    $leaderboard[$row->uid] = round($row->miles);
+  }
+  if (empty($leaderboard[$user->uid])) {
+    $leaderboard[$user->uid] = 0;
+  }
+  
+  // Get average miles
+  if ($period == 'thirty') {
+    $user_30 = $leaderboard[$user->uid];
+    unset($leaderboard);
+
+    // Find most-specific peer group with 2 or more members
+    $qpeers = db_select('node', 'n');
+    $qpeers->join('users', 'u', 'n.uid = u.uid');
+    $qpeers->join('users_roles', 'r', 'u.uid = r.uid');    
+    $qpeers->join('field_data_field_mileage_date', 't', 'n.nid = t.entity_id AND (t.entity_type = :type AND t.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+    $qpeers->join('field_data_field_mileage_distance', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type AND d.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+    $qpeers->fields('u', array('uid'));
+    $qpeers->distinct();
+    $qpeers->condition('n.type', 'mileage');
+    $qpeers->condition('n.status', 0, '<>');  
+    $qpeers->condition('t.field_mileage_date_value', $min_date, '>=');
+    $qpeers->condition('t.field_mileage_date_value', $max_date, '<');
+    $qpeers->condition('u.status', 0, '>');  
+    $qpeers->condition('r.rid', array($verified_role->rid, $admin_role->rid));
+    $qpeers->addTag('node_access');
+    $peer_count['date_only'] = $qpeers->execute()->rowCount();
+
+    if ($activity != FALSE) {
+      $qpeers->join('field_data_field_mileage_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+      $qpeers->condition('a.field_mileage_activity_tid', $activity, '=');
+      $peer_count['activity'] = $qpeers->execute()->rowCount();
+    }
+
+    if ($gender != FALSE) {     
+      $qpeers->join('field_data_field_user_gender', 'g', 'u.uid = g.entity_id AND (g.entity_type = :type2 AND g.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+      $qpeers->condition('g.field_user_gender_value', $gender, '=');
+      $peer_count['gender'] = $qpeers->execute()->rowCount();      
+    }
+    
+    if ($ages != FALSE) {    
+      $qpeers->join('field_data_field_user_age', 'q', 'u.uid = q.entity_id AND (q.entity_type = :type2 AND q.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+      $qpeers->condition('q.field_user_age_tid', $ages, '=');
+      $peer_count['ages'] = $qpeers->execute()->rowCount();
+    }
+      
+/*    if ($county != FALSE) {
+      $qpeers->join('field_data_field_user_county', 'c', 'u.uid = c.entity_id AND (c.entity_type = :type2 AND c.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+      $qpeers->condition('c.field_user_county_tid', $county, '=');
+      $peer_count['county'] = $qpeers->execute()->rowCount();
+    }*/
+   
+    if ( ($gender != FALSE) AND ($peer_count['gender'] >= 2) ) {  
+      $subqry->join('field_data_field_user_gender', 'g', 'u.uid = g.entity_id AND (g.entity_type = :type2 AND g.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+      $subqry->condition('g.field_user_gender_value', $gender, '=');
+    }
+
+    if ( ($ages != FALSE) AND ($peer_count['ages'] >= 2) ) {  
+      $subqry->join('field_data_field_user_age', 'q', 'u.uid = q.entity_id AND (q.entity_type = :type2 AND q.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+      $subqry->condition('q.field_user_age_tid', $ages, '=');
+    }
+
+/*    if ( ($county != FALSE) AND ($peer_count['county'] >= 2) ) {  
+      $subqry->join('field_data_field_user_county', 'c', 'u.uid = c.entity_id AND (c.entity_type = :type2 AND c.deleted = :deleted)', array(':type2' => 'user', ':deleted' => 0));
+      $subqry->condition('c.field_user_county_tid', $county, '=');    
+    }*/
+    
+    // Get average 30-day miles for all peers
+    $avg_miles = 0;
+    $tot_peers = 0;
+    $query4 = db_select($subqry, 's');
+    $query4->fields('s');
+    $result4 = $query4->execute()->fetchAll();
+    foreach ($result4 AS $row) {
+      $avg_miles += $row->miles;
+      $tot_peers++;
+    }
+    if ($tot_peers == 0) {
+      $leaderboard[-9] = 0;
+    } else {
+      $leaderboard[-9] = round($avg_miles / $tot_peers);
+    }
+    
+    // Get top two peer leaders
+    $query5 = db_select($subqry, 's');
+    $query5->fields('s');
+    $query5->range(0,2);
+    $result5 = $query5->execute()->fetchAll();
+    foreach ($result5 AS $row) {
+      $leaderboard[$row->uid] = round($row->miles);
+    }
+
+    // Add logged-in user's 30-day miles
+    $leaderboard[$user->uid] = $user_30;    
+  }  
+    
+  return $leaderboard;
+}
+
+
+/**
+ * Implements hook_action_info().
+ */
+/*
+function mo_project_action_info() {
+  $actions = array(
+    'mo_project_update_leaderboard_activity_stats_table' => array(
+      'label' => t('Update leaderboard table'),
+      'type' => 'system',
+      'configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+  );
+  return $actions;
+} */
+
+
+/*
+function mo_project_use_admin_theme() {
+  return 'mogov_admin';
+} */
+
+
+/*
+function mo_project_get_walks($uid=FALSE) {
+  $query = db_select('node', 'n');
+  $query->addField('n', 'nid', 'nid');
+  $query->condition('n.type', 'walk');
+  $query->condition('n.status', '0', '<>');
+  if ($uid) {
+    $query->condition('n.uid', $uid);
+  }
+  $result = $query->execute();
+  $nids = array();
+  foreach ($result as $row) {
+    $nids[] = $row->nid;
+  }
+  $nodes = entity_load('node', $nids);
+  return $nodes;
+} */

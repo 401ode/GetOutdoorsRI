@@ -1,0 +1,8 @@
+name = default Environment
+description = Environmental settings and module activations/deactivations.
+core = 7.x
+package = Site: default
+version = 7.x-1.0
+project = default_environment
+dependencies[] = ctools
+dependencies[] = environment_indicator

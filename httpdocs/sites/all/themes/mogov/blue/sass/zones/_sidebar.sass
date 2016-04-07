@@ -1,0 +1,58 @@
+@import "susy"
+@import "../variables/_layout"
+
+.sidebar-wrapper,
+.sidebar-block
+
+  border: 1px solid $brand-secondary-border
+  border-top: 0
+  background: $brand-secondary 
+  margin-top: 20px
+
+  p,
+  dl,
+  ol
+    margin: 5px 14px 
+
+  h2,
+  h3 
+    margin: 0
+    background-color: $brand-secondary-header
+    color: $gray
+    line-height: 1.75em
+    padding: 10px
+    border-top: 1px solid $brand-secondary-border
+    border-bottom: 1px solid $brand-secondary-border
+    height: auto
+
+  h4 
+    margin-left: 10px
+
+  ul
+    padding: 0
+    margin: 0 0 1px 0
+
+    li
+      list-style-type: disc
+      line-height: 1em
+      margin: 10px 5px 10px 25px
+ 
+      a
+        text-decoration: none
+        font-size: $font-size-small
+        color: $brand-primary
+      
+        &:hover,
+        &:focus
+          text-decoration: underline
+
+    ul 
+      border: 0
+
+    address, 
+    address 
+      margin: 12px 10px
+      
+  .menu .leaf
+    list-style-type: disc
+    list-style-image: none

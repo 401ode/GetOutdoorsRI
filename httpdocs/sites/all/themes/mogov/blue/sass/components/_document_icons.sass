@@ -1,0 +1,32 @@
+// Sprites
+$document_icons: sprite-map("document_icons/*.png") // define a sprite map
+
+.pdf-label,
+.doc-label,
+.xls-label,
+.ppt-label,
+.xml-label,
+.zip-label
+  width: 16px
+  height: 16px
+  display: inline-block
+  vertical-align: text-top
+  margin-left: 5px
+
+.pdf-label
+  @include get-sprite($document_icons, 'pdf_icon')
+  
+.doc-label
+  @include get-sprite($document_icons, 'doc_icon')
+  
+.xls-label
+  @include get-sprite($document_icons, 'xls_icon')
+  
+.ppt-label
+  @include get-sprite($document_icons, 'ppt_icon')
+
+.xml-label
+  @include get-sprite($document_icons, 'xml_icon')
+  
+.zip-label
+  @include get-sprite($document_icons, 'zip_icon')

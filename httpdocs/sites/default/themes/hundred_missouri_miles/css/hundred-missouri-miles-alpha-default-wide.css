@@ -1,0 +1,69 @@
+/**
+ * This file will hold styles that are loaded using the same media query as the
+ * wide grid.
+ */
+
+
+#block-system-user-menu h2.block-title {
+	font-size: 1.5em;
+	line-height: 1.2em;
+
+}
+
+#block-menu-menu-secondary-menu li a {
+	font-size: 1em;
+
+}
+
+/*.menu-level-1 li {
+	margin-right: 30px!important;
+}*/
+
+#block-system-user-menu li a {
+	font-size: 1.3em;
+
+}
+
+#block-mo-project-log-mileage-form #edit-location-facility {
+    max-width: 340px;
+}
+
+.welcome-msg {
+	height: 270px;
+}
+
+#global-stats-total h3 {
+	font-size: 36px;
+	line-height: 1em;
+}
+
+.mileage-box .mileage,
+.mileage-box.thirty-day .mileage {
+	font-size: 48px;
+}
+
+.mileage-box .mileage-label,
+.mileage-box.thirty-day .mileage-label {
+	font-size: 16px;
+}
+
+
+#mo-project-add-mileage-form #edit-distance {
+	width: auto!important;
+}
+
+.pane-current-challenge-miles-home h2.pane-title {
+	font-size: 24px;
+}
+
+select#edit-subuser {
+	max-width: 150px;
+}
+
+#mo-project-add-subuser-form input#edit-name {
+	width: 100px!important;
+}
+
+
+
+

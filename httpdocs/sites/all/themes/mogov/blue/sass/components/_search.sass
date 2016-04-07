@@ -1,0 +1,111 @@
+@import "susy"
+@import "../variables/_layout"
+
+#block-mogov-gsa-search 
+  margin: 0
+  padding: 0
+  
+  h2
+    display: none
+
+#mogov-gsa-search-form 
+  width: 90%
+  margin: 0
+  position: relative
+
+  fieldset
+    width: 100%
+    position: relative
+
+  label 
+    display: none
+
+  input[type=search], 
+  input[type=text]  
+    position: relative
+    width: 80%
+    height: 30px
+    padding-left: 5px
+    padding-right: 30px
+    border-radius: 3px
+    border: none
+    margin: 0
+    font-size: $font-size-base
+
+
+  input[type=submit] 
+    position: absolute
+    top: 0
+    right: 15%
+    display: inline-block
+    height: 16px
+    width: 12px
+    cursor: pointer
+    background: transparent url('/sites/all/themes/mogov/blue/images/mainsprite.png') -251px -141px no-repeat
+    border: none
+    color: transparent!important
+    z-index: 1
+    border-radius: 0
+    box-shadow: none
+    filter: none
+
+  input[type=submit]:hover, 
+  input[type=submit]:focus 
+    text-decoration: none
+    outline: none
+
+
+/* Suggestion list */
+#autocomplete 
+  border: 1px solid $gray
+  overflow: visible
+  background: $white
+
+#autocomplete ul 
+  margin: 6px 0
+
+#autocomplete li 
+  background: $white
+  color: $gray
+  cursor: pointer
+  white-space: normal
+  text-align: left
+  padding: 6px
+  display: block
+
+#autocomplete li.selected 
+  background: $blue-darker
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+    
+
+// Desktop
+@include at-breakpoint($desk)   
+    
+  #block-mogov-gsa-search 
+    width: 25%
+    float: left
+    position: relative
+    top: -6px
+    right: 4px
+
+  #mogov-gsa-search-form 
+    width: 100%
+    margin: 0 
+    
+    fieldset 
+      margin-bottom: 0 
+
+    input[type=search], 
+    input[type=text] 
+      background: $brand-primary
+      color: #a0b4d0
+      width: 100%
+
+    input[type=submit] 
+      right: -15px
+
+    .form-item  
+      margin-top: 0
+      margin-bottom: 0

@@ -1,0 +1,113 @@
+// Sprites
+@import 'news_icons/*.png'
+
+/*search results */
+
+.mo-cms-search-result-url 
+  font-size: $font-size-small
+
+.mo-cms-search-result-desc, 
+.mo-cms-search-result-url 
+  display: block
+
+
+.mo-cms-gsa-search-result h3 a 
+  font-weight: bold
+
+/*mo cms contact*/
+
+.node-mo-cms-contact h2.node-title 
+  border-bottom: none 
+  font-size: $font-size-h4
+  margin: 0
+
+.field-name-field-mo-cms-phone-numbers-label .field-item 
+  float: left
+  font-weight: bold
+  margin-right: 10px
+
+  .field-item:after	
+    content: ': '
+
+.field-name-field-mo-cms-news-deck-copy 
+  font-style: italic
+  margin-bottom: 10px
+  font-weight: bold
+
+/*mo cms news release*/
+
+.node-type-mo-cms-news-release .section-content h1 
+  background: none
+  border: none
+  color: $gray
+  padding: 0
+  filter: none
+  line-height: 1.2em
+
+  .date-display-single 
+    font-weight: bold
+    margin-bottom: 10px
+    display: block
+
+ol.search-results 
+  list-style-type: none
+  margin-left: 0
+
+.search-results .title 
+  font-family: $font-family-sans-serif
+  font-size: 1.2em
+
+.mo-cms-gsa-search-result h3 a 
+  font-weight: normal
+
+#mo-cms-search-pager 
+  margin: 12px 0
+
+  .prev, 
+  .next 
+    margin-right: 100px
+
+/*contact node title*/
+
+.embedded-contact-name 
+  font-size: $font-size-h5
+  font-weight: bold
+  color: $gray
+
+.drupal-navbar .navbar-tray a 
+  font-weight: normal
+
+/*fix shortcut button in toolbar */
+.drupal-navbar .edit-shortcuts 
+  padding: 1em 1.3333em
+  width: 140px
+  float: left
+
+/*related news*/
+ul.mo-cms-news-items 
+  margin: 0
+  padding: 0
+
+  li
+    @include news_icons-sprite('pressrelease')
+    list-style-type: none
+    padding: 0 10px 12px 25px
+    line-height: 1.2em
+    margin: 8px 0 12px 0 
+    border-bottom: 1px solid #e0dcdc
+
+    &:last-child 
+      border-bottom: none
+
+    a 
+      font-weight: normal
+
+    .with-image 
+      @include news_icons-sprite('with-image')
+
+    .with-video 
+      @include news_icons-sprite('with-video')
+
+
+
+

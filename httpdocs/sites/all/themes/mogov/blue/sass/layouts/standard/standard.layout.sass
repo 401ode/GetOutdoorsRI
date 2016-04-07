@@ -1,0 +1,43 @@
+/*******************************************************************************
+ * standard.layout.sass
+ ******************************************************************************/
+@import "susy"
+@import "../../variables/_layout"
+
+// Mobile
+.l-zone
+  .l-container
+    @include container // Define these elements as the grid containers.
+    margin-bottom: $vert-spacing-unit
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  .l-zone
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .l-branding
+        @include span-columns(6, 12)
+      .l-header-content
+        @include span-columns(6 omega, 12)
+  .with-sidebar
+    .l-main
+      .l-content
+        @include span-columns(8, 12)
+      .region-sidebar
+        @include span-columns(4 omega, 12)
+
+// Desktop
+@include at-breakpoint($desk)
+  .l-zone
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .l-branding
+        @include span-columns(10, 24)
+      .l-header-content
+        @include span-columns(14 omega, 24)
+  .with-sidebar
+    .l-main
+      .l-content
+        @include span-columns(16, 24)
+      .region-sidebar
+        @include span-columns(8 omega, 24)

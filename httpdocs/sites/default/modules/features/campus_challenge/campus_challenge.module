@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Campus Challengefeature.
+ */
+
+include_once 'campus_challenge.features.inc';

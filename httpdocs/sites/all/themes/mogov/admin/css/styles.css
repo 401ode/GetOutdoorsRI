@@ -1,0 +1,253 @@
+@font-face {
+  font-family: "Bitstream Vera Sans Mono";
+  src: url('../fonts/VeraMono.ttf') format('truetype');
+}
+
+input[id^="edit-submit"],
+input[id^="edit-submit"]:hover,
+input[id^="edit-submit"]:focus {
+  background: white;
+  color: black;
+  text-shadow: none;
+  text-align: left;
+  font-weight: normal;
+  border: 1px solid #f79521;
+}
+
+input[id^="edit-submit"][type="checkbox"] {
+  -webkit-appearance: checkbox;
+}
+input[id^="edit-submit"][type="radio"] {
+  -webkit-appearance: radio;
+}
+
+/*
+ * Fixes for some odd little bugs in Ember
+ */
+.page-admin-config .admin .left.clearfix {
+  clear: left;
+}
+.page-admin-config .admin .right.clearfix {
+  clear: right;
+}
+
+.ember .breadcrumb .menu-minipanel-panel {
+  display: none;
+}
+
+#page {
+  margin: 1.5rem 2.25em 3em;
+  position: relative;
+}
+
+.page-admin-config-mogov-api-keys form {
+  background: white;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.linkit-wrapper {
+  z-index: 10000;
+}
+
+td.ctools-export-ui-operations {
+  overflow: visible;
+}
+
+.form-item.form-type-checkbox.form-item-notify {
+  border: 1px solid #f79521;
+  display: inline-block;
+  padding: 10px;
+  margin-top: 20px;
+  background: #fde5cb;
+}
+
+.tips,
+.description {
+  opacity: 0.8;
+}
+
+.views-ui-display-tab-actions .ctools-button-processed input,
+.views-ui-display-tab-actions .ctools-button-processed input:hover,
+.views-ui-display-tab-actions .ctools-button-processed input:focus {
+  color: #1695a3;
+  text-shadow: none;
+}
+
+.views-ui-display-tab-actions .ctools-button-processed input:hover,
+.views-ui-display-tab-actions .ctools-button-processed input:focus {
+  color: #2a7d87;
+}
+
+#mediaBrowser {
+  z-index: 1002;
+}
+
+/*
+ * Override some of Ember's styles for aesthetic reasons
+ */
+a,
+a:link,
+a:visited,
+.action-links li:before {
+  color: #1695a3;
+}
+a:hover, a:focus,
+a:link:hover,
+a:link:focus,
+a:visited:hover,
+a:visited:focus,
+.action-links li:before:hover,
+.action-links li:before:focus {
+  color: #2a7d87;
+}
+
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"],
+[class*="action-item"],
+.button,
+[id^="edit-cancel"] {
+  background: #eb7f00;
+  color: white;
+  text-shadow: 0 1px 0 #444444;
+}
+button:hover, button:focus,
+input[type="reset"]:hover,
+input[type="reset"]:focus,
+input[type="submit"]:hover,
+input[type="submit"]:focus,
+input[type="button"]:hover,
+input[type="button"]:focus,
+[class*="action-item"]:hover,
+[class*="action-item"]:focus,
+.button:hover,
+.button:focus,
+[id^="edit-cancel"]:hover,
+[id^="edit-cancel"]:focus {
+  background: #ff8b03;
+  color: white;
+  text-shadow: 0 1px 0 #444444;
+}
+
+img, video, audio, figure {
+  display: inline-block;
+  margin: 0;
+}
+
+/*
+ * Generic form element styles
+ */
+.form-item label {
+  margin-top: 10px;
+}
+
+legend {
+  padding-top: 10px;
+}
+legend .fieldset-legend {
+  font-size: 1.25em;
+  padding: 0 0 3px;
+  border-bottom: 1px solid #dddddd;
+  font-weight: 200;
+}
+
+.mono {
+  font-family: "Bitstream Vera Sans Mono";
+}
+
+.node-form .form-item-title label,
+.entity-form .form-item-title label {
+  font-size: 1.75em;
+}
+.node-form #edit-title,
+.entity-form #edit-title {
+  width: 100%;
+  color: #666666;
+  font-size: 1.5em;
+  font-weight: bold;
+  -webkit-border-radius: 8px 8px;
+  -moz-border-radius: 8px / 8px;
+  border-radius: 8px / 8px;
+}
+
+.page-admin-dashboard {
+  background: #eeeeee;
+}
+.page-admin-dashboard .panel-pane {
+  -webkit-border-radius: 10px 10px;
+  -moz-border-radius: 10px / 10px;
+  border-radius: 10px / 10px;
+  padding: 4px 12px 30px 12px;
+  margin-bottom: 25px;
+  background: white;
+  -webkit-transition-property: background;
+  -moz-transition-property: background;
+  -o-transition-property: background;
+  transition-property: background;
+  -webkit-transition-duration: 400ms;
+  -moz-transition-duration: 400ms;
+  -o-transition-duration: 400ms;
+  transition-duration: 400ms;
+}
+.page-admin-dashboard .panel-pane h2 {
+  font-size: 1.85em;
+  font-weight: bold;
+  color: #225378;
+  padding-top: 0.2em;
+  border-bottom: 2px solid #eb7f00;
+  margin: 0 0 0.5em 0;
+  -webkit-transition-property: color;
+  -moz-transition-property: color;
+  -o-transition-property: color;
+  transition-property: color;
+  -webkit-transition-duration: 400ms;
+  -moz-transition-duration: 400ms;
+  -o-transition-duration: 400ms;
+  transition-duration: 400ms;
+}
+.page-admin-dashboard .panel-pane:hover {
+  background: #f5fafd;
+}
+.page-admin-dashboard .panel-pane:hover h2 {
+  color: #555555;
+}
+.page-admin-dashboard .panel-pane .pane-content {
+  padding-bottom: 4px;
+}
+.page-admin-dashboard .panel-pane .pane-content .edit-link {
+  float: right;
+}
+.page-admin-dashboard ul.admin-list {
+  margin-bottom: 0;
+}
+.page-admin-dashboard ul.admin-list .label {
+  font-size: 1.1em;
+}
+.page-admin-dashboard table .views-field-title {
+  max-width: 300px;
+}
+.page-admin-dashboard .views-exposed-form .views-exposed-widget .form-submit {
+  margin-top: 0;
+}
+.page-admin-dashboard input::-webkit-input-placeholder {
+  color: #aaaaaa;
+  font-weight: bold;
+}
+.page-admin-dashboard input:-moz-placeholder {
+  color: #aaaaaa;
+  font-weight: bold;
+}
+.page-admin-dashboard input::-moz-placeholder {
+  color: #aaaaaa;
+  font-weight: bold;
+}
+.page-admin-dashboard input:-ms-input-placeholder {
+  color: #aaaaaa;
+  font-weight: bold;
+}
+.page-admin-dashboard .views-widget-filter-filename label,
+.page-admin-dashboard .views-widget-filter-title label {
+  display: none;
+}

@@ -1,0 +1,91 @@
+@import 'susy'
+@import '../variables/_layout'
+
+// Sprites
+$social_icons: sprite-map("social_icons/*.png") // define a sprite map
+
+#block-mogov-blocks-social-bar 
+  width: auto
+  margin: 10px auto
+  height: 31px
+  
+  h2
+    display: none
+
+  .social-bar-item 
+    float: left
+    list-style-type: none
+    margin-right: 3px 
+
+    a 
+      display: inline-block
+
+    .rss 
+      @include get-sprite($social_icons, 'rss_hover')
+
+    .facebook 
+      @include get-sprite($social_icons, 'facebook_hover')
+
+    .twitter
+      @include get-sprite($social_icons, 'twitter_hover')
+
+    .youtube 
+      @include get-sprite($social_icons, 'youtube_hover')
+
+    .email 
+      @include get-sprite($social_icons, 'email_hover')
+
+    .flickr 
+      @include get-sprite($social_icons, 'flickr_hover')
+
+    
+    &:hover, 
+    &:focus
+      margin-top: -1px
+
+// Desktop
+@include at-breakpoint($desk)
+
+  .region-header-content-2
+    display: block
+    position: relative
+    top: 30px
+    
+  #block-mogov-blocks-social-bar 
+    height: 22px 
+    width: auto
+    position: relative
+    right: 0
+    float: right 
+    top: -15px
+
+    .social-bar-item 
+      display: inline-block	
+      margin: 0 
+      padding: 0
+      float: left 
+
+      a 
+        background-repeat: no-repeat
+
+      .rss 
+        @include get-sprite($social_icons, 'utility_rss')
+
+      .facebook 
+        @include get-sprite($social_icons, 'utility_facebook')
+
+      .twitter
+        @include get-sprite($social_icons, 'utility_twitter')
+
+      .youtube 
+        @include get-sprite($social_icons, 'utility_youtube')
+
+      .email 
+        @include get-sprite($social_icons, 'utility_email')
+
+      .flickr 
+        @include get-sprite($social_icons, 'utility_flickr')
+
+      .googleplus 
+        @include get-sprite($social_icons, 'utility_googleplus')
+

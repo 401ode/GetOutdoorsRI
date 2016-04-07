@@ -1,0 +1,33 @@
+/*******************************************************************************
+ * panes-3-a.layout.sass
+ *
+ * Styling of the "3 Panes A" layout.
+ ******************************************************************************/
+@import "susy"
+@import "../../../variables/_layout"
+
+// Mobile
+.panel-display--panes-3-a
+  .l-container
+    @include container // Define these elements as the grid containers.
+    margin-bottom: $vert-spacing-unit
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  .panel-display--panes-3-a
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .panes-3-a-region--row2-col1
+        @include span-columns(8, 12)
+      .panes-3-a-region--row2-col2
+        @include span-columns(4 omega, 12)
+
+// Desktop
+@include at-breakpoint($desk)
+  .panel-display--panes-3-a
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .panes-3-a-region--row2-col1
+        @include span-columns(16, 24)
+      .panes-3-a-region--row2-col2
+        @include span-columns(8 omega, 24)

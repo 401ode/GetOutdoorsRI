@@ -1,0 +1,32 @@
+/*******************************************************************************
+ * columns-2-a.layout.scss
+ *
+ * Styling of the "2 Columns A" layout.
+ ******************************************************************************/
+@import "susy"
+@import "../../../variables/_layout"
+
+// Mobile
+.panel-display--columns-2-a
+  .l-container
+    @include container // Define these elements as the grid containers.
+    margin-bottom: $vert-spacing-unit
+
+// Tablet
+@include at-breakpoint($tab) // At a given Susy Media Layout, use a given amount of columns.
+  .panel-display--columns-2-a
+    .l-container
+      @include set-container-width // Reset only the container width (elements have already been declared as containers).
+      .columns-2-a-region--column-1
+        @include span-columns(6, 12)
+      .columns-2-a-region--column-2
+        @include span-columns(6 omega, 12)
+
+// Desktop
+@include at-breakpoint($desk)
+  .panel-display--columns-2-a
+    .l-container
+      .columns-2-a-region--column-1
+        @include span-columns(12, 24)
+      .columns-2-a-region--column-2
+        @include span-columns(12 omega, 24)

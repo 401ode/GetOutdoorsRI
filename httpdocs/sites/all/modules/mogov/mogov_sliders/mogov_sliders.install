@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function mogov_sliders_schema() {
+  
+  $schema = array();
+   
+  $schema['mogov_sliders'] = array(
+    'description' => 'The base table for the Slider entity',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary key of the Slider entity',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'bundle' => array(
+        'description' => 'Slider type.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => FALSE,
+      ),
+      'title' => array(
+        'description' => 'Slider title.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  
+  return $schema;
+}
+
+/**
+ * Implements hook_enable
+ *
+ * Create some fields
+ */
+function mogov_sliders_enable() {
+  $check = mogov_sliders_enable_fields();
+  $check = mogov_sliders_enable_field_groups();
+}
+
+
+function mogov_sliders_enable_fields() {
+
+  mogov_helpers_load('check_field_instance');
+  include('install/field_bases.inc');
+  include('install/field_instances.inc');
+
+  foreach ($field_bases as $field_name=>$config) {
+    if (!field_info_field($field_name)) {
+      field_create_field($config);
+      watchdog('mogov_sliders', t('!field_name was added successfully.', array('!field_name' => $field_name)));
+    } else {
+      watchdog('mogov_sliders', t('!field_name already exists.', array('!field_name' => $field_name)));
+    }
+  }
+
+  foreach ($field_instances as $field_name=>$field) {
+    foreach ($field['attach_to'] as $bundle) {
+      if (!check_field_instance($field_name, $field['instance']['entity_type'], $bundle)) {
+        $field['instance']['bundle'] = $bundle;
+        field_create_instance($field['instance']);
+        watchdog('mogov_sliders', t('!field_name instance was added successfully.', array('!field_name' => $field_name)));
+      } else {
+        watchdog('mogov_sliders', t('!field_name instance already exists.', array('!field_name' => $field_name)));
+      }
+    }
+  }
+  
+  return TRUE;
+
+}
+
+function mogov_sliders_enable_field_groups() {
+  include('install/field_groups.inc');
+  $new_group = new stdClass();
+  $new_group->disabled = FALSE;
+  $new_group->api_version = 1;
+  $new_group->mode = 'form';
+  foreach ($field_groups as $field_group) {
+    if (!field_group_exists($field_group['group_name'], $field_group['entity_type'], $field_group['bundle'], 'form')) {
+      $new_group->group_name = $field_group['group_name'];
+      $new_group->label = $field_group['label'];
+      $new_group->identifier = $field_group['identifier'];
+      $new_group->entity_type = $field_group['entity_type'];
+      $new_group->bundle = $field_group['bundle'];
+      $new_group->parent_name = $field_group['parent_name'];
+      $new_group->weight = $field_group['weight'];
+      $new_group->format_type = $field_group['format_type'];
+      $new_group->format_settings = $field_group['format_settings'];
+      $new_group->children = $field_group['children'];
+      field_group_group_save($new_group);
+      watchdog('slider install', 'Added field group: ' . $new_group->identifier);
+    } else {
+      watchdog('slider install', 'Field group exists: ' . $new_group->identifier);
+    }
+  }
+  return TRUE;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function mogov_sliders_uninstall() {
+  include('install/field_bases.inc');
+  field_group_field_attach_delete_bundle('field_collection_item', 'field_mogov_slides_images');
+  field_group_field_attach_delete_bundle('field_collection_item', 'field_mogov_slides_titles');
+  field_group_field_attach_delete_bundle('field_collection_item', 'field_mogov_slider_flex_options');
+  field_group_field_attach_delete_bundle('mogov_slider', 'mogov_slider_images');
+  field_group_field_attach_delete_bundle('mogov_slider', 'mogov_slider_titles');
+  field_attach_delete_bundle('field_collection_item', 'field_mogov_slides_images');
+  field_attach_delete_bundle('field_collection_item', 'field_mogov_slides_titles');
+  field_attach_delete_bundle('field_collection_item', 'field_mogov_slider_flex_options');
+  field_attach_delete_bundle('mogov_slider', 'mogov_slider_images');
+  field_attach_delete_bundle('mogov_slider', 'mogov_slider_titles');
+  foreach ($field_bases as $field_name=>$config) {
+    field_delete_field($field_name);
+  }
+}
+
+/**
+ * Add "Create Block" field to sliders.
+ */
+function mogov_sliders_update_7001() {
+  mogov_helpers_load('check_field_instance');
+  include('install/field_bases.inc');
+  include('install/field_instances.inc');
+  include('install/field_groups.inc');
+  $field_name = 'field_mogov_slider_create_block';
+  $field = $field_bases[$field_name];
+  field_create_field($field);
+  $field = $field_instances[$field_name];
+  foreach ($field['attach_to'] as $bundle) {
+    if (!check_field_instance($field_name, $field['instance']['entity_type'], $bundle)) {
+      $field['instance']['bundle'] = $bundle;
+      field_create_instance($field['instance']);
+      watchdog('mogov_sliders', t('!field_name instance was added successfully.', array('!field_name' => $field_name)));
+    } else {
+      watchdog('mogov_sliders', t('!field_name instance already exists.', array('!field_name' => $field_name)));
+    }
+  }
+  foreach (array('mogov_slider_images', 'mogov_slider_titles') as $bundle) {
+    $field_group = field_group_load_field_group('group_tab_config', 'mogov_slider', $bundle, 'form');
+    $field_group->children = array(
+      0 => 'field_mogov_slider_create_block',
+      1 => 'field_mogov_slider_flex_options',
+    );
+    field_group_group_save($field_group);
+  }
+}

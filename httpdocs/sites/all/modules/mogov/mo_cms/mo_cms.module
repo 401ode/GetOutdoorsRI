@@ -1,0 +1,287 @@
+<?php
+/**
+ * @file
+ * Code for the MO CMS feature.
+ */
+
+include_once 'mo_cms.features.inc';
+
+function mo_cms_init() {
+  $module_path = drupal_get_path('module', 'mo_cms');
+  module_load_include('inc', 'mo_cms', 'includes/form_alterations');
+  module_load_include('inc', 'mo_cms', 'includes/social_bar');
+  drupal_add_css($module_path . '/css/mo_cms.css');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function mo_cms_menu() {
+
+  global $base_url;
+  $items = array();
+
+  $items['admin/config/mo-cms'] = array(
+    'title'            => 'MO CMS',
+    'description'      => 'Configuration for the MO CMS system',
+    'page callback'    => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file'             => 'system.admin.inc',
+    'file path'        => drupal_get_path('module', 'system'),
+    'position'         => 'right',
+  );
+
+  $items['admin/config/mo-cms/config'] = array(
+    'title' => 'MO CMS: Configure Site',
+    'description' => 'Base configuration for the MO CMS suite',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('variable_module_form', 'mo_cms'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_variable_group_info().
+ */
+function mo_cms_variable_group_info() {
+  $groups['mo_cms_agency_info'] = array(
+    'title' => t('Agency configuration'), 
+    'description' => t('Basic information about the agency that owns this site.'),
+    'access' => 'administer site configuration', 
+    'path' => array('admin/config/system/site-information', 'admin/config/development/maintenance'),
+  );
+  $groups['mo_cms_agency_social_bar'] = array(
+    'title' => t('Social settings'), 
+    'description' => t('Information required to build the agency\'s social bar in the header.'), 
+    'access' => 'administer site configuration',
+  );
+  return $groups;
+}
+
+/**
+ * Implements hook_variable_info().
+ */
+function mo_cms_variable_info($options) {
+  
+  global $base_url;
+  $variables = array();
+
+  $variables['mo_cms_governor_name'] = array(
+    'title' => t('Governor', array(), $options),
+    'description' => t('Governor\'s full name.'),
+    'group' => 'mo_cms_agency_info',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => '',
+  );
+
+  $variables['mo_cms_governor_url'] = array(
+    'title' => t('Governor site URL', array(), $options),
+    'description' => t('URL to the Governor\'s website.'),
+    'group' => 'mo_cms_agency_info',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => '',
+  );
+
+  $variables['mo_cms_agency_name'] = array(
+    'title' => t('Agency Name', array(), $options),
+    'description' => t('Full name of the agency that owns the site.'),
+    'group' => 'mo_cms_agency_info',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => '',
+  );
+
+  $variables['mo_cms_agency_head'] = array(
+    'title' => t('Agency Head', array(), $options),
+    'description' => t('Full name of the head of the agency that owns the site.'),
+    'group' => 'mo_cms_agency_info',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => '',
+  );
+
+  $variables['mo_cms_agency_head_title'] = array(
+    'title' => t('Agency Head Title', array(), $options),
+    'description' => t('Title of the head of the agency that owns the site (e.g., "Commissioner").'),
+    'group' => 'mo_cms_agency_info',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => '',
+  );
+
+  $variables['mo_cms_agency_url'] = array(
+    'title' => t('Agency URL', array(), $options),
+    'description' => t('URL to the website of the agency that owns this website (may be same as this site).'),
+    'group' => 'mo_cms_agency_info',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => $base_url,
+  );
+  
+  $variables['mo_cms_social_bar_mailto'] = array(
+    'title' => t('Mailto Address', array(), $options),
+    'description' => t('The Email address for which the social bar should build a mailto link.'),
+    'group' => 'mo_cms_agency_social_bar',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => NULL,
+  );
+  
+  $variables['mo_cms_social_bar_youtube'] = array(
+    'title' => t('YouTube channel', array(), $options),
+    'description' => t('The YouTube channel to which the social bar should link.'),
+    'group' => 'mo_cms_agency_social_bar',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => NULL,
+  );
+  
+  $variables['mo_cms_social_bar_twitter'] = array(
+    'title' => t('Twitter Account', array(), $options),
+    'description' => t('The Twitter account to which the social bar should link.'),
+    'group' => 'mo_cms_agency_social_bar',
+    'type' => 'string',
+    'access' => 'access administration pages',
+    'default' => NULL,
+  );
+  
+  return $variables;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mo_cms_theme() {
+  return array(
+    'mo_cms_leadership' => array(
+      'arguments' => array(),
+      'template'  => 'mo-cms-leadership',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function mo_cms_block_info() {
+  $blocks['leadership']['info'] = t('MO CMS: Leadership block');
+  $block_contacts = mo_cms_find_contacts(TRUE);
+  if ($block_contacts) {
+    foreach ($block_contacts as $block_contact) {
+      $blocks['mo_cms_contact_' . $block_contact->nid]['info'] = t('MO CMS Contact: ' . $block_contact->title);
+    }
+  }
+  $blocks['social_bar']['info'] = t('MO CMS: Social bar');
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function mo_cms_block_view($delta = '') {
+
+  $block = array();
+  
+  switch ($delta) {
+    
+    case 'leadership':
+      $block['subject'] = t('Leadership');
+      $block['content'] = theme('mo_cms_leadership',
+                                array('governor' => variable_get_value('mo_cms_governor_name'),
+                                      'governor_url' => variable_get_value('mo_cms_governor_url'),
+                                      'agency_name' => variable_get_value('mo_cms_agency_name'),
+                                      'agency_head' => variable_get_value('mo_cms_agency_head'),
+                                      'agency_head_title' => variable_get_value('mo_cms_agency_head_title'),
+                                      'agency_url' => variable_get_value('mo_cms_agency_url')));
+      break;
+    
+    case 'social_bar':
+      $block = mo_cms_social_bar();
+      break;
+      
+  }
+  
+  if (preg_match('/^mo\_cms\_contact\_/', $delta)) {
+    $matches = array();
+    $match = preg_match('/^mo\_cms\_contact\_(\d+)$/', $delta, $matches);
+    if (!empty($matches[1])) {
+      $nodes = entity_load('node', array($matches[1]));
+      if (!$nodes) {
+        return FALSE;
+      }
+      $node = $nodes[$matches[1]];
+      $node_render_array = node_view($node, 'embedded_contact');
+      $render_array = array(
+        '#type' => 'container',
+        '#attributes' => array(),
+        0 => $node_render_array,
+      );
+      $block['subject'] = t($node->title);
+      $block['content'] = t(render($render_array));
+    }
+  }
+  
+  return $block;
+
+}
+
+/**
+ * Find contact nodes
+ */
+function mo_cms_find_contacts($block_enabled=FALSE) {
+  $query = db_select('node', 'n');
+  $query->addField('n', 'nid');
+  $query->condition('n.type', 'mo_cms_contact');
+  $query->condition('n.status', 0, '>');
+  $query->orderBy('n.title', 'ASC');
+  if ($block_enabled and db_table_exists('field_data_field_mo_cms_create_block')) {
+    $query->join('field_data_field_mo_cms_create_block', 'b', 'n.nid = b.entity_id AND (b.entity_type = :type AND b.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
+    $query->condition('b.field_mo_cms_create_block_value', 1);
+  }
+  $results = $query->execute();
+  $contact_nids = array();
+  foreach ($results as $row) {
+    $contact_nids[] = $row->nid;
+  }
+  if (!$contact_nids) {
+    return NULL;
+  }
+  $contacts = entity_load('node', $contact_nids);
+  return $contacts;
+}
+
+/**
+ * Hack the core link element to use IMCE
+ * https://drupal.org/node/916076#comment-3522924
+ */
+function mo_cms_link($element) {
+  static $imce_access;
+  if (!isset($imce_access) && ($imce_access = (bool) module_invoke('imce', 'access'))) {
+    drupal_add_js('
+(function($) {Drupal.behaviors.imceLinkFields = function(context) {
+  $.each(Drupal.settings.imceLinkFields || [], function(i, fid) {
+    var $field = $("#" + fid, context);
+    if ($field.size() && !$field.is(".imce-processed")) {
+      var $button = $(document.createElement("input")).attr({type: "button", value: "Browse"}).click(function() {
+        window.open("' . url('imce', array('query' => array('app' => 'field'))) . '|url@" + fid, "", "width=760,height=560,resizable=1");
+      }).addClass("imce-processed").insertAfter($field);
+      $field.width($field.width() - $button.width()).css("display", "inline-block").focus(function() {
+        var val = this.value, bpath = Drupal.settings.basePath;
+        if (val.indexOf(bpath) == 0) {
+          this.value = val.substr(bpath.length);
+        }
+      });
+    }
+  });
+}})(jQuery)', 'inline');
+  }
+  if ($imce_access) {
+    drupal_add_js(array('imceLinkFields' => array($element['#id'] . '-url')), 'setting');
+  }
+  return theme_link($element);
+}

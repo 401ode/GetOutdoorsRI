@@ -1,0 +1,143 @@
+<?php
+// Create the admin page and form
+function gosquared_admin() {
+  $form = array();
+
+  $form['gosquared_acctcode'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Your site account code:'),
+    '#default_value' => variable_get('gosquared_acctcode', 'GSN-000000-X'),
+    '#size' => 14,
+    '#maxlength' => 13,
+    '#description' => t('This is your site\'s account code from GoSquared\'s LiveStats service. If you do not have an account please go to <a href="http://www.gosquared.com/plans" target="_blank">http://www.gosquared.com/plans</a> to get one!'),
+    '#required' => TRUE,
+  );
+
+/*  $form['livestats_trackadmin'] = array(
+    '#type' => 'radios',
+    '#title' => t('Track admin pages:'),
+    '#default_value' => variable_get('livestats_trackadmin', 0),
+    '#options' => array(t('Yes'), t('No')),
+    '#description' => t('This option allows you choose whether you want LiveStats to track your admin pages.'),
+    '#required' => TRUE,
+  );
+*/
+
+  $form['gosquared_trackusers'] = array(
+    '#type' => 'radios',
+    '#title' => t('Display users as:'),
+    '#default_value' => variable_get('gosquared_trackusers', 2),
+    '#options' => array(t('Off'), t('User ID'), t('Username')),
+    '#description' => t('This sets whether or not the visitor ID\'s in LiveStats are replaced by the logged in user\'s details. Choose "Off" to use the deafult LiveStats ID, choose "User ID" to use the user\'s ID from Drupal and choose "Username" to use the user\'s username from Drupal.'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+// Validate the admin page form
+function gosquared_admin_validate($form, &$form_state) {
+  $acctcode = $form_state['values']['gosquared_acctcode'];
+  if (!preg_match('/GSN-[0-9]{6,7}-[A-Z]{1}/', $acctcode)) {
+    form_set_error('gosquared_acctcode', t('The code you have entered is in an incorrect format. Please enter the code in this format: GSN-000000-X. If you do not have an account code then please go to <a href="http://www.gosquared.com/plans" target="_blank">http://www.gosquared.com/plans</a> to get one.'));
+  }
+}
+
+// Add the settings page to the menu
+function gosquared_menu() {
+  $items = array();
+
+  $items['admin/config/system/gosquared'] = array(
+    'title' => 'GoSquared',
+    'description' => 'Use this page to configure your GoSquared LiveStats module settings with your account code.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('gosquared_admin'),
+    'access arguments' => array('administer modules'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+function gosquared_setJS() {
+  //Get the settings
+  $acct = variable_get('gosquared_acctcode', 'GSN-000000-X');
+  $trkUsers = variable_get('gosquared_trackusers', 2);
+  //$trkAdmin = variable_get('livestats_trackadmin', 0);
+
+  //Check they have entered their tracking code
+  if ($acct !='' && $acct != 'GSN-000000-X' && preg_match('/GSN-[0-9]{6,7}-[A-Z]{1}/', $acct)) {
+
+    //Account code is valid so add it to the settings
+    drupal_add_js(array('gosquared' => array('acct' => $acct)), 'setting');
+
+    //Check if we are not tracking admin pages and if this is an admin page then return
+    /*if ($trkAdmin == 1) {
+      if (arg(0) == 'admin') {
+        return;
+      }
+    }*/
+
+    //If tracking names, get the relevant information
+    $hasUserInfo = FALSE;
+    if ($trkUsers != 0) {
+      //Get current user
+      $currUser = $GLOBALS['user'];
+      //Check if current user is not a guest
+      if ($currUser->uid) {
+        $lsUser = '';
+        switch ($trkUsers) {
+          case 1:
+          $lsUser = $currUser->uid;
+          break;
+
+          case 2:
+          $lsUser = $currUser->name;
+          break;
+
+          default:
+          $lsUser = FALSE;
+          break;
+        }
+      $hasUserInfo = TRUE;
+      }
+    }
+
+    //Now create the relevant JS
+    //Set the initial JS
+    $GSJavascript = '
+        var GoSquared={};
+        GoSquared.acct = Drupal.settings.gosquared.acct;
+        ';
+        if ($hasUserInfo) {
+          //Now add that user string to the settings for the javascript to use
+	      drupal_add_js(array('gosquared' => array('user' => $lsUser)), 'setting');
+          //And add the relevant line to the javascript to be returned
+          $GSJavascript .= 'GoSquared.VisitorName = Drupal.settings.gosquared.user;
+          ';
+        }
+        $GSJavascript .= '(function(w){
+            function gs(){
+              w._gstc_lt=+(new Date); var d=document;
+              var g = d.createElement("script"); g.type = "text/javascript"; g.async = true; g.src = "//d1l6p2sc9645hc.cloudfront.net/tracker.js";
+              var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(g, s);
+            }
+            w.addEventListener?w.addEventListener("load",gs,false):w.attachEvent("onload",gs);
+          })(window);
+  ';
+    //now return the complete JS to the calling function.
+    return $GSJavascript;
+  }
+  else {
+    return;
+  }
+}
+
+function gosquared_init() {
+  $returnedJS = gosquared_setJS();
+  if ($returnedJS) {
+    drupal_add_js($returnedJS,
+      array('type' => 'inline', 'scope' => 'footer', 'weight' => 10)
+    );
+  }
+}

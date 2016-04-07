@@ -1,0 +1,23 @@
+<?php
+/**
+ * @file
+ * Code for the Foundations feature.
+ */
+
+include_once 'mogov_foundations.features.inc';
+
+module_load_include('inc', 'mogov_foundations', 'includes/menu');
+module_load_include('inc', 'mogov_foundations', 'includes/permissions');
+module_load_include('inc', 'mogov_foundations', 'includes/variables');
+module_load_include('inc', 'mogov_foundations', 'includes/blank_page');
+module_load_include('inc', 'mogov_foundations', 'includes/field_formatters');
+module_load_include('inc', 'mogov_foundations', 'includes/alter_urls');
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function mogov_foundations_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'panels' and !empty($plugin)) {
+    return 'plugins/' . $plugin;
+  }
+}
