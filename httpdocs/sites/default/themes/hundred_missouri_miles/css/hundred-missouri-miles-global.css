@@ -748,6 +748,10 @@ select.multiselect_sel {
 	position: relative;
 }
 
+.section-content .leaflet-container img {
+	position: inherit;
+}
+
 .folded-corner-box, 
 .content-box,
 #node-panel-234688 > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div, 
