@@ -2490,14 +2490,12 @@ function mo_project_proximity_element_process($element, &$form_state, $form) {
     '1' => '1 mi',
     '5' => '5 mi',
     '10' => '10 mi',
-    '25' => '25 mi',
-    '50' => '50 mi',
-    '100' => '100 mi',
+    '25' => '25 mi'
   );
   $element['distance']['#type'] = 'select';
   $element['distance']['#options'] = $options;
   $element['distance']['#multiple'] = false;
-  $element['distance']['#default_value'] = 100;
+  $element['distance']['#default_value'] = 25;
   $element['unit']['#type'] = 'hidden';
   $element['origin']['#placeholder'] = t('Starting address (Zip code minimum)');
 
