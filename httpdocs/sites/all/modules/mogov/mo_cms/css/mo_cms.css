@@ -8,3 +8,8 @@
 .field-name-field-mo-cms-contact-info-std .country {
     display: none;
 } 
+#suggest-a-trail {
+    position: absolute;
+    right: 8px;
+    bottom: 30px;
+}
