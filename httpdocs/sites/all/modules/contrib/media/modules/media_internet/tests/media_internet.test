@@ -177,6 +177,10 @@ class MediaInternetProviderTestCase extends MediaInternetTestHelper {
     // DrupalTestCase so we can test the upload wizard correctly.
     variable_del('file_private_path');
 
+    // Enable media_internet_test.module's hook_media_internet_providers()
+    // implementation.
+    variable_set('media_internet_test_media_internet_providers', TRUE);
+
     $web_user = $this->drupalCreateUser(array('create files', 'view own private files', 'add media from remote sources'));
     $this->drupalLogin($web_user);
   }
@@ -189,8 +193,15 @@ class MediaInternetProviderTestCase extends MediaInternetTestHelper {
     $this->assertResponse(200);
 
     // Check that the provider is listed as supported.
-    $supported_providers = 'Media Internet Test';
-    $this->assertRaw(t('Supported internet media providers: !providers.', array('!providers' => '<strong>' . $supported_providers . '</strong>')), t('The example media provider is enabled.'));
+    $this->assertRaw(t('Supported internet media providers: !providers.', array('!providers' => '<strong>' . 'Media Internet Test' . '</strong>')), t('The example media provider is enabled.'));
+
+    // Enable media_internet_test.module's
+    // hook_media_browser_plugin_info_alter_alter() implementation and ensure it
+    // is working as designed.
+    variable_set('media_internet_test_media_internet_providers_alter', TRUE);
+
+    $this->drupalGet('file/add/web');
+    $this->assertRaw(t('Supported internet media providers: !providers.', array('!providers' => '<strong>' . 'Altered provider title' . '</strong>')), t('The example media provider was successfully altered.'));
 
     // Step 1: Upload a basic video file.
     $edit = array();
