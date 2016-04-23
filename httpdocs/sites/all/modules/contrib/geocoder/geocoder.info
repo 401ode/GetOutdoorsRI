@@ -4,9 +4,11 @@ core = 7.x
 dependencies[] = geophp
 dependencies[] = ctools
 
-; Information added by drupal.org packaging script on 2013-09-30
-version = "7.x-1.2+9-dev"
+configure = admin/config/content/geocoder
+
+; Information added by Drupal.org packaging script on 2016-01-31
+version = "7.x-1.3"
 core = "7.x"
 project = "geocoder"
-datestamp = "1380580676"
+datestamp = "1454270340"
 

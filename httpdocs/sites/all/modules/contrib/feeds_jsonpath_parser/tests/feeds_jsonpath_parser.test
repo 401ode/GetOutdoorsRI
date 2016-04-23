@@ -171,6 +171,10 @@ class FeedsJSONPathParserTestCase extends FeedsWebTestCase {
     $this->postAndCheck($edit_url, $edit, 'Save', 'Your changes have been saved.');
     $this->drupalGet('node/' . $nid . '/edit');
     $this->assertNoText('JSONPath Parser Settings');
+
+    // Test byte replacement.
+    $this->assertEqual('ࡇ abc ʦ &#135361;', FeedsJSONPathParser::convertFourBytes('ࡇ abc ʦ 𡃁'));
+    $this->assertEqual('ࡇ abc ʦ ', FeedsJSONPathParser::stripFourBytes('ࡇ abc ʦ 𡃁'));
   }
 
   public function postAndCheck($url, $edit, $button, $saved_text) {

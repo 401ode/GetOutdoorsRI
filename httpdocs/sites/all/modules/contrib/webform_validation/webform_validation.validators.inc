@@ -76,7 +76,7 @@ function webform_validation_webform_validation_validators() {
       ),
       'custom_data' => array(
         'label' => t('Minimum number of words'),
-        'description' => t('Specify the minimum number of words that have to be entered to pass validation. Words are defined as strings of letters separated by spaces.')
+        'description' => t('Specify the minimum number of words that have to be entered to pass validation. Words are defined as strings of letters separated by spaces.'),
       ),
       'description' => t('Verifies that a user-entered value contains at least the specified number of words.'),
     ),
@@ -90,7 +90,7 @@ function webform_validation_webform_validation_validators() {
       ),
       'custom_data' => array(
         'label' => t('Maximum number of words'),
-        'description' => t('Specify the maximum number of words that have to be entered to pass validation. Words are defined as strings of letters separated by spaces.')
+        'description' => t('Specify the maximum number of words that have to be entered to pass validation. Words are defined as strings of letters separated by spaces.'),
       ),
       'description' => t('Verifies that a user-entered value contains at most the specified number of words.'),
     ),
@@ -123,6 +123,7 @@ function webform_validation_webform_validation_validators() {
         'textarea',
         'textfield',
         'time',
+        'boolean',
       ),
       'min_components' => 2,
       'description' => t('Verifies that all specified components contain equal values. If all components are of type email, they will get case-insensitive comparison.'),
@@ -159,6 +160,7 @@ function webform_validation_webform_validation_validators() {
         'textarea',
         'textfield',
         'time',
+        'boolean',
       ),
       'min_components' => 2,
       'description' => t('Verifies that none of the specified components contain the same value as another selected component in this submission. (To check that values are unique between submissions, use the unique validation option on the "Edit component" page for that component.) If all components are of type email, they will get case-insensitive comparison.'),
@@ -173,6 +175,7 @@ function webform_validation_webform_validation_validators() {
         'select',
         'textarea',
         'textfield',
+        'boolean',
       ),
       'custom_error' => TRUE,
       'custom_data' => array(
@@ -192,6 +195,7 @@ function webform_validation_webform_validation_validators() {
         'select',
         'textarea',
         'textfield',
+        'boolean',
       ),
       'custom_error' => TRUE,
       'description' => t('Verifies that the user-entered value is the default value for that component. Negate if you want not the default value.'),
@@ -206,7 +210,8 @@ function webform_validation_webform_validation_validators() {
         'select',
         'textarea',
         'textfield',
-        'time'
+        'time',
+        'boolean',
       ),
       'custom_data' => array(
         'label' => t('Number to be completed'),
@@ -325,10 +330,10 @@ function webform_validation_webform_validation_validators() {
       ),
       'custom_error' => TRUE,
       'custom_data' => array(
-        'label' => t('Regex code'),
-        'description' => t('Specify regex code to validate the user input against.'),
+        'label' => t('Regex code (case-sensitive)'),
+        'description' => t('Specify regex code to validate the user input against. Do not include delimiters such as /.'),
       ),
-      'description' => t('Validates user-entered text against a specified case-sensitive regular expression. Note: don\'t include delimiters such as /.'),
+      'description' => t('Validates user-entered text against a case-sensitive regular expression.'),
     ),
     'regexi' => array(
       'name' => t('Regular expression, case-insensitive'),
@@ -342,10 +347,10 @@ function webform_validation_webform_validation_validators() {
       ),
       'custom_error' => TRUE,
       'custom_data' => array(
-        'label' => t('Regex code'),
-        'description' => t('Specify regex code to validate the user input against.'),
+        'label' => t('Regex code (case-insensitive)'),
+        'description' => t('Specify regex code to validate the user input against. Do not include delimiters such as /.'),
       ),
-      'description' => t('Validates user-entered text against a specified case-insensitive regular expression. Note: don\'t include delimiters such as /.'),
+      'description' => t('Validates user-entered text against a case-insensitive regular expression.'),
     ),
     'must_be_empty' => array(
       'name' => t('Must be empty'),
@@ -373,7 +378,7 @@ function webform_validation_webform_validation_validators() {
       ),
       'description' => t('Validates that user-entered data doesn\'t contain any of the specified illegal words.'),
     ),
-   'username' => array(
+    'username' => array(
       'name' => t('Must match a username'),
       'negatable' => TRUE,
       'component_types' => array(
@@ -1025,10 +1030,22 @@ function _webform_validation_i18n_error_message($rule) {
 }
 
 /**
- * Helper function used by array_filter to determine if a value was selected or not
+ * Helper function used by array_filter() to determine if a value is empty.
+ *
+ * This is used in place of empty() because string '0' needs to be considered
+ * not empty and return FALSE.
+ *
+ * @param mixed $var
+ *   The value to check.
+ *
+ * @return bool
+ *   TRUE if $var is not one of FALSE, int 0, or empty string; FALSE otherwise.
+ *
+ * @see https://www.drupal.org/node/886458
+ * @see https://www.drupal.org/node/2638172
  */
 function _webform_validation_check_false($var) {
-  return $var !== FALSE && $var !== 0;
+  return $var !== FALSE && $var !== 0 && $var !== '';
 }
 
 /**

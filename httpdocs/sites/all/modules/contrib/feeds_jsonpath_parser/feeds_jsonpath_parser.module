@@ -35,20 +35,20 @@ function feeds_jsonpath_parser_enable() {
  *   The relative path of the JSONPath directory, or false if not found.
  */
 function feeds_jsonpath_parser_library_path() {
-  $search = glob(dirname(__FILE__) . '/jsonpath*.php');
-
-  if ($file = reset($search)) {
-    $path = dirname($file);
+  $libraries_path = module_exists('libraries') ? libraries_get_path('jsonpath') : FALSE;
+  if ($libraries_path && is_dir($libraries_path)) {
+    $path = $libraries_path;
   }
-  elseif (module_exists('libraries') && file_exists(libraries_get_path('jsonpath'))) {
-    $path = libraries_get_path('jsonpath');
-  }
-  elseif (file_exists(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
-    $path = 'sites/all/libraries/jsonpath';
+  elseif (is_dir(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
+    $path = DRUPAL_ROOT . '/sites/all/libraries/jsonpath';
   }
   // This is defined when simpletest downloads the library for us.
   elseif (variable_get('feeds_jsonpath_library_dir')) {
     $path = variable_get('feeds_jsonpath_library_dir');
+  }
+  else {
+    $search = glob(dirname(__FILE__) . '/jsonpath*.php');
+    return is_array($search) ? reset($search) : FALSE;
   }
 
   if (!isset($path)) {
@@ -56,7 +56,7 @@ function feeds_jsonpath_parser_library_path() {
   }
 
   // Newer forks of JSONPath are all modern and fancy with their autoloaders.
-  if (file_exists($path . '/vendor/autoload.php')) {
+  if (is_file($path . '/vendor/autoload.php')) {
     return $path . '/vendor/autoload.php';
   }
   // Old school. Look for multiple versions.

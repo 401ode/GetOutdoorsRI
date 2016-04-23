@@ -11,6 +11,13 @@
 class FeedsJSONPathParser extends FeedsParser {
 
   /**
+   * A regular expression that finds four byte UTF-8 chars.
+   *
+   * @var string
+   */
+  protected static $fourByteRegex = '/(?:\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})/s';
+
+  /**
    * The source fields to debug.
    *
    * @var array
@@ -35,15 +42,14 @@ class FeedsJSONPathParser extends FeedsParser {
     $fetcher_config = $source->getConfigFor($source->importer->fetcher);
     $result->link = $fetcher_config['source'];
 
-    $array = json_decode(utf8_encode($raw), TRUE);
+    $array = json_decode($raw, TRUE);
 
     // Support JSON lines format.
     if (!is_array($array)) {
       $raw = preg_replace('/}\s*{/', '},{', $raw);
       $raw = '[' . $raw . ']';
-      $array = json_decode(utf8_encode($raw), TRUE);
+      $array = json_decode($raw, TRUE);
     }
-    unset($raw);
 
     if (!is_array($array)) {
       throw new Exception(t('There was an error decoding the JSON document.'));
@@ -70,21 +76,22 @@ class FeedsJSONPathParser extends FeedsParser {
     $this->debug($all_items, 'context');
 
     foreach ($all_items as $item) {
+      // Invoke a hook to check whether the item should be skipped.
+      if ($this->invokeHook($item, $source) === TRUE) {
+        continue;
+      }
+
       $parsed_item = $variables = array();
-      foreach ($source_config['sources'] as $source => $query) {
+      foreach ($source_config['sources'] as $source_key => $query) {
         // Variable substitution.
         $query = strtr($query, $variables);
-        $parsed = $this->parseSourceElement($item, $query, $source);
+        $parsed = $this->parseSourceElement($item, $query, $source_key);
+
+        $variables['{' . $mappings[$source_key] . '}'] = is_array($parsed) ? reset($parsed) : $parsed;
+
         // Avoid null values.
         if (isset($parsed)) {
-          // Variable sunstitution can't handle arrays.
-          if (!is_array($parsed)) {
-            $variables['{' . $mappings[$source] . '}'] = $parsed;
-          }
-          else {
-            $variables['{' . $mappings[$source] . '}'] = '';
-          }
-          $parsed_item[$source] = $parsed;
+          $parsed_item[$source_key] = $parsed;
         }
       }
       if (!empty($parsed_item)) {
@@ -135,17 +142,22 @@ class FeedsJSONPathParser extends FeedsParser {
     }
     $results = $this->jsonPath($item, $query);
     $this->debug($results, $source);
-    unset($item);
 
-
-    // If there is one result, return it directly.  If there are no results,
-    // return. Otherwise return the results.
-    if (count($results) === 1) {
-      return $results[0];
-    }
-    if (count($results) === 0) {
+    $count = count($results);
+    if ($count === 0) {
       return;
     }
+
+    foreach ($results as $delta => $value) {
+      if (is_string($value) && $value !== '') {
+        $results[$delta] = !empty($this->config['convert_four_byte']) ? $this->convertFourBytes($value) : $this->stripFourBytes($value);
+      }
+    }
+
+    if ($count === 1) {
+      return reset($results);
+    }
+
     return $results;
   }
 
@@ -274,6 +286,13 @@ class FeedsJSONPathParser extends FeedsParser {
       '#description' => t('This setting allows feed nodes to specify their own JSONPath values for the context and sources.'),
       '#default_value' => $config['allow_override'],
     );
+    $form['jsonpath']['convert_four_byte'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Convert four byte characters'),
+      '#description' => t('Coverts four byte UTF-8 characters to their HTML entity. By default, four byte characters will be stripped.'),
+      '#default_value' => !empty($config['convert_four_byte']),
+    );
+
     return $form;
   }
 
@@ -316,6 +335,7 @@ class FeedsJSONPathParser extends FeedsParser {
       'sources' => array(),
       'debug' => array(),
       'allow_override' => FALSE,
+      'convert_four_byte' => FALSE,
     );
   }
 
@@ -333,6 +353,7 @@ class FeedsJSONPathParser extends FeedsParser {
     $values = $values['jsonpath'];
     $allow_override = $config['allow_override'];
     unset($config['allow_override']);
+    unset($config['convert_four_byte']);
     ksort($values);
     ksort($config);
     if ($values === $config || !$allow_override) {
@@ -349,9 +370,12 @@ class FeedsJSONPathParser extends FeedsParser {
     if (isset($values['jsonpath'])) {
       $values = $values['jsonpath'];
     }
-    $values['context'] = trim($values['context']);
-    foreach ($values['sources'] as &$source) {
-      $source = trim($source);
+
+    $values['context'] = isset($values['context']) ? trim($values['context']) : '';
+    if (!empty($values['sources'])) {
+      foreach ($values['sources'] as &$source) {
+        $source = trim($source);
+      }
     }
   }
 
@@ -394,6 +418,72 @@ class FeedsJSONPathParser extends FeedsParser {
       $o .= '</ul>';
       drupal_set_message($source . ':' . $o);
     }
+  }
+
+  /**
+   * Calls our filter hook.
+   *
+   * @param array &$item
+   *   The item to alter.
+   * @param FeedsSource $source
+   *   The feed source.
+   * @return true|null
+   *   Returns true if the item should be skipped.
+   */
+  protected function invokeHook(array &$item, FeedsSource $source) {
+    foreach (module_implements('feeds_jsonpath_parser_filter') as $module) {
+      $function = $module . '_feeds_jsonpath_parser_filter';
+      if ($function($item, $source) === TRUE) {
+        return TRUE;
+      }
+    }
+  }
+
+  /**
+   * Strips four byte characters from a string.
+   *
+   * @param string $string
+   *   The input string.
+   *
+   * @return string
+   *   The string with four byte characters removed.
+   */
+  public static function stripFourBytes($string) {
+    return preg_replace(self::$fourByteRegex, '', $string);
+  }
+
+  /**
+   * Replaces four byte characters with their HTML unicode codepoint.
+   *
+   * @param string $string
+   *   The input string.
+   *
+   * @return string
+   *   The string with four byte characters converted.
+   */
+  public static function convertFourBytes($string) {
+    return preg_replace_callback(self::$fourByteRegex, array('FeedsJSONPathParser', 'doFourByteReplace'), $string);
+  }
+
+  /**
+   * Callback for FeedsJSONPathParser::convertFourBytes().
+   *
+   * @param array $matches
+   *   The regular expression matches.
+   *
+   * @return string
+   *   A four byte unicode character converted to its HTML representation.
+   */
+  public static function doFourByteReplace(array $matches) {
+    $char = $matches[0];
+
+    // Calculate the codepoint of the character.
+    $codepoint = ord($char[0]) - 0xF0 << 18;
+    $codepoint += ord($char[1]) - 0x80 << 12;
+    $codepoint += ord($char[2]) - 0x80 << 6;
+    $codepoint += ord($char[3]) - 0x80;
+
+    return '&#' . $codepoint . ';';
   }
 
 }
