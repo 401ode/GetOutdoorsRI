@@ -529,7 +529,7 @@ return $value;';
   $handler->display->display_options['filters']['field_trail_activity_tid']['field'] = 'field_trail_activity_tid';
   $handler->display->display_options['filters']['field_trail_activity_tid']['value'] = array(
     118 => '118',
-    119 => '119',
+    5613 => '5613',
     130 => '130',
     121 => '121',
     120 => '120',
