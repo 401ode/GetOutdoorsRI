@@ -1,7 +1,7 @@
 name = Mileage
-description = Creates and manages mileage entries for 100missourimiles.com.
+description = Creates and manages mileage entries for greatoutdoorsri.com.
 core = 7.x
-package = Site: 100missourimiles.com
+package = Site: greatoutdoorsri.com
 version = 7.x-1.0
 
 dependencies[] = entity

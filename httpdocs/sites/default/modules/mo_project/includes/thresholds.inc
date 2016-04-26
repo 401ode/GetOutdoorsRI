@@ -50,8 +50,8 @@ function mo_project_total_mileage_threshold_alert_mail($key, &$message, $params)
   switch($key) {
     //switching on $key lets you create variations of the email based on the $key parameter
     case 'threshold_alert':
-      $message['subject'] = t('ALERT 100momiles exceeded current mileage threshold');
-      $message['body'][] = t('Users on 100missourimiles.com have logged more than @threshold miles. If this is unexpected, you should immediately check the site for spam mileage entries.', array('@threshold' => $params['threshold']));
+      $message['subject'] = t('ALERT GoRI exceeded current mileage threshold');
+      $message['body'][] = t('Users on greatoutdoorsri.com have logged more than @threshold miles. If this is unexpected, you should immediately check the site for spam mileage entries.', array('@threshold' => $params['threshold']));
       break;
   }
 }

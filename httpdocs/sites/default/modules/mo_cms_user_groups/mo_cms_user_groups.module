@@ -150,8 +150,7 @@ function mo_cms_user_groups_create_unpub_node() {
       'title' => NULL,
       'attributes' => array(),
       'items' => array(
-	t('Please <a href="http://100missourimiles.com/user/login?current=groups/create">log in with your username and password</a>.. You\'ll be redirected back to this page afterward.'),
-	t('Please <a href="http://100momiles.uservoice.com/">contact us</a> if the issue persists or you need access.'),
+	t('Please <a href="http://greatoutdoorsri.com/user/login?current=groups/create">log in with your username and password</a>.. You\'ll be redirected back to this page afterward.')
       ),
     );
     $output = array(
