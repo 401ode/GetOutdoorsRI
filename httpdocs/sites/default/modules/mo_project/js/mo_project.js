@@ -483,5 +483,22 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         $(this).next('.toggle-content').slideToggle();
     });
-    
 });
+
+var count = 0;
+setInterval(function() {
+    var rows = jQuery(".view-trails .views-table tbody tr")
+    if (rows.length != count) {
+        count = rows.length;
+        rows.each(function(index) {
+            if (index % 2 == 0) {
+                jQuery(this).click(function() {
+                    jQuery(jQuery(".view-trails .views-table tbody tr")[index + 1]).toggle();
+                });
+            } else {
+                // hide secondary rows
+                jQuery(this).css('display', 'none');
+            }
+        });
+    }
+}, 1000);
