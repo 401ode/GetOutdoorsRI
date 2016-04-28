@@ -7,6 +7,9 @@
   var scroll_threshold = 200;
   var vis_index = 0;
 
+  // The selector for the automatic pager.
+  var content_wrapper_selector = '.views-infinite-scroll-content-wrapper tbody';
+
   /**
    * Insert a views infinite scroll view into the document after AJAX.
    *
@@ -14,8 +17,10 @@
    */
   $.fn.infiniteScrollInsertView = function ($new_view) {
     var $existing_view = this;
-    var $existing_content = $existing_view.find('.view-content').children();
-    $new_view.find('.view-content').prepend($existing_content);
+    var $existing_content = $existing_view.find(content_wrapper_selector).children();
+    $existing_view.css('height', $existing_view.height() + 'px');
+    $new_view = $new_view.hasClass('view') ? $new_view : $new_view.find('> .view');
+    $new_view.find(content_wrapper_selector).prepend($existing_content);
     $existing_view.replaceWith($new_view);
     $(document).trigger('infiniteScrollComplete', [$new_view, $existing_content]);
   };
