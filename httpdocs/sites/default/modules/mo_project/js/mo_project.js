@@ -483,22 +483,23 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         $(this).next('.toggle-content').slideToggle();
     });
-});
-
-var count = 0;
-setInterval(function() {
-    var rows = jQuery(".view-trails .views-table tbody tr")
-    if (rows.length != count) {
-        count = rows.length;
+    var lastUpdated = -1;
+    var updateRows = function() {
+        var rows = $(".view-trails .views-table tbody tr");
         rows.each(function(index) {
+            if (index <= lastUpdated) return;
             if (index % 2 == 0) {
-                jQuery(this).click(function() {
-                    jQuery(jQuery(".view-trails .views-table tbody tr")[index + 1]).toggle();
+                $(this).click(function() {
+                    $($(".view-trails .views-table tbody tr")[index + 1])
+                     .toggle();
                 });
             } else {
                 // hide secondary rows
-                jQuery(this).css('display', 'none');
+                $(this).css('display', 'none');
             }
+            lastUpdated = index;
         });
     }
-}, 1000);
+    updateRows();
+    $(document).on('infiniteScrollComplete', updateRows);
+});
