@@ -483,13 +483,11 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         $(this).next('.toggle-content').slideToggle();
     });
-    var lastUpdated = -1;
     var updateRows = function() {
         var rows = $(".view-trails .views-table tbody tr");
         rows.each(function(index) {
-            if (index <= lastUpdated) return;
             if (index % 2 == 0) {
-                $(this).click(function() {
+                $(this).unbind('click').click(function() {
                     $($(".view-trails .views-table tbody tr")[index + 1])
                      .toggle();
                 });
@@ -497,9 +495,12 @@ jQuery(document).ready(function($) {
                 // hide secondary rows
                 $(this).css('display', 'none');
             }
-            lastUpdated = index;
         });
     }
     updateRows();
     $(document).on('infiniteScrollComplete', updateRows);
+
+    $("#edit-submit-trails").click(function() {
+        $("#views-exposed-form-trails-panel-pane-1").submit();
+    });
 });
