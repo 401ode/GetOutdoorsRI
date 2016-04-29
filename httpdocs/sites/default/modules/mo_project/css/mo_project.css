@@ -6,3 +6,6 @@
  * multiple themes, defining default styles
  * here can be useful.
  */
+#node-panel-234850 .attachment {
+    display: none;
+}
