@@ -483,24 +483,46 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         $(this).next('.toggle-content').slideToggle();
     });
-    var updateRows = function() {
-        var rows = $(".view-trails .views-table tbody tr");
-        rows.each(function(index) {
-            if (index % 2 == 0) {
-                $(this).unbind('click').click(function() {
-                    $($(".view-trails .views-table tbody tr")[index + 1])
-                     .toggle();
+    if ($("#edit-submit-trails")) {
+        var updateRows = function() {
+            var rows = $(".view-trails .views-table tbody tr");
+            rows.each(function(index) {
+                if (index % 2 == 0) {
+                    $(this).unbind('click').click(function() {
+                        $($(".view-trails .views-table tbody tr")[index + 1])
+                         .toggle();
+                    });
+                } else {
+                    // hide secondary rows
+                    $(this).css('display', 'none');
+                }
+            });
+        }
+        updateRows();
+        $(document).on('infiniteScrollComplete', updateRows);
+        $("#edit-submit-trails").click(function() {
+            $("#views-exposed-form-trails-panel-pane-1").submit();
+        });
+        $('#block-ip-geoloc-geocode-address').hide();
+        $('.geofield-proximity-origin-from').show();
+        $('.form-item-field-geofield-distance-origin').show();
+        var addParam = function(base, param) {
+            var charr = base.includes("?") ? '&' : '?';
+            return base + charr + param;
+        };
+        if (!$(".geofield-proximity-origin").val().trim()) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    var strcoords = pos.coords.latitude + ',' + pos.coords.longitude;
+                    var strparam = 'field_geofield_distance%5Borigin%5D=' + strcoords;
+                    var form = $('#set-location-form');
+                    form.attr('action', addParam(form.attr('action'), strparam));
+                    $('#edit-street-address').html(strcoords);
+                    $('#edit-submit-address').click();
                 });
             } else {
-                // hide secondary rows
-                $(this).css('display', 'none');
+                addParam('field_geofield_distance%5Borigin%5D=Providence,%20RI');
             }
-        });
+        }
     }
-    updateRows();
-    $(document).on('infiniteScrollComplete', updateRows);
-
-    $("#edit-submit-trails").click(function() {
-        $("#views-exposed-form-trails-panel-pane-1").submit();
-    });
 });
