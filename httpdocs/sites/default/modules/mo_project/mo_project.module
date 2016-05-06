@@ -403,32 +403,14 @@ function mo_project_menu() {
         'type' => MENU_NORMAL_ITEM,
         'description' => 'Display all badges earned by a single user',
         'page callback' => 'mo_project_build_badge_gallery',
-        'page arguments' => array('2015'),
+        'page arguments' => array('2016'),
         'access arguments' => array('access content'),
       );
       
-      $items['trophy/2015'] = array(
-        'title' => t('2015'),
+      $items['trophy/2016'] = array(
+        'title' => t('2016'),
         'type' => MENU_DEFAULT_LOCAL_TASK,
         'weight' => -10,
-      );
-      
-      $items['trophy/2014'] = array(
-        'title' => t('2014'),
-        'type' => MENU_LOCAL_TASK,
-        'page callback' => 'mo_project_build_badge_gallery',
-        'page arguments' => array('2014'),
-        'access arguments' => array('access content'),
-        'weight' => -4,
-      );
-
-      $items['trophy/2013'] = array(
-        'title' => t('2013'),
-        'type' => MENU_LOCAL_TASK,
-        'page callback' => 'mo_project_build_badge_gallery',
-        'page arguments' => array('2013'),
-        'access arguments' => array('access content'),
-        'weight' => -3,    
       );
 
       $items['trophy/upcoming'] = array(
