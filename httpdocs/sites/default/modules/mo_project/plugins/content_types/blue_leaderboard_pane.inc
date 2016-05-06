@@ -51,7 +51,7 @@ function mo_project_blue_leaderboard_pane_render($subtype, $conf, $args, $contex
 
   $content[] = array(
       '#type' => 'markup',
-      '#markup' => t('<h2>Blue Miles Leaderboard</h2>'),
+      '#markup' => t('<h2>GoRI Leaderboard</h2>'),
   );
   
   $headers = array(
@@ -178,9 +178,6 @@ function mo_project_blue_leaderboard_pane_render($subtype, $conf, $args, $contex
  *  @details  2015-02-06 
  */
 function mo_project_build_bluemiles_leaderboard_query($gender=NULL) {
-  $pad_id = key(taxonomy_get_term_by_name('Paddling'));
-  $swm_id = key(taxonomy_get_term_by_name('Swimming'));
-
   $challenge_dates = mo_project_get_challenge_dates_by_year();
   if ( (date('Y-m-d H:i:s') > $challenge_dates['start']) AND (date('Y-m-d H:i:s') <= $challenge_dates['end']) ) {
     $end_date = date('Y-m-d H:i:s');
@@ -209,7 +206,6 @@ function mo_project_build_bluemiles_leaderboard_query($gender=NULL) {
   $query->condition('n.status', 0, '<>');
   $query->condition('n.uid', 0, '<>');
   $query->condition('r.rid', array($verified_role->rid, $admin_role->rid));
-  $query->condition('a.field_mileage_activity_tid', array($pad_id, $swm_id), 'IN');
   if ($gender != NULL) {
     $query->condition('g.field_user_gender_value', $gender);
   }

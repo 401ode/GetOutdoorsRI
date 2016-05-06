@@ -1712,7 +1712,7 @@ function mo_project_build_blue_header_content_1() {
     0 => array(
       '#type' => 'markup',
       '#prefix' => "<img src='" . $image . "' alt='GoRI Blue Miles' style='float:left;margin:0 5px 0 0;'>",
-      '#markup' => t("<h3>Rhode Island Blue Miles</h3><p>We are encouraging Rhode Islanders to experience Rhode Island's many waterways and to log their paddling and swimming miles.</p>"),
+      '#markup' => t("<h3>Rhode Island Miles</h3><p>We are encouraging Rhode Islanders to experience Rhode Island's many waterways and to log their paddling and swimming miles.</p>"),
     ),
   );
   return $output;
@@ -1727,15 +1727,7 @@ function mo_project_build_blue_header_content_1() {
  *  @details  2015-02-04 
  */
 function mo_project_build_blue_header_content_2() {
-  $pad_id = key(taxonomy_get_term_by_name('Paddling'));
-  $swm_id = key(taxonomy_get_term_by_name('Swimming'));
-  $pad_miles = 0;
-  $swm_miles = 0;  
-  $blue_miles = 0;
-
-  $blue_miles = (int) round(mo_project_get_total_mileage(array(), array($pad_id, $swm_id), 2015));
-  $pad_miles = (int) round(mo_project_get_total_mileage(array(), array($pad_id), 2015));
-  $swm_miles = (int) round(mo_project_get_total_mileage(array(), array($swm_id), 2015)); 
+  $blue_miles = variable_get_value('total_mileage');
     
   $output = array(
     '#type' => 'container',
@@ -1743,29 +1735,6 @@ function mo_project_build_blue_header_content_2() {
       'id' => 'bluemiles-header',
     ),
   );
-  $output[] = array(
-    '#type' => 'container',
-    '#attributes' => array(
-      'id' => 'bluemiles-paddling',
-      'class' => array(
-        'bluemiles-stats-paddling',
-      ),
-    ),
-  );
-  $output[0][] = mo_project_progress_bar($pad_miles, $blue_miles, 'Paddling', $label_position='top', FALSE);
-  $output[] = array(
-    '#type' => 'container',
-    '#attributes' => array(
-      'id' => 'bluemiles-swimming',
-      'class' => array(
-        'bluemiles-stats-swimming',
-      ),
-    ),
-  );
-  $output[1][] = mo_project_progress_bar($swm_miles, $blue_miles, 'Swimming', $label_position='top', FALSE);
-
-  $output[0][0][0]['#prefix'] = '<span class="activity-icon paddling"></span>';
-  $output[1][0][0]['#prefix'] = '<span class="activity-icon swimming"></span>';
 
   return $output;
 }
@@ -1779,11 +1748,7 @@ function mo_project_build_blue_header_content_2() {
  *  @details  2015-02-04 
  */
 function mo_project_build_blue_header_content_3() {
-  $pad_id = key(taxonomy_get_term_by_name('Paddling'));
-  $swm_id = key(taxonomy_get_term_by_name('Swimming'));
-  $blue_miles = 0;
-
-  $blue_miles = (int) round(mo_project_get_total_mileage(array(), array($pad_id, $swm_id), 2015));
+  $blue_miles = variable_get_value('total_mileage');
     
   $output = array(
     '#type' => 'container',
@@ -1804,7 +1769,7 @@ function mo_project_build_blue_header_content_3() {
     ),
     '0' => array(
       '#type' => 'markup',
-      '#markup' => t('Total Blue Miles'),
+      '#markup' => t('Total Miles'),
     ),
   );
   $output[] = array(
@@ -2477,7 +2442,7 @@ function mo_project_proximity_element_process($element, &$form_state, $form) {
   $element['distance']['#type'] = 'select';
   $element['distance']['#options'] = $options;
   $element['distance']['#multiple'] = false;
-  $element['distance']['#default_value'] = 25;
+  $element['distance']['#default_value'] = 5;
   $element['unit']['#type'] = 'hidden';
   $element['origin']['#placeholder'] = t('Starting address (Zip code minimum)');
 

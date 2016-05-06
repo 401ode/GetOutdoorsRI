@@ -16,31 +16,36 @@ $plugin = array(
 
 function mo_project_bluemileage_pane_render($subtype, $conf, $args, $contexts) {
   global $user;
-  $pad_id = key(taxonomy_get_term_by_name('Paddling'));
-  $swm_id = key(taxonomy_get_term_by_name('Swimming'));
+  $activities = array(
+    'pad' => 'Paddling',
+    'swm' => 'Swimming',
+    'hik' => 'Hiking',
+    'bik' => 'Biking',
+    'wlk' => 'Walking',
+    'run' => 'Running',
+  );
   $mileage = 0;
   
   switch($conf['miles']) {
     case 'all':
       if ($user->uid <> 0) {
-        $subs_mileage = mo_project_get_mileage_per_subuser(array($user->uid), array('Me'), array($pad_id, $swm_id));
+        $all_ids = array();
+        foreach ($activities as $act_name) {
+          array_push($all_ids, key(taxonomy_get_term_by_name($act_name)));
+        }
+        $subs_mileage = mo_project_get_mileage_per_subuser(array($user->uid), array('Me'), $all_ids);
         $mileage = (int) round($subs_mileage[0]->distance);
       }
-      $name = 'blue miles';
+      $name = 'all miles';
       break;
-    case 'pad':
+    default:
+      $act_name = $activities[$conf['miles']];
       if ($user->uid <> 0) {
-        $subs_mileage = mo_project_get_mileage_per_subuser(array($user->uid), array('Me'), array($pad_id));
+        $act_id = key(taxonomy_get_term_by_name($act_name));
+        $subs_mileage = mo_project_get_mileage_per_subuser(array($user->uid), array('Me'), array($act_id));
         $mileage = (int) round($subs_mileage[0]->distance);
       }
-      $name = 'paddling';
-      break;
-    case 'swm':
-      if ($user->uid <> 0) {
-        $subs_mileage = mo_project_get_mileage_per_subuser(array($user->uid), array('Me'), array($swm_id));
-        $mileage = (int) round($subs_mileage[0]->distance);
-      }
-      $name = 'swimming';
+      $name = strtolower($act_name);
       break;
   }
 
@@ -95,6 +100,10 @@ function mo_project_bluemileage_pane_edit_form($form, &$form_state) {
       'all' => t('All Blue Miles'),
       'pad' => t('Paddling Miles'),
       'swm' => t('Swimming Miles'),
+      'hik' => t('Hiking Miles'),
+      'bik' => t('Biking Miles'),
+      'wlk' => t('Walking Miles'),
+      'run' => t('Running Miles'),
     ),
     '#default_value' => $default,
   );
