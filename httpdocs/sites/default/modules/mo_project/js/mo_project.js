@@ -483,7 +483,7 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         $(this).next('.toggle-content').slideToggle();
     });
-    if ($("#edit-submit-trails")) {
+    if ($("#edit-submit-trails").length) {
         var updateRows = function() {
             var rows = $(".view-trails .views-table tbody tr");
             rows.each(function(index) {
