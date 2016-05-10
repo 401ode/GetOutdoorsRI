@@ -60,7 +60,7 @@ function mo_project_blue_leaderboard_pane_render($subtype, $conf, $args, $contex
       'field' => 'name_all',
     ),
     array(
-      'data' => t('Blue Miles'),
+      'data' => t('Miles'),
       'field' => 'miles_all',
       'class' => array(
         'blue-miles-column',
@@ -71,7 +71,7 @@ function mo_project_blue_leaderboard_pane_render($subtype, $conf, $args, $contex
       'field' => 'name_fem',
     ),
     array(
-      'data' => t('Blue Miles'),
+      'data' => t('Miles'),
       'field' => 'miles_fem',
       'class' => array(
         'blue-miles-column',
@@ -82,7 +82,7 @@ function mo_project_blue_leaderboard_pane_render($subtype, $conf, $args, $contex
       'field' => 'name_mal',
     ),
     array(
-      'data' => t('Blue Miles'),
+      'data' => t('Miles'),
       'field' => 'miles_mal',
       'class' => array(
         'blue-miles-column',

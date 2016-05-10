@@ -20,7 +20,7 @@ function mo_project_bluemileage_pane_render($subtype, $conf, $args, $contexts) {
     'pad' => 'Paddling',
     'swm' => 'Swimming',
     'hik' => 'Hiking',
-    'bik' => 'Biking',
+    'bik' => 'Cycling',
     'wlk' => 'Walking',
     'run' => 'Running',
   );
@@ -43,7 +43,7 @@ function mo_project_bluemileage_pane_render($subtype, $conf, $args, $contexts) {
       if ($user->uid <> 0) {
         $act_id = key(taxonomy_get_term_by_name($act_name));
         $subs_mileage = mo_project_get_mileage_per_subuser(array($user->uid), array('Me'), array($act_id));
-        $mileage = (int) round($subs_mileage[0]->distance);
+        $mileage = count($subs_mileage) > 0 ? ((int) round($subs_mileage[0]->distance)) : 0;
       }
       $name = strtolower($act_name);
       break;
@@ -101,7 +101,7 @@ function mo_project_bluemileage_pane_edit_form($form, &$form_state) {
       'pad' => t('Paddling Miles'),
       'swm' => t('Swimming Miles'),
       'hik' => t('Hiking Miles'),
-      'bik' => t('Biking Miles'),
+      'bik' => t('Cycling Miles'),
       'wlk' => t('Walking Miles'),
       'run' => t('Running Miles'),
     ),
