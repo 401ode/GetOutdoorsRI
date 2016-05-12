@@ -1164,8 +1164,9 @@ function mo_project_get_allowed_term_reference_values($field) {
   $v = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
   $v_tree = taxonomy_get_tree($v->vid, $field['settings']['allowed_values'][0]['parent'], 1);
   $allowed_values = array();
+  $blacklist = array('Other', 'Geocaching', 'Rolling', 'Riding', 'Skating');
   foreach ($v_tree as $t) {
-    if ($t->name == 'Other') {
+    if (in_array($t->name, $blacklist)) {
       continue;
     }
     $allowed_values[$t->tid] = t($t->name);
