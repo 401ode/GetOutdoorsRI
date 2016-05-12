@@ -190,7 +190,7 @@ function mo_project_build_bluemiles_leaderboard_query($gender=NULL) {
   $admin_role = user_role_load_by_name('administrator');
 
   $query = db_select('node', 'n');
-  $query->join('users_roles', 'r', 'n.uid = r.uid');
+  //$query->join('users_roles', 'r', 'n.uid = r.uid');
   $query->join('field_data_field_user_first_name', 'f', 'n.uid = f.entity_id AND (f.entity_type = :type AND f.deleted = :deleted)', array(':type' => 'user', ':deleted' => 0));
   $query->join('field_data_field_user_last_name', 'l', 'n.uid = l.entity_id AND (l.entity_type = :type AND l.deleted = :deleted)', array(':type' => 'user', ':deleted' => 0));
   $query->join('field_data_field_mileage_distance', 'd', 'n.nid = d.entity_id AND (d.entity_type = :type2 AND d.deleted = :deleted)', array(':type2' => 'node', ':deleted' => 0));
@@ -205,7 +205,7 @@ function mo_project_build_bluemiles_leaderboard_query($gender=NULL) {
   $query->condition('n.type', 'mileage');
   $query->condition('n.status', 0, '<>');
   $query->condition('n.uid', 0, '<>');
-  $query->condition('r.rid', array($verified_role->rid, $admin_role->rid));
+  //$query->condition('r.rid', array($verified_role->rid, $admin_role->rid));
   if ($gender != NULL) {
     $query->condition('g.field_user_gender_value', $gender);
   }
