@@ -1517,13 +1517,10 @@ function mo_project_get_total_mileage($uids=array(), $activities=array(), $perio
   if ($uids) {
     $query->condition('n.uid', $uids);
   } else {
-    $verified_role = user_role_load_by_name('verified user');
     $admin_role = user_role_load_by_name('administrator');
     $events_role = user_role_load_by_name('Event Aggregator');
     $query->join('users', 'u', 'n.uid = u.uid');
-    $query->join('users_roles', 'r', 'u.uid = r.uid');
     $query->condition('u.status', 0, '>');
-    $query->condition('r.rid', array($verified_role->rid, $admin_role->rid, $events_role->rid));
   }
   if ($activities) {
     $query->join('field_data_field_mileage_activity', 'a', 'n.nid = a.entity_id AND (a.entity_type = :type AND a.deleted = :deleted)', array(':type' => 'node', ':deleted' => 0));
