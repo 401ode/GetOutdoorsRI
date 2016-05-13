@@ -386,7 +386,7 @@ function mo_project_build_badge_gallery($yr) {
   } else {
     $message1 = "In your Trophy Room, you can see any ";
   }
-  $message1 .= "badges you earned with <strong>100 Missouri Miles</strong> in the <strong>" . $yr . " Challenge!</strong><br>Select another tab to see what you achieved in ";
+  $message1 .= "badges you earned with <strong>GoRI</strong> in the <strong>" . $yr . " Challenge!</strong><br>Select another tab to see what you achieved in ";
   $challenge_dates = mo_project_get_challenge_dates_by_year();
   if ($yr == date("Y", $challenge_dates['start_sse'])) {
     $message1 .= "previous years, or <em>Upcoming Badges</em> to see all the badges you can still unlock! ";
@@ -435,9 +435,9 @@ function mo_project_build_badge_gallery($yr) {
   } else {
     $challenge_dates = mo_project_get_challenge_dates_by_year();
     if ($yr == date("Y", $challenge_dates['start_sse'])) {
-      $message = "Log some miles in Missouri's beautiful outdoors to earn badges!";
+      $message = "Log some miles in Rhode Island's beautiful outdoors to earn badges!";
     } else {
-      $message = "You earned no badges for 100 Missouri Miles in " . $yr . ".";  
+      $message = "You earned no badges for GoRI in " . $yr . ".";  
     }
     $content['trophies'][0][0] = array(
       '#type' => 'markup',
@@ -517,9 +517,9 @@ function mo_project_build_badge_gallery_subuser($earned_badge_nids, $index, $nam
   } else {
     $challenge_dates = mo_project_get_challenge_dates_by_year();
     if ($yr == date("Y", $challenge_dates['start_sse'])) {
-      $message = "Log some miles in Missouri's beautiful outdoors to earn badges!";
+      $message = "Log some miles in Rhode Island's beautiful outdoors to earn badges!";
     } else {
-      $message = "You earned no badges for 100 Missouri Miles in " . $yr . ".";  
+      $message = "You earned no badges for GoRI in " . $yr . ".";  
     }
     $content['trophies'][$index][0] = array(
       '#type' => 'markup',
@@ -564,7 +564,7 @@ function mo_project_build_upcoming_gallery() {
   
   if (!empty($unearned_badge_nids)) {
     $yr = date("Y");
-    $message = "Need some inspiration? These are all the badges you can still unlock with <strong>100 Missouri Miles</strong> in the <strong>" . $yr . " Challenge!</strong> Try an event, set a goal to go farther than before, or check out a new activity like Paddling or Swimming! <br>Build up your confidence by selecting the " . $yr . " tab to see what you've already earned this year, or any of the other tabs for previous years.<br>Want to know what you might have missed? Browse through our new <a href=\"/archive/trophy\">Trophy Archive</a>.";
+    $message = "Need some inspiration? These are all the badges you can still unlock with <strong>GoRI</strong> in the <strong>" . $yr . " Challenge!</strong> Try an event, set a goal to go farther than before, or check out a new activity like Paddling or Swimming! <br>Build up your confidence by selecting the " . $yr . " tab to see what you've already earned this year, or any of the other tabs for previous years.<br>Want to know what you might have missed? Browse through our new <a href=\"/archive/trophy\">Trophy Archive</a>.";
   } else {
     $message = "WOW! What an overachiever! You've already earned all the badges available to you right now. Check back soon because we are adding new badges all the time.<br>Want to know what you might have missed? Browse through our new <a href=\"/archive/trophy\">Trophy Archive</a>.";
   }
@@ -750,7 +750,7 @@ function mo_project_build_badge_archive() {
     'Rolling Miles' => $b_roll,    
   );
   
-  $message = "<p>How many badges can you unlock? Here's a list of all the badges you can earn with 100 Missouri Miles (as well as a few we've archived and are no longer available).</p><p>Keep track of your progress in your <a href=\"/trophy\">Trophy Room</a> and if you have an idea for a badge you'd like to see, <a href=\"/content/connect-us\">we'd love to hear it</a>.</p>";
+  $message = "<p>How many badges can you unlock? Here's a list of all the badges you can earn with GoRI (as well as a few we've archived and are no longer available).</p><p>Keep track of your progress in your <a href=\"/trophy\">Trophy Room</a> and if you have an idea for a badge you'd like to see, <a href=\"/content/connect-us\">we'd love to hear it</a>.</p>";
   
   $content = array(
     'archive' => array(
