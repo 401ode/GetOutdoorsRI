@@ -514,14 +514,16 @@ jQuery(document).ready(function($) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(pos) {
                     var strcoords = pos.coords.latitude + ',' + pos.coords.longitude;
-                    var strparam = 'field_geofield_distance%5Borigin%5D=' + strcoords;
+                    var strparam = 'field_geofield_distance[origin]=' + strcoords;
                     var form = $('#set-location-form');
                     form.attr('action', addParam(form.attr('action'), strparam));
                     $('#edit-street-address').html(strcoords);
                     $('#edit-submit-address').click();
+                }, function(error) {
+                    window.location = addParam(window.location.href, 'field_geofield_distance[origin]=Providence,%20RI');
                 });
             } else {
-                addParam('field_geofield_distance%5Borigin%5D=Providence,%20RI');
+                window.location = addParam(window.location.href, 'field_geofield_distance[origin]=Providence,%20RI');
             }
         }
     }
