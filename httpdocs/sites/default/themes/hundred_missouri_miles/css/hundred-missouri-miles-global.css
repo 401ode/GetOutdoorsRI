@@ -2257,6 +2257,11 @@ p, li, h1, h2, h3, h4, h5, h6, div { font-size: 12px; line-height: 1.3em; margin
 	margin-bottom: 0;
 }
 
+.pane-front-page-social-buttons .inside img {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 /*text area grippie*/
 .resizable-textarea .grippie {
 	width: 96%;
