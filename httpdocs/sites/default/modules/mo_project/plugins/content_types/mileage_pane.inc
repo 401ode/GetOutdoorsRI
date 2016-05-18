@@ -30,7 +30,7 @@ function mo_project_mileage_pane_render($subtype, $conf, $args, $contexts) {
     case 'First Lady':
       global $static_users;
       $user = user_load($static_users[$conf['user']]);
-      $name = 'First Lady';
+      $name = 'First Gentleman';
       break;
     case 'Huck':
       global $static_users;

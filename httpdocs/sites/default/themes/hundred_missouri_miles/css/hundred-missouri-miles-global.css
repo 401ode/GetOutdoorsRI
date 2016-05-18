@@ -2205,6 +2205,9 @@ p, li, h1, h2, h3, h4, h5, h6, div { font-size: 12px; line-height: 1.3em; margin
 
 .pane-mo-project-gov-progress {
 	margin-bottom: 10px;
+	max-width: 500px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .pane-mo-project-gov-progress .item-list ul {
@@ -2221,11 +2224,11 @@ p, li, h1, h2, h3, h4, h5, h6, div { font-size: 12px; line-height: 1.3em; margin
 }
 
 .pane-mo-project-gov-progress .item-list ul li.Gov {
-	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/gov-icon.png") 10px no-repeat;
+	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/fl-icon.png") 10px no-repeat;
 }
 
 .pane-mo-project-gov-progress .item-list ul li.FL {
-	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/fl-icon.png") 10px no-repeat;
+	background: #f9f7f1 url("/sites/default/themes/hundred_missouri_miles/img/gov-icon.png") 10px no-repeat;
 }
 
 .pane-mo-project-gov-progress .item-list ul li.Dog {
@@ -2234,11 +2237,15 @@ p, li, h1, h2, h3, h4, h5, h6, div { font-size: 12px; line-height: 1.3em; margin
 
 .pane-mo-project-gov-progress .item-list ul li .name,
 .pane-mo-project-gov-progress .item-list ul li .mileage {
-	width: 50%;
 	float: left;
 }
 
+.pane-mo-project-gov-progress .item-list ul li .name {
+	width: 70%;
+}
+
 .pane-mo-project-gov-progress .item-list ul li .mileage {
+	width: 30%;
 	text-align: right;
 }
 

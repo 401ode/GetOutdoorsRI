@@ -555,7 +555,7 @@ function mo_project_block_info() {
     'cache' => DRUPAL_NO_CACHE,
   );
   $blocks['global_stats']['info'] = t('Statistics (global)');
-  $blocks['gov_progress']['info'] = t('Governor & First Lady Progress');
+  $blocks['gov_progress']['info'] = t('Governor & First Gentleman Progress');
   $blocks['km_to_miles_converter']['info'] = t('KM to Miles Converter');
   $blocks['leaderboard']['info'] = t('Leaderboard');
   $blocks['log_mileage_form']['info'] = t('Submit Mileage');
@@ -695,7 +695,7 @@ function mo_project_block_view($delta='') {
               $huck_mileage = $huck_mileage[0]->distance;
               $first_lady_mileage = $first_lady_mileage[0]->distance;
       }
-      $block['subject'] = t('Governor & First Lady Progress');
+      $block['subject'] = t('Governor & First Gentleman Progress');
       $content = array(
         'type' => 'ul',
         'title' => NULL,
@@ -706,12 +706,8 @@ function mo_project_block_view($delta='') {
             'class' => array('Gov'),
           ),
           1 => array(
-            'data' => t('<span class="name">First Lady:</span> <span class="mileage">' . number_format($first_lady_mileage, 1) . ' mi</span>'),
+            'data' => t('<span class="name">First Gentleman:</span> <span class="mileage">' . number_format($first_lady_mileage, 1) . ' mi</span>'),
             'class' => array('FL'),
-          ),
-          2 => array(
-            'data' => t('<span class="name">Huck:</span> <span class="mileage">' . number_format($huck_mileage, 1) . ' mi</span>'),
-            'class' => array('Dog'),
           ),
         ),
       );
