@@ -141,6 +141,16 @@ dd {
     text-decoration: none;
 }
 
+.menu-level-1 ul.menu {
+    display: table;
+    width: 100%;
+}
+
+.menu-level-1 ul.menu li {
+    display: table-cell;
+    float: none;
+}
+
 .not-logged-in .my-miles-menu-item {
 	display: none;
 }
