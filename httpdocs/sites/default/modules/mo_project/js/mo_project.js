@@ -512,18 +512,26 @@ jQuery(document).ready(function($) {
         };
         if (!$(".geofield-proximity-origin").val().trim()) {
             if (navigator.geolocation) {
+                var geoFail = function() {
+                    window.location = addParam(window.location.href, 'field_geofield_distance[origin]=Providence,%20RI');
+                };
+
+                var timeout;
+                if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                    // user has 10 seconds to allow/disallow location services
+                    timeout = setTimeout(geoFail, 10000);
+                }
                 navigator.geolocation.getCurrentPosition(function(pos) {
+                    if (timeout) clearTimeout(timeout);
                     var strcoords = pos.coords.latitude + ',' + pos.coords.longitude;
                     var strparam = 'field_geofield_distance[origin]=' + strcoords;
                     var form = $('#set-location-form');
                     form.attr('action', addParam(form.attr('action'), strparam));
                     $('#edit-street-address').html(strcoords);
                     $('#edit-submit-address').click();
-                }, function(error) {
-                    window.location = addParam(window.location.href, 'field_geofield_distance[origin]=Providence,%20RI');
-                });
+                }, geoFail, { timeout: 10000 });
             } else {
-                window.location = addParam(window.location.href, 'field_geofield_distance[origin]=Providence,%20RI');
+                geoFail();
             }
         }
     }
