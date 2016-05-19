@@ -203,7 +203,8 @@ jQuery(document).ready(function($) {
             activity = "rolled";
             break;
           case "Cycling":
-            activity = "cycled";
+          case "Biking":
+            activity = "biked";
             break;
           case "Paddling":
             activity = "paddled";
@@ -329,7 +330,8 @@ jQuery(document).ready(function($) {
             activity = "rolled";
             break;
           case "Cycling":
-            activity = "cycled";
+          case "Biking":
+            activity = "biked";
             break;
           case "Paddling":
             activity = "paddled";

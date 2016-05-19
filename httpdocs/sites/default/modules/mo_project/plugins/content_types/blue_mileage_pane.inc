@@ -20,7 +20,7 @@ function mo_project_bluemileage_pane_render($subtype, $conf, $args, $contexts) {
     'pad' => 'Paddling',
     'swm' => 'Swimming',
     'hik' => 'Hiking',
-    'bik' => 'Cycling',
+    'bik' => 'Biking',
     'wlk' => 'Walking',
     'run' => 'Running',
   );
@@ -101,7 +101,7 @@ function mo_project_bluemileage_pane_edit_form($form, &$form_state) {
       'pad' => t('Paddling Miles'),
       'swm' => t('Swimming Miles'),
       'hik' => t('Hiking Miles'),
-      'bik' => t('Cycling Miles'),
+      'bik' => t('Biking Miles'),
       'wlk' => t('Walking Miles'),
       'run' => t('Running Miles'),
     ),
