@@ -635,121 +635,17 @@ function mo_project_build_badge_archive() {
   $q_all->condition('n.type', 'achievement', '=');
   $q_all->orderBy('n.nid', 'ASC');
   $all = $q_all->execute()->fetchAllAssoc('nid');
-  
-  // Get Sponsored Event badges
-  $term_id = taxonomy_get_term_by_name('100MoMiles Events');
-  $q_event = mo_project_build_badge_archive_helper(key($term_id));
-  $event = $q_event->execute()->fetchCol();
-  $b_event = mo_project_get_archive_badge_list($event, $all);
 
-  // Get Featured Water Trail badges
-  $term_id = taxonomy_get_term_by_name('Featured Water Trails');
-  $q_water = mo_project_build_badge_archive_helper(key($term_id));
-  $water = $q_water->execute()->fetchCol();
-  $b_water = mo_project_get_archive_badge_list($water, $all);
+  $h3_array = array();
+  $terms = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('achievement_category')->vid);
 
-  // Get State Park badges
-  $term_id = taxonomy_get_term_by_name('State Parks');
-  $q_park = mo_project_build_badge_archive_helper(key($term_id));
-  $park = $q_park->execute()->fetchCol();
-  $b_park = mo_project_get_archive_badge_list($park, $all);
- 
-  // Get Healthy Month badges
-  $term_id = taxonomy_get_term_by_name('Healthy Months');  
-  $q_month = mo_project_build_badge_archive_helper(key($term_id));
-  $month = $q_month->execute()->fetchCol();
-  $b_month = mo_project_get_archive_badge_list($month, $all);
-  
-  // Get Calendar Holiday badges
-  $term_id = taxonomy_get_term_by_name('Calendar Holidays'); 
-  $q_days = mo_project_build_badge_archive_helper(key($term_id));
-  $days = $q_days->execute()->fetchCol();
-  $b_days = mo_project_get_archive_badge_list($days, $all);
-  
-  // Get Other badges
-  $term_id = taxonomy_get_term_by_name('Other Achievements');
-  $q_other = mo_project_build_badge_archive_helper(key($term_id));
-  $other = $q_other->execute()->fetchCol();
-  $b_other = mo_project_get_archive_badge_list($other, $all);
+  foreach ($terms as $term) {
+    $q_event = mo_project_build_badge_archive_helper($term->tid);
+    $event = $q_event->execute()->fetchCol();
+    $b_event = mo_project_get_archive_badge_list($event, $all);
+    $h3_array[$term->name] = $b_event;
+  }
 
-  // Get Total Miles badges
-  $term_id = taxonomy_get_term_by_name('Mileage Milestones');
-  $q_miles = mo_project_build_badge_archive_helper(key($term_id));
-  $miles = $q_miles->execute()->fetchCol();
-  $b_miles = mo_project_get_archive_badge_list($miles, $all);
- 
-   // Get Miles by Activity badges
-  $term_id = taxonomy_get_term_by_name('Activity Miles');
-  $q_walk = mo_project_build_badge_archive_helper(key($term_id));
-  $q_walk->condition('n.title', '%Walk%', 'LIKE');
-  $walk = $q_walk->execute()->fetchCol(); 
-  $b_walk = mo_project_get_archive_badge_list($walk, $all);
-
-  $q_run = mo_project_build_badge_archive_helper(key($term_id));
-  $q_run->condition('n.title', '%Run%', 'LIKE');
-  $run = $q_run->execute()->fetchCol(); 
-  $b_run = mo_project_get_archive_badge_list($run, $all);
-
-  $q_cycl = mo_project_build_badge_archive_helper(key($term_id));
-  $q_cycl->condition('n.title', '%Cycl%', 'LIKE');
-  $cycl = $q_cycl->execute()->fetchCol();
-  $b_cycl = mo_project_get_archive_badge_list($cycl, $all);
-
-  $q_hik = mo_project_build_badge_archive_helper(key($term_id));
-  $q_hik->condition('n.title', '%Hik%', 'LIKE');
-  $hik = $q_hik->execute()->fetchCol();
-  $b_hik = mo_project_get_archive_badge_list($hik, $all);
-  
-  $q_swim = mo_project_build_badge_archive_helper(key($term_id));
-  $q_swim->condition('n.title', '%Swim%', 'LIKE');
-  $swim = $q_swim->execute()->fetchCol();
-  $b_swim = mo_project_get_archive_badge_list($swim, $all);
-
-  $q_paddl = mo_project_build_badge_archive_helper(key($term_id));
-  $q_paddl->condition('n.title', '%Paddl%', 'LIKE');
-  $paddl = $q_paddl->execute()->fetchCol();  
-  $b_paddl = mo_project_get_archive_badge_list($paddl, $all);
-
-  $q_rid = mo_project_build_badge_archive_helper(key($term_id));
-  $q_rid->condition('n.title', '%Rid%', 'LIKE');
-  $rid = $q_rid->execute()->fetchCol();  
-  $b_rid = mo_project_get_archive_badge_list($rid, $all);
-
-  $q_geo = mo_project_build_badge_archive_helper(key($term_id));
-  $q_geo->condition('n.title', '%Geocach%', 'LIKE');
-  $geo = $q_geo->execute()->fetchCol();  
-  $b_geo = mo_project_get_archive_badge_list($geo, $all);
-
-  $q_skat = mo_project_build_badge_archive_helper(key($term_id));
-  $q_skat->condition('n.title', '%Skat%', 'LIKE');
-  $skat = $q_skat->execute()->fetchCol();  
-  $b_skat = mo_project_get_archive_badge_list($skat, $all);
-  
-  $q_roll = mo_project_build_badge_archive_helper(key($term_id));
-  $q_roll->condition('n.title', '%Roll%', 'LIKE');
-  $roll = $q_roll->execute()->fetchCol(); 
-  $b_roll = mo_project_get_archive_badge_list($roll, $all);
-  
-  $h3_array = array(
-    '100MoMiles Events' => $b_event,
-    'Featured Water Trails' => $b_water,
-    'State Park Attendance' => $b_park,
-    'Mileage Milestones' => $b_miles,
-    'Healthy Months' => $b_month,
-    'Active Holidays' => $b_days,
-    'Other Achievements' => $b_other,
-    'Walking Miles' => $b_walk,
-    'Running Miles' => $b_run,
-    'Cycling Miles' => $b_cycl,
-    'Hiking Miles' => $b_hik,
-    'Swimming Miles' => $b_swim,
-    'Paddling Miles' => $b_paddl,
-    'Riding Miles' => $b_rid,
-    'Geocaching Miles' => $b_geo,
-    'Skating Miles' => $b_skat,
-    'Rolling Miles' => $b_roll,    
-  );
-  
   $message = "<p>How many badges can you unlock? Here's a list of all the badges you can earn with GoRI (as well as a few we've archived and are no longer available).</p><p>Keep track of your progress in your <a href=\"/trophy\">Trophy Room</a> and if you have an idea for a badge you'd like to see, <a href=\"/content/connect-us\">we'd love to hear it</a>.</p>";
   
   $content = array(
@@ -830,151 +726,16 @@ function mo_project_build_badge_archive_helper($condition=NULL) {
 function mo_project_badge_gallery_sort($unsorted_nids) {
   $sorted_nids = array();
   
-  // Get Sponsored Event badges
-  $term_id = taxonomy_get_term_by_name('100MoMiles Events');
-  $q_event = mo_project_build_badge_archive_helper(key($term_id));
-  $q_event->condition('n.nid', $unsorted_nids, 'IN');
-  $event = $q_event->execute()->fetchCol();
-  foreach($event AS $v) {
-    $sorted_nids[] = $v;
+  $terms = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('achievement_category')->vid);
+  foreach ($terms as $term) {
+    $q_event = mo_project_build_badge_archive_helper(key($term->tid));
+    $q_event->condition('n.nid', $unsorted_nids, 'IN');
+    $event = $q_event->execute()->fetchCol();
+    foreach($event AS $v) {
+      $sorted_nids[] = $v;
+    }
   }
 
-  // Get Featured Water Trail badges
-  $term_id = taxonomy_get_term_by_name('Featured Water Trails');
-  $q_water = mo_project_build_badge_archive_helper(key($term_id));
-  $q_water->condition('n.nid', $unsorted_nids, 'IN');
-  $water = $q_water->execute()->fetchCol();
-  foreach($water AS $v) {
-    $sorted_nids[] = $v;
-  }
-  
-  // Get State Park badges
-  $term_id = taxonomy_get_term_by_name('State Parks');
-  $q_park = mo_project_build_badge_archive_helper(key($term_id));
-  $q_park->condition('n.nid', $unsorted_nids, 'IN');
-  $park = $q_park->execute()->fetchCol();
-  foreach($park AS $v) {
-    $sorted_nids[] = $v;
-  }
- 
-  // Get Healthy Month badges
-  $term_id = taxonomy_get_term_by_name('Healthy Months');  
-  $q_month = mo_project_build_badge_archive_helper(key($term_id));
-  $q_month->condition('n.nid', $unsorted_nids, 'IN');
-  $month = $q_month->execute()->fetchCol();
-  foreach($month AS $v) {
-    $sorted_nids[] = $v;
-  }
-  
-  // Get Calendar Holiday badges
-  $term_id = taxonomy_get_term_by_name('Calendar Holidays'); 
-  $q_days = mo_project_build_badge_archive_helper(key($term_id));
-  $q_days->condition('n.nid', $unsorted_nids, 'IN');
-  $days = $q_days->execute()->fetchCol();
-  foreach($days AS $v) {
-    $sorted_nids[] = $v;
-  }
-  
-  // Get Other badges
-  $term_id = taxonomy_get_term_by_name('Other Achievements');
-  $q_other = mo_project_build_badge_archive_helper(key($term_id));
-  $q_other->condition('n.nid', $unsorted_nids, 'IN');
-  $other = $q_other->execute()->fetchCol();
-  foreach($other AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  // Get Total Miles badges
-  $term_id = taxonomy_get_term_by_name('Mileage Milestones');
-  $q_miles = mo_project_build_badge_archive_helper(key($term_id));
-  $q_miles->condition('n.nid', $unsorted_nids, 'IN');
-  $miles = $q_miles->execute()->fetchCol();
-  foreach($miles AS $v) {
-    $sorted_nids[] = $v;
-  }
-   
-   // Get Miles by Activity badges
-  $term_id = taxonomy_get_term_by_name('Activity Miles');
-  $q_walk = mo_project_build_badge_archive_helper(key($term_id));
-  $q_walk->condition('n.title', '%Walk%', 'LIKE');
-  $q_walk->condition('n.nid', $unsorted_nids, 'IN');
-  $walk = $q_walk->execute()->fetchCol(); 
-  foreach($walk AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_run = mo_project_build_badge_archive_helper(key($term_id));
-  $q_run->condition('n.title', '%Run%', 'LIKE');
-  $q_run->condition('n.nid', $unsorted_nids, 'IN');
-  $run = $q_run->execute()->fetchCol(); 
-  foreach($run AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_cycl = mo_project_build_badge_archive_helper(key($term_id));
-  $q_cycl->condition('n.title', '%Cycl%', 'LIKE');
-  $q_cycl->condition('n.nid', $unsorted_nids, 'IN');
-  $cycl = $q_cycl->execute()->fetchCol();
-  foreach($cycl AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_hik = mo_project_build_badge_archive_helper(key($term_id));
-  $q_hik->condition('n.title', '%Hik%', 'LIKE');
-  $q_hik->condition('n.nid', $unsorted_nids, 'IN');
-  $hik = $q_hik->execute()->fetchCol();
-  foreach($hik AS $v) {
-    $sorted_nids[] = $v;
-  }
-  
-  $q_swim = mo_project_build_badge_archive_helper(key($term_id));
-  $q_swim->condition('n.title', '%Swim%', 'LIKE');
-  $q_swim->condition('n.nid', $unsorted_nids, 'IN');
-  $swim = $q_swim->execute()->fetchCol();
-  foreach($swim AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_paddl = mo_project_build_badge_archive_helper(key($term_id));
-  $q_paddl->condition('n.title', '%Paddl%', 'LIKE');
-  $q_paddl->condition('n.nid', $unsorted_nids, 'IN');
-  $paddl = $q_paddl->execute()->fetchCol();  
-  foreach($paddl AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_rid = mo_project_build_badge_archive_helper(key($term_id));
-  $q_rid->condition('n.title', '%Rid%', 'LIKE');
-  $q_rid->condition('n.nid', $unsorted_nids, 'IN');
-  $rid = $q_rid->execute()->fetchCol();  
-  foreach($rid AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_geo = mo_project_build_badge_archive_helper(key($term_id));
-  $q_geo->condition('n.title', '%Geocach%', 'LIKE');
-  $q_geo->condition('n.nid', $unsorted_nids, 'IN');
-  $geo = $q_geo->execute()->fetchCol();  
-  foreach($geo AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_skat = mo_project_build_badge_archive_helper(key($term_id));
-  $q_skat->condition('n.title', '%Skat%', 'LIKE');
-  $q_skat->condition('n.nid', $unsorted_nids, 'IN');
-  $skat = $q_skat->execute()->fetchCol();  
-  foreach($skat AS $v) {
-    $sorted_nids[] = $v;
-  }
-  
-  $q_roll = mo_project_build_badge_archive_helper(key($term_id));
-  $q_roll->condition('n.title', '%Roll%', 'LIKE');
-  $q_roll->condition('n.nid', $unsorted_nids, 'IN');
-  $roll = $q_roll->execute()->fetchCol(); 
-  foreach($roll AS $v) {
-    $sorted_nids[] = $v;
-  }
-  
   return $sorted_nids;
 } 
 
