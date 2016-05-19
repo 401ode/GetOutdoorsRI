@@ -534,7 +534,7 @@ function mo_project_activity_log_export_form() {
   );
   $form['instructions'][0] = array(
     '#type' => 'markup',
-    '#markup' => t('<p>Want a record of your 100 Missouri Miles activity? Just pick a start and end date, then click the "Export" button to download a spreadsheet of your activity.</p>'),
+    '#markup' => t('<p>Want a record of your GoRI activity? Just pick a start and end date, then click the "Export" button to download a spreadsheet of your activity.</p>'),
   );  
   $form['range'] = array(
     '#type' => 'fieldset',
@@ -647,7 +647,7 @@ function mo_project_activity_log_export_form_submit($form, &$form_state) {
   }
 
   // complete sending response headers to the browser
-  $filename = 'attachment;filename=100momiles_' . $begin_date . '-' . $end_date . '.csv';
+  $filename = 'attachment;filename=getoutdoorsri_' . $begin_date . '-' . $end_date . '.csv';
   drupal_add_http_header('Content-Disposition', $filename);  
   
   $query = db_select('node', 'n');
