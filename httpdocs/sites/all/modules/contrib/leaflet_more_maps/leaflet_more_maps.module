@@ -341,7 +341,7 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
     'settings' => $default_settings,
     'layers' => array(
       'layer' => array(
-        'urlTemplate' => $prot . "{s}.tile.opencyclemap.org/cycle/$zxy",
+        'urlTemplate' => $prot . "{s}.tile.thunderforest.com/cycle/$zxy",
         'options' => array('attribution' => $attr_thunderforest),
       ),
     ),
