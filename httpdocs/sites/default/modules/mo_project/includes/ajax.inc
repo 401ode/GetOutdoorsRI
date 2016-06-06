@@ -97,7 +97,7 @@ function mo_project_ajax_submit_mileage() {
       $badge['text']['#markup'] = t('Congratulations, ' . $name[0] . '! You\'ve earned the <span class="badge-name">' . $node->title . '</span> badge! You can view it in your <a href="/trophy">Trophy&nbsp;Room</a>.');
       $badge['text']['#suffix'] = t('</p>');
       if ($buddy_class == "Me") {
-        $tweet = 'I just earned the ' . $node->title . ' badge with @100MoMiles! Explore #100MoMiles with me at http://100MissouriMiles.com.';
+        $tweet = 'I just earned the ' . $node->title . ' badge with @GetOutdoorsRI! Explore #GetOutDoorsRI with me at http://GetOutdoorsRI.com.';
         $badge['share'] = array(
           '#type' => 'container',
           '#attributes' => array(
