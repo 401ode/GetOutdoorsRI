@@ -636,86 +636,15 @@ function mo_project_build_badge_archive() {
   $q_all->orderBy('n.nid', 'ASC');
   $all = $q_all->execute()->fetchAllAssoc('nid');
 
-  // Get GetOutdoorsRI Event badges
-  $term_id = taxonomy_get_term_by_name('GetOutdoorsRI Events');
-  $q_event = mo_project_build_badge_archive_helper(key($term_id));
-  $event = $q_event->execute()->fetchCol();
-  $b_event = mo_project_get_archive_badge_list($event, $all);
+  $h3_array = array();
+  $terms = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('achievement_category')->vid);
 
-  // Get State Park Attendance badges
-  $term_id = taxonomy_get_term_by_name('State Park Attendance');
-  $q_park = mo_project_build_badge_archive_helper(key($term_id));
-  $park = $q_park->execute()->fetchCol();
-  $b_park = mo_project_get_archive_badge_list($park, $all);
-
-  // Get Total Miles badges
-  $term_id = taxonomy_get_term_by_name('Mileage Milestones');
-  $q_miles = mo_project_build_badge_archive_helper(key($term_id));
-  $miles = $q_miles->execute()->fetchCol();
-  $b_miles = mo_project_get_archive_badge_list($miles, $all);
-
-  // Get Healthy Month badges
-  $term_id = taxonomy_get_term_by_name('Healthy Months');
-  $q_month = mo_project_build_badge_archive_helper(key($term_id));
-  $month = $q_month->execute()->fetchCol();
-  $b_month = mo_project_get_archive_badge_list($month, $all);
-
-  // Get Calendar Holiday badges
-  $term_id = taxonomy_get_term_by_name('Active Holidays');
-  $q_days = mo_project_build_badge_archive_helper(key($term_id));
-  $days = $q_days->execute()->fetchCol();
-  $b_days = mo_project_get_archive_badge_list($days, $all);
-
-  // Get Other badges
-  $term_id = taxonomy_get_term_by_name('Other Achievements');
-  $q_other = mo_project_build_badge_archive_helper(key($term_id));
-  $other = $q_other->execute()->fetchCol();
-  $b_other = mo_project_get_archive_badge_list($other, $all);
-
-  $q_walk = mo_project_build_badge_archive_helper(key($term_id));
-  $q_walk->condition('n.title', '%Walk%', 'LIKE');
-  $walk = $q_walk->execute()->fetchCol();
-  $b_walk = mo_project_get_archive_badge_list($wlk, $all);
-
-  $q_run = mo_project_build_badge_archive_helper(key($term_id));
-  $q_run->condition('n.title', '%Run%', 'LIKE');
-  $run = $q_run->execute()->fetchCol();
-  $b_run = mo_project_get_archive_badge_list($run, $all);
-
-  $q_bik = mo_project_build_badge_archive_helper(key($term_id));
-  $q_bik->condition('n.title', '%Bik%', 'LIKE');
-  $bik = $q_bik->execute()->fetchCol();
-  $b_bik = mo_project_get_archive_badge_list($bik, $all);
-
-  $q_hik = mo_project_build_badge_archive_helper(key($term_id));
-  $q_hik->condition('n.title', '%Hik%', 'LIKE');
-  $hik = $q_hik->execute()->fetchCol();
-  $b_hik = mo_project_get_archive_badge_list($hik, $all);
-
-  $q_swm = mo_project_build_badge_archive_helper(key($term_id));
-  $q_swm->condition('n.title', '%Swim%', 'LIKE');
-  $swm = $q_swm->execute()->fetchCol();
-  $b_swm = mo_project_get_archive_badge_list($swm, $all);
-
-  $q_pad = mo_project_build_badge_archive_helper(key($term_id));
-  $q_pad->condition('n.title', '%Paddl%', 'LIKE');
-  $pad = $q_pad->execute()->fetchCol();
-  $b_pad = mo_project_get_archive_badge_list($pad, $all);
-
-  $h3_array = array(
-    'GetOutdoorsRI Events' => $b_event,
-    'State Park Attendance' => $b_park,
-    'Mileage Milestones' => $b_miles,
-    'Healthy Months' => $b_month,
-    'Active Holidays' => $b_days,
-    'Other Achievements' => $b_other,
-    'Walking Miles' => $b_wlk,
-    'Running Miles' => $b_run,
-    'Biking Miles' => $b_bik,
-    'Hiking Miles' => $b_hik,
-    'Swimming Miles' => $b_swm,
-    'Paddling Miles' => $b_pad,
-  );
+  foreach ($terms as $term) {
+    $q_event = mo_project_build_badge_archive_helper($term->tid);
+    $event = $q_event->execute()->fetchCol();
+    $b_event = mo_project_get_archive_badge_list($event, $all);
+    $h3_array[$term->name] = $b_event;
+  }
 
   $message = "<p>How many badges can you unlock? Here's a list of all the badges you can earn with GoRI (as well as a few we've archived and are no longer available).</p><p>Keep track of your progress in your <a href=\"/trophy\">Trophy Room</a> and if you have an idea for a badge you'd like to see, <a href=\"/content/connect-us\">we'd love to hear it</a>.</p>";
 
@@ -797,106 +726,14 @@ function mo_project_build_badge_archive_helper($condition=NULL) {
 function mo_project_badge_gallery_sort($unsorted_nids) {
   $sorted_nids = array();
 
-  // Get Sponsored Event badges
-  $term_id = taxonomy_get_term_by_name('GetOutdoorsRI Events');
-  $q_event = mo_project_build_badge_archive_helper(key($term_id));
-  $q_event->condition('n.nid', $unsorted_nids, 'IN');
-  $event = $q_event->execute()->fetchCol();
-  foreach($event AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  // Get State Park badges
-  $term_id = taxonomy_get_term_by_name('State Park Attendance');
-  $q_park = mo_project_build_badge_archive_helper(key($term_id));
-  $q_park->condition('n.nid', $unsorted_nids, 'IN');
-  $park = $q_park->execute()->fetchCol();
-  foreach($park AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  // Get Total Miles badges
-  $term_id = taxonomy_get_term_by_name('Mileage Milestones');
-  $q_miles = mo_project_build_badge_archive_helper(key($term_id));
-  $q_miles->condition('n.nid', $unsorted_nids, 'IN');
-  $miles = $q_miles->execute()->fetchCol();
-  foreach($miles AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  // Get Healthy Month badges
-  $term_id = taxonomy_get_term_by_name('Healthy Months');
-  $q_month = mo_project_build_badge_archive_helper(key($term_id));
-  $q_month->condition('n.nid', $unsorted_nids, 'IN');
-  $month = $q_month->execute()->fetchCol();
-  foreach($month AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  // Get Calendar Holiday badges
-  $term_id = taxonomy_get_term_by_name('Active Holidays');
-  $q_days = mo_project_build_badge_archive_helper(key($term_id));
-  $q_days->condition('n.nid', $unsorted_nids, 'IN');
-  $days = $q_days->execute()->fetchCol();
-  foreach($days AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  // Get Other badges
-  $term_id = taxonomy_get_term_by_name('Other Achievements');
-  $q_other = mo_project_build_badge_archive_helper(key($term_id));
-  $q_other->condition('n.nid', $unsorted_nids, 'IN');
-  $other = $q_other->execute()->fetchCol();
-  foreach($other AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_wlk = mo_project_build_badge_archive_helper(key($term_id));
-  $q_wlk->condition('n.title', '%Walk%', 'LIKE');
-  $q_wlk->condition('n.nid', $unsorted_nids, 'IN');
-  $wlk = $q_wlk->execute()->fetchCol();
-  foreach($wlk AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_run = mo_project_build_badge_archive_helper(key($term_id));
-  $q_run->condition('n.title', '%Run%', 'LIKE');
-  $q_run->condition('n.nid', $unsorted_nids, 'IN');
-  $run = $q_run->execute()->fetchCol();
-  foreach($run AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_bik = mo_project_build_badge_archive_helper(key($term_id));
-  $q_bik->condition('n.title', '%Bik%', 'LIKE');
-  $q_bik->condition('n.nid', $unsorted_nids, 'IN');
-  $bik = $q_bik->execute()->fetchCol();
-  foreach($bik AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_hik = mo_project_build_badge_archive_helper(key($term_id));
-  $q_hik->condition('n.title', '%Hik%', 'LIKE');
-  $q_hik->condition('n.nid', $unsorted_nids, 'IN');
-  $hik = $q_hik->execute()->fetchCol();
-  foreach($hik AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_swm = mo_project_build_badge_archive_helper(key($term_id));
-  $q_swm->condition('n.title', '%Swim%', 'LIKE');
-  $q_swm->condition('n.nid', $unsorted_nids, 'IN');
-  $swm = $q_swm->execute()->fetchCol();
-  foreach($swm AS $v) {
-    $sorted_nids[] = $v;
-  }
-
-  $q_pad = mo_project_build_badge_archive_helper(key($term_id));
-  $q_pad->condition('n.title', '%Paddl%', 'LIKE');
-  $q_pad->condition('n.nid', $unsorted_nids, 'IN');
-  $pad = $q_pad->execute()->fetchCol();
-  foreach($pad AS $v) {
-    $sorted_nids[] = $v;
+  $terms = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('achievement_category')->vid);
+  foreach ($terms as $term) {
+    $q_event = mo_project_build_badge_archive_helper($term->tid);
+    $q_event->condition('n.nid', $unsorted_nids, 'IN');
+    $event = $q_event->execute()->fetchCol();
+    foreach($event AS $v) {
+      $sorted_nids[] = $v;
+    }
   }
 
   return $sorted_nids;
