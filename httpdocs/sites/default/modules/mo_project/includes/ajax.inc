@@ -19,12 +19,12 @@
 
 /**
  *  @brief  Creates a new mileage node.  Evaluates new earned badges.  Creates the badge earned banner with tweet capability.
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  *  updated 2015-04-28  to add sub-user
- */ 
+ */
 function mo_project_ajax_submit_mileage() {
   global $user;
   $node = new stdClass();
@@ -36,7 +36,7 @@ function mo_project_ajax_submit_mileage() {
   $node->promote = 0;
   $node->sticky = 0;
   node_object_prepare($node);
-  
+
   $date = $_POST['date']['date'] . ' 00:00:00';
   $node->field_mileage_date[$node->language][0]['value'] = t($date);
   $i = 0;
@@ -82,13 +82,13 @@ function mo_project_ajax_submit_mileage() {
         'text' => array(),
       );
     }
-    
+
     // Get sub-user name
     $query_name = db_select('subuser', 's');
     $query_name->fields('s', array('name'));
     $query_name->condition('s.suid', $suid, '=');
-    $name = $query_name->execute()->fetchCol(); 
-      
+    $name = $query_name->execute()->fetchCol();
+
     foreach ($new_badge_nodes as $nid=>$node) {
       $badge = $badge_template;
       $image_field = field_get_items('node', $node, 'field_achievement_badge');
@@ -97,7 +97,7 @@ function mo_project_ajax_submit_mileage() {
       $badge['text']['#markup'] = t('Congratulations, ' . $name[0] . '! You\'ve earned the <span class="badge-name">' . $node->title . '</span> badge! You can view it in your <a href="/trophy">Trophy&nbsp;Room</a>.');
       $badge['text']['#suffix'] = t('</p>');
       if ($buddy_class == "Me") {
-        $tweet = 'I just earned the ' . $node->title . ' badge with @GetOutdoorsRI! Explore #GetOutDoorsRI with me at http://GetOutdoorsRI.com.';
+        $tweet = 'I just earned the ' . $node->title . ' badge with @GetOutdoorsRI! Explore #GetOutdoorsRI with me at http://GetOutdoorsRI.com.';
         $badge['share'] = array(
           '#type' => 'container',
           '#attributes' => array(
@@ -120,10 +120,10 @@ function mo_project_ajax_submit_mileage() {
 
 /**
  *  @brief  Displays blocks for home page and dashboard
- *  
+ *
  *  @param [in] $delta  Machine name of block
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_ajax_block_content($delta) {
@@ -147,9 +147,9 @@ function mo_project_ajax_block_content($delta) {
 
 /**
  *  @brief  Displays total mileage logged by all verified users in the site header
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_ajax_total_mileage() {
@@ -161,9 +161,9 @@ function mo_project_ajax_total_mileage() {
 
 /**
  *  @brief  Displays results of activity conversions
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_ajax_convert_activity() {
@@ -188,13 +188,13 @@ function mo_project_ajax_convert_activity() {
 
 /**
  *  @brief  Converts minutes to walking miles
- *  
+ *
  *  @return  Array of the converted mileage and the activity performed
- *  
+ *
  *  @details  2013
  */
 function mo_project_convert_activity() {
-  
+
   $result = array();
   if (!empty($_POST['activity']) and !empty($_POST['time'])) {
     $activity = taxonomy_term_load($_POST['activity']);
@@ -206,15 +206,15 @@ function mo_project_convert_activity() {
   $result['mileage'] = $mileage;
   $result['activity'] = $activity;
   return $result;
-  
+
 }
 
 
 /**
  *  @brief  Calculates and displays kilometer to mile conversion
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_ajax_convert_km() {
@@ -231,9 +231,9 @@ function mo_project_ajax_convert_km() {
 
 /**
  *  @brief  Calculates and displays calories burned for supplied time of supplied activity
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_ajax_calculate_calories() {
@@ -257,9 +257,9 @@ function mo_project_ajax_calculate_calories() {
 
 /**
  *  @brief  Creates and displays autocomplete locations from facilities and trail names
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_mileage_location_autocomplete($string) {
@@ -321,9 +321,9 @@ function mo_project_mileage_location_autocomplete($string) {
 
 /**
  *  @brief  Updates mileage totals on homepage and dashboard
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_get_user_current_stats() {
@@ -347,7 +347,7 @@ function mo_project_get_user_current_stats() {
       $avg30_mileage = mo_project_get_leaderboard_activity_stats('average', $activity->tid, $user->uid);
       $leader30_mileage = mo_project_get_leaderboard_activity_stats('leader', $activity->tid, $user->uid);
 
-      // If the user enters miles that make him/her the leader and cron has not yet run, 
+      // If the user enters miles that make him/her the leader and cron has not yet run,
       // make the user the leader.
       if ($user30_mileage > $leader30_mileage) {
         $leader30_mileage = $user30_mileage;
@@ -355,13 +355,13 @@ function mo_project_get_user_current_stats() {
           $avg30_mileage = $user30_mileage;
         }
       }
-      
+
       $output['user_30day_' . $name] = (int) round($user30_mileage);
       $output['avg_30day_' . $name] = (int) round($avg30_mileage);
       $output['leader_30day_' . $name] = (int) round($leader30_mileage);
     }
   }
-  
+
   $output['upcoming_trophies'] = drupal_render(mo_project_build_upcoming_trophy_block());
   drupal_json_output($output);
   drupal_exit();
@@ -370,9 +370,9 @@ function mo_project_get_user_current_stats() {
 
 /**
  *  @brief  Display individual badge description on click
- *  
+ *
  *  @return  void
- *  
+ *
  *  @details  2013
  */
 function mo_project_badge_detail($nid) {
