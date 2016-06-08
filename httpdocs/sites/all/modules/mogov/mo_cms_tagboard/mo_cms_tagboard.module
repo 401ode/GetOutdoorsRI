@@ -54,19 +54,18 @@ function mo_cms_tagboard_block_view($delta='') {
   switch ($delta) {
 
     case 'mo_cms_tagboard':
-      $id = variable_get_value('tagboard_id');
       $content = array(
         '#type' => 'container',
         '#attributes' => array(
-          'class' => 'tagboard-embed',
-          'tgb-slug' => $id
+          'id' => 'tagboard-embed',
         ),
       );
       $block['content'] = render($content);
-      $js = /*'var tagboardOptions = {tagboard:"' . $id . '", autoLoad: true};'*/''
+      $id = variable_get_value('tagboard_id');
+      $js = 'var tagboardOptions = {tagboard:"' . $id . '", autoLoad: true};'
           . 'Modernizr.load({'
           .   'test: Modernizr.mq("only screen and (min-width:739px)"),'
-          .   'yep: "//static.tagboard.com/public/js/embed.js"'
+          .   'yep: "//tagboard.com/public/js/embed.js"'
           . '})';
       drupal_add_js($js, array('type' => 'inline', 'scope' => 'footer'));
       break;
