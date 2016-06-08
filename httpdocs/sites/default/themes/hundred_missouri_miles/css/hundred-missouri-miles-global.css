@@ -1,18 +1,18 @@
 /**
  * This file will hold styles for the mobile version of your website (mobile
  * first).
- * 
+ *
  * This also can include ANY global CSS that applies site-wide. Unless
  * overwritten by a more specific style rule, CSS declarations in this file
  * will apply site-wide.
- * 
+ *
  * File will be aggregated and minimized when performance options are enabled,
  * so feel free to use readable formatting.
  */
- 
+
 
 body {
-	font-size: 16px; 
+	font-size: 16px;
     line-height: 1.75em;
 	color: #3B2D1B;
 	background: #eae4cf url("/sites/default/themes/hundred_missouri_miles/img/footer-image-sm.png") center bottom repeat-x;
@@ -31,8 +31,8 @@ h6 {
 	letter-spacing: normal;
 }
 
-h1, 
-.dotted-underline, 
+h1,
+.dotted-underline,
 #home-page .pane-mo-cms-slider > h2 {
 	border-bottom: 2px dotted #d5cfb0;
 }
@@ -46,7 +46,7 @@ h6 {
 }
 
 p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address, fieldset {
-	margin-bottom: 14px; 
+	margin-bottom: 14px;
 }
 
 ol {
@@ -92,21 +92,21 @@ dd {
 
 #region-header-left {
 	background-color: #5cb8b4;
-	border-bottom: 4px solid #34807b; 
-	margin: 0; 
+	border-bottom: 4px solid #34807b;
+	margin: 0;
 }
 
-#zone-header .block-title, 
+#zone-header .block-title,
 #block-mo-project-gov-progress {
     display: none;
 	font-weight: bold;
 }
 
 .logo {
-	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/100-Mo-Logo.png"); 
+	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/100-Mo-Logo.png");
 	height: 150px;
 	width: 185px;
-	display: block; 
+	display: block;
 }
 
 
@@ -118,7 +118,7 @@ dd {
 }*/
 
 .menu-level-1 {
-	width: 100%; 
+	width: 100%;
 	position: relative;
 }
 
@@ -130,7 +130,7 @@ dd {
 
 .menu-level-1 li a, #block-menu-menu-secondary-menu li a {
 	color: #fff;
-	font-size: 1em; 
+	font-size: 1em;
 	background: #1E5350;
     border-radius: 10px;
     display: block;
@@ -183,17 +183,17 @@ dd {
 	width: 100px;
 }
 
-#navigate{ 
+#navigate{
   	background: #2A7771;
-	border-radius: 10px 10px 0 0; 
-	height: 20px; 
+	border-radius: 10px 10px 0 0;
+	height: 20px;
 	bottom: 0;
 	position: absolute;
 	top: 123px;
     font-size: .8em;
 }
 
-#navigate .menu-toggle {   
+#navigate .menu-toggle {
     color: #E3E1CC;
     display: block;
     padding: 3px 5px 0px 5px;
@@ -229,8 +229,8 @@ span.arrow {
 	height: 10px;
 }
 
-body.front h1#page-title, 
-.block-user-stats .block-title, 
+body.front h1#page-title,
+.block-user-stats .block-title,
 .welcome-msg .governor  {
   display: none;
 }
@@ -318,7 +318,7 @@ ul.badges {
 	color: #EFEDE1;
 	margin: 0;
 	padding: 10px
-	
+
 }
 
 #overall-badges p, #activity-badges p,
@@ -398,13 +398,13 @@ ul.badges {
 	margin-bottom: 0;
 }
 
-.page-home #block-mo-project-user-stats, 
-#block-mo-project-log-mileage-form-front, 
+.page-home #block-mo-project-user-stats,
+#block-mo-project-log-mileage-form-front,
 .not-logged-in.page-home #block-block-15 {
 	margin-bottom: 20px;
 }
 
-.logged-in.page-home #block-block-15 .block-inner, 
+.logged-in.page-home #block-block-15 .block-inner,
 .logged-in.page-home #block-block-10 .block-inner {
 	border: none;
 	background: none;
@@ -431,9 +431,9 @@ ul.badges {
 /*logged in homepage*/
 
 #leaderboard-group-notable-figures h3,
-#leaderboard-group-notable-figures .activity-bg, 
-#leaderboard-group-notable-figures .activity-icon, 
-.badge-goal { 
+#leaderboard-group-notable-figures .activity-bg,
+#leaderboard-group-notable-figures .activity-icon,
+.badge-goal {
 	display: none;
 }
 
@@ -454,7 +454,7 @@ ul.badges {
 	padding: 20px 0 20px 40px;
 	height: 20px;
 	display: block;
-	line-height: 1.2em; 
+	line-height: 1.2em;
 }
 
 #req-medal:hover, #req-medal:focus {
@@ -491,27 +491,27 @@ ul.badges {
 #block-mo-project-event-search .block-inner {
 	background: #F0EEE2;
 	border: 1px solid #BDBAA9;
-	padding: 10px; 
+	padding: 10px;
 }
 
 #views-exposed-form-trails-page .form-type-bef-checkbox  {
-	white-space: nowrap;	
+	white-space: nowrap;
 }
 
-#views-exposed-form-trails-page .views-exposed-widget.views-submit-button, 
+#views-exposed-form-trails-page .views-exposed-widget.views-submit-button,
 #views-exposed-form-mo-cms-events-lists-mo-cms-events-search .views-exposed-widget.views-submit-button {
 	float: none;
 	clear: left;
-	padding: 10px 0;	
+	padding: 10px 0;
 }
 
-#edit-submit-trails { 
+#edit-submit-trails {
 	margin: 0;
 }
 
 table {
 	color: #3B2D1B;
-	
+
 }
 
 thead th, th, th.active {
@@ -536,7 +536,7 @@ tr:hover td, tr.even:hover td.active, tr.odd:hover td.active {
 tr.even td.active, tr.odd td.active, th.active {
 	border-left: 0;
 	border-right: 0;
-	
+
 }
 
 th.active img {
@@ -583,16 +583,16 @@ th a:hover, th a:focus {
 
 /*forms*/
 button,
-.button, 
-input[type="reset"], 
-input[type="submit"], 
-input[type="button"], 
+.button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"],
 .form-actions input,
 .form-actions input:focus,
 .form-actions input:hover,
-a.btn, 
-.logged-in.page-user ul.tabs li a, 
-#user-stats a.btn, 
+a.btn,
+.logged-in.page-user ul.tabs li a,
+#user-stats a.btn,
 #section-content a.btn {
 	background: #c16236;
 	color: #fff;
@@ -611,24 +611,24 @@ a.btn,
 }
 
 button:hover,
-.button:hover, 
-input[type="reset"]:hover, 
-input[type="submit"]:hover, 
-input[type="button"]:hover, 
-.form-actions input:hover, 
-a.btn:hover, 
-.logged-in.page-user ul.tabs li a:hover, 
-#user-stats a.btn:hover, 
-#section-content a.btn:hover, 
+.button:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.form-actions input:hover,
+a.btn:hover,
+.logged-in.page-user ul.tabs li a:hover,
+#user-stats a.btn:hover,
+#section-content a.btn:hover,
 button:focus,
-.button:focus, 
-input[type="reset"]:focus, 
-input[type="submit"]:focus, 
-input[type="button"]:focus, 
-.form-actions input:focus, 
-a.btn:focus, 
-.logged-in.page-user ul.tabs li a:focus, 
-#user-stats a.btn:focus, 
+.button:focus,
+input[type="reset"]:focus,
+input[type="submit"]:focus,
+input[type="button"]:focus,
+.form-actions input:focus,
+a.btn:focus,
+.logged-in.page-user ul.tabs li a:focus,
+#user-stats a.btn:focus,
 #section-content a.btn:focus  {
 	color: #fff;
 	background: #a3431b;
@@ -639,15 +639,15 @@ a.btn:focus,
 	background: #ce8652;
 }
 
-button:focus, 
-button:active, 
+button:focus,
+button:active,
 .button:focus,
 .button:active,
-input:focus, 
-input:active, 
-select:focus, 
-select:active, 
-textarea:focus, 
+input:focus,
+input:active,
+select:focus,
+select:active,
+textarea:focus,
 textarea:active  {
 	box-shadow: 0 0 7px #B15126
 }
@@ -662,7 +662,7 @@ input[type=text], textarea, select, input[type=password] {
 }
 
 input[type=text], input[type=password], select {
-	height: 26px; 
+	height: 26px;
 }
 
 input, select, textarea {
@@ -702,7 +702,7 @@ select.multiselect_sel {
 /*content */
 
 #zone-content {
-	margin-top: 20px; 
+	margin-top: 20px;
 }
 
 #zone-content ul li.leaf {
@@ -711,7 +711,7 @@ select.multiselect_sel {
 	color: #2a7671;
 }
 
-.section-content .node ol, 
+.section-content .node ol,
 .section-content .node ul {
 	padding-left: 0;
 	margin-left: 30px;
@@ -723,18 +723,18 @@ select.multiselect_sel {
 .section-content h5 { font-size: 16px; }
 .section-content h6 { font-size: 14px; }
 
-.section-content a, 
-#modal-content a, 
+.section-content a,
+#modal-content a,
 #section-footer a {
     color: #2a7671;
     background-color: transparent;
 	font-weight: bold;
 }
 
-.section-content a:hover, 
-.section-content a:focus, 
-#modal-content a:hover, 
-#modal-content a:focus, 
+.section-content a:hover,
+.section-content a:focus,
+#modal-content a:hover,
+#modal-content a:focus,
 #section-footer a:hover,
 #section-footer a:focus {
     color: #b15226;
@@ -749,10 +749,10 @@ select.multiselect_sel {
 }
 
 
-.section-content img, #region-branding img { 
+.section-content img, #region-branding img {
 	max-width: 100%!important;
-	height: auto!important; 
-	display: block; 
+	height: auto!important;
+	display: block;
 	position: relative;
 }
 
@@ -760,22 +760,22 @@ select.multiselect_sel {
 	position: inherit;
 }
 
-.folded-corner-box, 
+.folded-corner-box,
 .content-box,
-#node-panel-234688 > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div, 
-#mo-cms-user-group-detail-panel #panel-top-left-upper .inside  { 
-	background: #EFEDE1 url("/sites/default/themes/hundred_missouri_miles/img/folded_corner.png") no-repeat top right; 
+#node-panel-234688 > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div,
+#mo-cms-user-group-detail-panel #panel-top-left-upper .inside  {
+	background: #EFEDE1 url("/sites/default/themes/hundred_missouri_miles/img/folded_corner.png") no-repeat top right;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	margin-bottom: 20px;
 }
 
-.folded-corner-box h2, 
+.folded-corner-box h2,
 .content-box h2,
-#node-panel-234688  > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div h2, 
-.logged-in.node-type-mo-cms-user-group h1, 
-.logged-in.page-groups h1, 
+#node-panel-234688  > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div h2,
+.logged-in.node-type-mo-cms-user-group h1,
+.logged-in.page-groups h1,
 .node-type-achievement #region-content h2 {
 	border-bottom: 2px dotted #d5cfb0;
     color: #624f36;
@@ -825,8 +825,8 @@ select.multiselect_sel {
 }
 
 
-.content-box { 
-	background-image: none; 
+.content-box {
+	background-image: none;
 }
 
 .content-box.add-padding ul {
@@ -834,7 +834,7 @@ select.multiselect_sel {
 }
 
 
-.add-height { 
+.add-height {
 	min-height: 370px;
 }
 
@@ -850,7 +850,7 @@ select.multiselect_sel {
 	text-transform: capitalize;
 }
 
-.add-padding, 
+.add-padding,
 #node-panel-234688  > div.content.clearfix > div > div.panel-panel.grid-16.alpha > div,
 #mo-cms-user-group-detail-panel #panel-top-left-upper .inside {
 	padding: 20px;
@@ -863,7 +863,7 @@ select.multiselect_sel {
 	color: #F4F0E6;
 	text-align: center;
 	margin: 20px 0;
-	
+
 }
 
 /*.mileage-box.thirty-day {
@@ -1034,7 +1034,7 @@ span.mi {
     height: 17px;
     background-position: -49px -48px;
 	display: inline-block;
-	margin-right: 5px; 
+	margin-right: 5px;
 }
 
 .stats-icon-white {
@@ -1051,40 +1051,40 @@ span.mi {
 
 
 
-.transparent-icon-cycling, 
-.transparent-icon-geocaching, 
+.transparent-icon-biking,
+.transparent-icon-geocaching,
 .transparent-icon-hiking,
 .transparent-icon-paddling,
 .transparent-icon-riding,
 .transparent-icon-walking,
 .transparent-icon-rolling,
 .transparent-icon-swimming,
-.transparent-icon-running, 
-.transparent-icon-skating, 
-.transparent-icon-person, 
+.transparent-icon-running,
+.transparent-icon-skating,
+.transparent-icon-person,
 .transparent-icon-gov,
 .transparent-icon-first-lady,
-.leaderboard-activity-stats.cycling .mileage-box.first, 
-.leaderboard-activity-stats.geocaching .mileage-box.first, 
-.leaderboard-activity-stats.hiking .mileage-box.first, 
-.leaderboard-activity-stats.paddling .mileage-box.first, 
-.leaderboard-activity-stats.riding .mileage-box.first, 
-.leaderboard-activity-stats.walking .mileage-box.first, 
-.leaderboard-activity-stats.rolling .mileage-box.first, 
-.leaderboard-activity-stats.swimming .mileage-box.first, 
-.leaderboard-activity-stats.running .mileage-box.first, 
+.leaderboard-activity-stats.biking .mileage-box.first,
+.leaderboard-activity-stats.geocaching .mileage-box.first,
+.leaderboard-activity-stats.hiking .mileage-box.first,
+.leaderboard-activity-stats.paddling .mileage-box.first,
+.leaderboard-activity-stats.riding .mileage-box.first,
+.leaderboard-activity-stats.walking .mileage-box.first,
+.leaderboard-activity-stats.rolling .mileage-box.first,
+.leaderboard-activity-stats.swimming .mileage-box.first,
+.leaderboard-activity-stats.running .mileage-box.first,
 .leaderboard-activity-stats.skating .mileage-box.first {
 	background-repeat: no-repeat;
 	background-position: left center;
 }
 
 
-.transparent-icon-cycling, .leaderboard-activity-stats.cycling .mileage-box.first {
-    background-image: url("/sites/default/themes/hundred_missouri_miles/img/cycling-bg.png");
+.transparent-icon-biking, .leaderboard-activity-stats.biking.mileage-box.first {
+    background-image: url("/sites/default/themes/hundred_missouri_miles/img/biking-bg.png");
 }
 
 .transparent-icon-geocaching, .leaderboard-activity-stats.geocaching .mileage-box.first {
-    background-image: url("/sites/default/themes/hundred_missouri_miles/img/geocaching-bg.png");	
+    background-image: url("/sites/default/themes/hundred_missouri_miles/img/geocaching-bg.png");
 }
 
 .transparent-icon-hiking, .leaderboard-activity-stats.hiking .mileage-box.first {
@@ -1141,8 +1141,8 @@ span.mi {
 
 
 .leaderboard-activity-stats .leaderboard-box {
-  float: left; 
-  width: 30%; 
+  float: left;
+  width: 30%;
   margin-right: .5em;
 }
 
@@ -1185,10 +1185,10 @@ span.mi {
     background: transparent url("/sites/default/themes/hundred_missouri_miles/img/activityicons_spritesheet.png");
 	margin-right: 5px;
 	float: left;
-	
+
 }
 
-.activity-icon.cycling {
+.activity-icon.biking {
     background-position: -5px -5px;
 }
 
@@ -1248,7 +1248,7 @@ span.mi {
     display: inline-block;
     font-size: 22px;
     margin: 0 10px 0 0;
-    padding: 5px 15px; 
+    padding: 5px 15px;
 }
 
 /*pdf file icon, drupal likes to add automatically, remove*/
@@ -1264,15 +1264,15 @@ span.mi {
 	margin-bottom: 20px;
 }
 
-.region-sidebar-inner .plain-sidebar .block-inner .content, 
+.region-sidebar-inner .plain-sidebar .block-inner .content,
 .plain-sidebar .block-inner {
 	border: none;
 	padding: 0;
 	background: none;
 }
-	
 
-.block-activity-converter .block-inner, 
+
+.block-activity-converter .block-inner,
 .block-achievements .block-inner {
 	margin-top: -20px;
 	border-top: none;
@@ -1285,7 +1285,7 @@ span.mi {
 }
 
 .region-sidebar-inner .block-inner .content {
-	padding: 10px; 
+	padding: 10px;
 }
 
 .region-sidebar-inner ul {
@@ -1293,11 +1293,11 @@ span.mi {
 }
 
 .region-sidebar-inner .collapsible-block h2 {
-	display: block; 
+	display: block;
 
 }
 
-.region-sidebar-inner .collapsible-block h2 a:hover, 
+.region-sidebar-inner .collapsible-block h2 a:hover,
 .region-sidebar-inner .collapsible-block h2 a:focus {
 	border-bottom: 0!important;
 }
@@ -1305,7 +1305,7 @@ span.mi {
 .region-sidebar-inner .collapsible-block h2 a {
 	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/expand.png") no-repeat;
 	color: #fff;
-	padding-left: 38px; 
+	padding-left: 38px;
 }
 
 .region-sidebar-inner .item-list ul li {
@@ -1314,7 +1314,7 @@ span.mi {
 
 .region-sidebar-inner .item-list h3 {
 	font-size: 16px;
-	
+
 }
 
 #region-sidebar ul.menu li a.active {
@@ -1328,7 +1328,7 @@ span.mi {
 	border: none;
 	background: transparent;
 	box-shadow: none;
-	
+
 }
 
 .region-sidebar #block-mo-cms-slider-mo-cms-slider-1464 .flex-viewport {
@@ -1355,7 +1355,7 @@ span.mi {
 
 /*flexslider overrides*/
 
-.section-content .flexslider ul, 
+.section-content .flexslider ul,
 .section-content .flexslider ol,
 .section-content .flexslider .item-list ul li {
 	margin: 0;
@@ -1382,33 +1382,33 @@ span.mi {
 	background-position: -31px -1px;
 }
 
-.section-content .flex-direction-nav a:before, 
+.section-content .flex-direction-nav a:before,
 .section-content .flex-direction-nav a.flex-next:before {
 	content: '';
 }
 
-.ie7 .flex-direction-nav .flex-prev, 
+.ie7 .flex-direction-nav .flex-prev,
 .ie7 .flexslider:hover .flex-prev,
-.ie7 .flex-direction-nav .flex-next, 
+.ie7 .flex-direction-nav .flex-next,
 .ie7 .flexslider:hover .flex-next {
 	display: none;
 }
 
-.ie8 .flex-direction-nav .flex-prev, 
+.ie8 .flex-direction-nav .flex-prev,
 .ie8 .flexslider:hover .flex-prev {
 	left: 10px;
 }
 
-.ie8 .flex-direction-nav .flex-next, 
+.ie8 .flex-direction-nav .flex-next,
 .ie8 .flexslider:hover .flex-next {
 	right: 10px;
 }
 
 .section-content .flex-direction-nav a:hover,
-.section-content .flex-direction-nav a:focus, 
+.section-content .flex-direction-nav a:focus,
 .section-content .flex-control-nav li a:hover,
-.section-content .flex-control-nav li a:focus, 
-.flex-pauseplay a:hover, 
+.section-content .flex-control-nav li a:focus,
+.flex-pauseplay a:hover,
 .flex-pauseplay a:focus  {
 	border-bottom: none;
 }
@@ -1444,9 +1444,9 @@ span.mi {
 	font-size: 12px;
 }
 
-.flex-pauseplay a { 
+.flex-pauseplay a {
 	color: #fff;
-	right: 10px; 
+	right: 10px;
 	height: 25px;
 }
 
@@ -1465,7 +1465,7 @@ span.mi {
 /*node slider*/
 
 .flexslider .slide {
-	display: none;	
+	display: none;
 }
 
 .flexslider .slide.flex-active-slide {
@@ -1491,7 +1491,7 @@ span.mi {
 
 .page-node-delete h1, .page-node-edit h1 {
 	font-size: 18px;
-	border-bottom: none;	
+	border-bottom: none;
 }
 
 
@@ -1523,7 +1523,7 @@ span.mi {
 }
 
 #section-footer #block-menu-menu-footer-menu a {
-	margin: 0 10px; 	
+	margin: 0 10px;
 }
 
 #section-footer #block-menu-menu-social-menu ul  {
@@ -1534,8 +1534,8 @@ span.mi {
 #section-footer a.social-icon {
 	background: transparent url("/sites/default/themes/hundred_missouri_miles/img/social.png") no-repeat;
 	display: block;
-	width: 39px; 
-	height: 38px;	
+	width: 39px;
+	height: 38px;
 }
 
 #section-footer a.social-icon.facebook {
@@ -1549,8 +1549,8 @@ span.mi {
 #section-footer a.social-icon.twitter {
 	background-position: -6px -57px;
 }
-	
-	
+
+
 #section-footer a.social-icon.youtube {
 	background-position: -56px -57px;
 }
@@ -1566,7 +1566,7 @@ li.pager-previous a {
     width: 70px !important;
 }
 
-.pager li a:hover, 
+.pager li a:hover,
 .pager li a:active,
 .pager li a:focus {
 	border-bottom: none!important;
@@ -1600,7 +1600,7 @@ li.pager-previous a {
 	border: 2px dotted #2a7671;
 }
 
-.not-logged-in.node-type-mo-cms-user-group h1, 
+.not-logged-in.node-type-mo-cms-user-group h1,
 .not-logged-in.page-groups-directory h1 {
 	border-bottom: none;
 }
@@ -1610,17 +1610,17 @@ li.pager-previous a {
 	max-width: 100%;
 }
 
-.node-type-mo-cms-user-group .panel-pane.pane-group-details-pane > .pane-content, 
+.node-type-mo-cms-user-group .panel-pane.pane-group-details-pane > .pane-content,
 .node-type-mo-cms-user-group .panel-pane.pane-group-miles-pane > .pane-content {
 	padding: 0 20px 20px 20px;
 }
 
 .node-mo-cms-user-group .group-total-mileage {
 	font-weight: bold;
-	color: #70983F;	
+	color: #70983F;
 	font-size: 22px;
-	float: left; 
-	
+	float: left;
+
 }
 
 .node-mo-cms-user-group .pane-group-total-miles-pane h2 {
@@ -1659,7 +1659,7 @@ li.pager-previous a {
 
 ul.umbrella-groups-list li {
 	list-style-type: disc;
-	color: #2a7671;	
+	color: #2a7671;
 }
 
 #mo-cms-user-groups-group-action-form {
@@ -1674,7 +1674,7 @@ ul.umbrella-groups-list li {
 
 .messages h3 {
 	font-size: 18px;
-	margin: 0; 
+	margin: 0;
 }
 
 #messages-content .message {
@@ -1760,26 +1760,26 @@ ul.umbrella-groups-list li {
 	font-size: 1em;
 }
 
-.ui-widget .ui-state-default, 
-.ui-widget .ui-state-default a, 
-.ui-widget .ui-state-default a:link, 
-.ui-widget .ui-state-default a:visited {	
+.ui-widget .ui-state-default,
+.ui-widget .ui-state-default a,
+.ui-widget .ui-state-default a:link,
+.ui-widget .ui-state-default a:visited {
 	background: #1A5752;
 	color: #FEFFFF;
 	border: none;
 }
 
-.ui-widget .ui-state-default a:hover, 
-.ui-widget .ui-state-default a:focus, 
-.ui-widget .ui-state-active a:hover, 
+.ui-widget .ui-state-default a:hover,
+.ui-widget .ui-state-default a:focus,
+.ui-widget .ui-state-active a:hover,
 .ui-widget .ui-state-active a:focus,
-.ui-widget .ui-state-active a, 
-.ui-widget .ui-state-active a:link, 
-.ui-widget .ui-state-default:hover, 
+.ui-widget .ui-state-active a,
+.ui-widget .ui-state-active a:link,
+.ui-widget .ui-state-default:hover,
 .ui-widget .ui-state-default:focus {
 	background: #1e655f;
 	color: #FEFFFF;
-	border: none; 
+	border: none;
 }
 
 .ui-widget .ui-state-active .ui-icon, .ui-widget .ui-state-default .ui-icon {
@@ -1828,7 +1828,7 @@ div.form-item div.password-suggestions {
 
 /*on site group sign up*/
 
-.webform-client-form .fieldset-wrapper, 
+.webform-client-form .fieldset-wrapper,
 #edit-submitted-personal-info-email {
 	width: 90%;
 }
@@ -1856,7 +1856,7 @@ div.form-item div.password-suggestions {
 }
 
 .qtip ul {
-	margin: 0 10px 0 20px; 
+	margin: 0 10px 0 20px;
 }
 
 .qtip li {
@@ -1876,7 +1876,7 @@ div.form-item div.password-suggestions {
 	font-size: 14px;
 }
 
-.qtip a:hover, 
+.qtip a:hover,
 .qtip a:focus {
 	color: #ea7640;
 }
@@ -2302,4 +2302,3 @@ span.Me {
 .pane-mo-project-add-subuser-form td {
 	line-height: 40px;
 }
-
